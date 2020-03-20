@@ -2,39 +2,39 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>vector on James Brennan</title>
-    <link>http://james-brennan.github.io/tags/vector/</link>
+    <link>https://james-brennan.github.io/tags/vector/</link>
     <description>Recent content in vector on James Brennan</description>
     <generator>Hugo -- gohugo.io</generator>
     <lastBuildDate>Mon, 16 Mar 2020 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="http://james-brennan.github.io/tags/vector/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://james-brennan.github.io/tags/vector/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Fast and easy gridding of point data with geopandas</title>
-      <link>http://james-brennan.github.io/posts/fast_gridding_geopandas/</link>
+      <link>https://james-brennan.github.io/posts/fast_gridding_geopandas/</link>
       <pubDate>Mon, 16 Mar 2020 00:00:00 +0000</pubDate>
       
-      <guid>http://james-brennan.github.io/posts/fast_gridding_geopandas/</guid>
-      <description>&lt;p&gt;&lt;img src=&#34;http://james-brennan.github.io/img/top1.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+      <guid>https://james-brennan.github.io/posts/fast_gridding_geopandas/</guid>
+      <description>&lt;p&gt;&lt;img src=&#34;https://james-brennan.github.io/img/top1.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
 &lt;p&gt;This post looks at using the &lt;a href=&#34;https://geopandas.org&#34;&gt;geopandas&lt;/a&gt; library to do fast efficient gridding of point data onto a regular grid. Geopandas is a python package that provides a geospatial extension to pandas &amp;ndash; so that dataframes can store geographic data such as points and polygons.&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Essential packages for geospatial analysis in python</title>
-      <link>http://james-brennan.github.io/posts/pythongeo/</link>
+      <link>https://james-brennan.github.io/posts/pythongeo/</link>
       <pubDate>Fri, 06 Mar 2020 00:00:00 +0000</pubDate>
       
-      <guid>http://james-brennan.github.io/posts/pythongeo/</guid>
+      <guid>https://james-brennan.github.io/posts/pythongeo/</guid>
       <description>&lt;p&gt;Python is fast becoming the defacto standard for geospatial work &amp;ndash; primarily because of its great ecosystem of packages, but also probably whatever you want to do someone has posted an answer for it on &lt;a href=&#34;https://gis.stackexchange.com/questions/tagged/python&#34;&gt;stackoverflow&lt;/a&gt; with attached python code. To save you some of that trouble below is a collection of &amp;ldquo;essential&amp;rdquo;&amp;rdquo; packages for everything geospatial in python.&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>ASCII maps of vector files</title>
-      <link>http://james-brennan.github.io/posts/ascii_1/</link>
+      <link>https://james-brennan.github.io/posts/ascii_1/</link>
       <pubDate>Sun, 01 Mar 2020 00:00:00 +0000</pubDate>
       
-      <guid>http://james-brennan.github.io/posts/ascii_1/</guid>
+      <guid>https://james-brennan.github.io/posts/ascii_1/</guid>
       <description>&lt;h1 id=&#34;ʕᴥʔ&#34;&gt;ʕ•ᴥ•ʔ&lt;/h1&gt;
 &lt;p&gt;I recently came across a nice python package for visualising vector data quickly. Of course, an obvious option is to fire up QGIS but often I generate these on a remote server so would like something a little more &amp;ldquo;text-based&amp;rdquo;&amp;hellip; Then this &lt;a href=&#34;https://medium.com/@vtcraghead/geoascii-93fe3764dfe1&#34;&gt;post&lt;/a&gt; highlighted some rather charming tools for generating ASCII rasterisations of vector geometries. I liked the look of the python-based &lt;a href=&#34;https://github.com/geowurster/gj2ascii&#34;&gt;&lt;code&gt;gj2ascii&lt;/code&gt;&lt;/a&gt; the most.&lt;/p&gt;</description>
     </item>

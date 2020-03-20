@@ -2,137 +2,119 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Tags on James Brennan</title>
-    <link>http://james-brennan.github.io/tags/</link>
+    <link>https://james-brennan.github.io/tags/</link>
     <description>Recent content in Tags on James Brennan</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Fri, 20 Mar 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 16 Mar 2020 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="http://james-brennan.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://james-brennan.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
     
-    
-    <item>
-      <title>python</title>
-      <link>http://james-brennan.github.io/tags/python/</link>
-      <pubDate>Fri, 20 Mar 2020 00:00:00 +0000</pubDate>
-      
-      <guid>http://james-brennan.github.io/tags/python/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>statistics</title>
-      <link>http://james-brennan.github.io/tags/statistics/</link>
-      <pubDate>Fri, 20 Mar 2020 00:00:00 +0000</pubDate>
-      
-      <guid>http://james-brennan.github.io/tags/statistics/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>uncertainty</title>
-      <link>http://james-brennan.github.io/tags/uncertainty/</link>
-      <pubDate>Fri, 20 Mar 2020 00:00:00 +0000</pubDate>
-      
-      <guid>http://james-brennan.github.io/tags/uncertainty/</guid>
-      <description></description>
-    </item>
     
     <item>
       <title>geopandas</title>
-      <link>http://james-brennan.github.io/tags/geopandas/</link>
+      <link>https://james-brennan.github.io/tags/geopandas/</link>
       <pubDate>Mon, 16 Mar 2020 00:00:00 +0000</pubDate>
       
-      <guid>http://james-brennan.github.io/tags/geopandas/</guid>
+      <guid>https://james-brennan.github.io/tags/geopandas/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>python</title>
+      <link>https://james-brennan.github.io/tags/python/</link>
+      <pubDate>Mon, 16 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://james-brennan.github.io/tags/python/</guid>
       <description></description>
     </item>
     
     <item>
       <title>vector</title>
-      <link>http://james-brennan.github.io/tags/vector/</link>
+      <link>https://james-brennan.github.io/tags/vector/</link>
       <pubDate>Mon, 16 Mar 2020 00:00:00 +0000</pubDate>
       
-      <guid>http://james-brennan.github.io/tags/vector/</guid>
+      <guid>https://james-brennan.github.io/tags/vector/</guid>
       <description></description>
     </item>
     
     <item>
       <title>visualisation</title>
-      <link>http://james-brennan.github.io/tags/visualisation/</link>
+      <link>https://james-brennan.github.io/tags/visualisation/</link>
       <pubDate>Mon, 16 Mar 2020 00:00:00 +0000</pubDate>
       
-      <guid>http://james-brennan.github.io/tags/visualisation/</guid>
+      <guid>https://james-brennan.github.io/tags/visualisation/</guid>
       <description></description>
     </item>
     
     <item>
       <title>datashader</title>
-      <link>http://james-brennan.github.io/tags/datashader/</link>
+      <link>https://james-brennan.github.io/tags/datashader/</link>
       <pubDate>Sat, 14 Mar 2020 00:00:00 +0000</pubDate>
       
-      <guid>http://james-brennan.github.io/tags/datashader/</guid>
+      <guid>https://james-brennan.github.io/tags/datashader/</guid>
       <description></description>
     </item>
     
     <item>
       <title>raster</title>
-      <link>http://james-brennan.github.io/tags/raster/</link>
+      <link>https://james-brennan.github.io/tags/raster/</link>
       <pubDate>Sat, 14 Mar 2020 00:00:00 +0000</pubDate>
       
-      <guid>http://james-brennan.github.io/tags/raster/</guid>
+      <guid>https://james-brennan.github.io/tags/raster/</guid>
       <description></description>
     </item>
     
     <item>
       <title>xarray</title>
-      <link>http://james-brennan.github.io/tags/xarray/</link>
+      <link>https://james-brennan.github.io/tags/xarray/</link>
       <pubDate>Sat, 14 Mar 2020 00:00:00 +0000</pubDate>
       
-      <guid>http://james-brennan.github.io/tags/xarray/</guid>
+      <guid>https://james-brennan.github.io/tags/xarray/</guid>
       <description></description>
     </item>
     
     <item>
       <title>computation</title>
-      <link>http://james-brennan.github.io/tags/computation/</link>
+      <link>https://james-brennan.github.io/tags/computation/</link>
       <pubDate>Fri, 06 Mar 2020 00:00:00 +0000</pubDate>
       
-      <guid>http://james-brennan.github.io/tags/computation/</guid>
+      <guid>https://james-brennan.github.io/tags/computation/</guid>
       <description></description>
     </item>
     
     <item>
       <title>packages</title>
-      <link>http://james-brennan.github.io/tags/packages/</link>
+      <link>https://james-brennan.github.io/tags/packages/</link>
       <pubDate>Fri, 06 Mar 2020 00:00:00 +0000</pubDate>
       
-      <guid>http://james-brennan.github.io/tags/packages/</guid>
+      <guid>https://james-brennan.github.io/tags/packages/</guid>
       <description></description>
     </item>
     
     <item>
       <title>processing</title>
-      <link>http://james-brennan.github.io/tags/processing/</link>
+      <link>https://james-brennan.github.io/tags/processing/</link>
       <pubDate>Fri, 06 Mar 2020 00:00:00 +0000</pubDate>
       
-      <guid>http://james-brennan.github.io/tags/processing/</guid>
+      <guid>https://james-brennan.github.io/tags/processing/</guid>
       <description></description>
     </item>
     
     <item>
       <title>tools</title>
-      <link>http://james-brennan.github.io/tags/tools/</link>
+      <link>https://james-brennan.github.io/tags/tools/</link>
       <pubDate>Fri, 06 Mar 2020 00:00:00 +0000</pubDate>
       
-      <guid>http://james-brennan.github.io/tags/tools/</guid>
+      <guid>https://james-brennan.github.io/tags/tools/</guid>
       <description></description>
     </item>
     
     <item>
       <title>terminal</title>
-      <link>http://james-brennan.github.io/tags/terminal/</link>
+      <link>https://james-brennan.github.io/tags/terminal/</link>
       <pubDate>Sun, 01 Mar 2020 00:00:00 +0000</pubDate>
       
-      <guid>http://james-brennan.github.io/tags/terminal/</guid>
+      <guid>https://james-brennan.github.io/tags/terminal/</guid>
       <description></description>
     </item>
     
