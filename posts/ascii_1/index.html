@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title> ASCII maps of vector files &middot; James Brennan </title>
+
+
+<link rel="stylesheet" href="http://james-brennan.github.io/css/slim.css">
+<link rel="stylesheet" href="http://james-brennan.github.io/css/highlight.min.css">
+<link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Source+Code+Pro' rel='stylesheet' type='text/css'>
+
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+<link rel="shortcut icon" href="/favicon.ico">
+
+
+<link href="" rel="alternate" type="application/rss+xml" title="James Brennan" />
+
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+  <h1 class="site-title"><a href="http://james-brennan.github.io/">James Brennan</a></h1>
+  <p class="site-tagline">A blog about scientific computing, statistics, geoscience and remote sensing. </p>
+  <div class="nav">
+    <a class="nav-btn" href="#">
+      <span class="ci ci-burger"></span>
+    </a>
+    <ul class="nav-list">
+       
+	  <li class="spacer">&ac;</li>
+
+      <li><a href="https://github.com/james-brennan">Github</a></li> 
+      <li><a href="https://twitter.com/jamesbrennan">Twitter</a></li> 
+    </ul>
+  </div>
+</div>
+
+    <div class="content">
+      <div class="post">
+        <h2 class="post-title"><a href="http://james-brennan.github.io/posts/ascii_1/">ASCII maps of vector files</a></h2>
+        <div class="post-content">
+          <h1 id="ʕᴥʔ">ʕ•ᴥ•ʔ</h1>
+<p>I recently came across a nice python package for visualising vector data quickly. Of course, an obvious option is to fire up QGIS but often I generate these on a remote server so would like something a little more &ldquo;text-based&rdquo;&hellip; Then this <a href="https://medium.com/@vtcraghead/geoascii-93fe3764dfe1">post</a> highlighted some rather charming tools for generating ASCII rasterisations of vector geometries. I liked the look of the python-based <a href="https://github.com/geowurster/gj2ascii"><code>gj2ascii</code></a> the most.</p>
+<p>In my case, I was conducting lots processing on shapefiles containing mapped perimeters of wildfires. I wanted to just image the extent of the area considered by the data and the wildfire perimeters.  Using <code>gj2ascii</code> visualising the result is, actually, extremely easy:</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#007020;font-weight:bold">import</span> <span style="color:#0e84b5;font-weight:bold">fiona</span>
+<span style="color:#007020;font-weight:bold">import</span> <span style="color:#0e84b5;font-weight:bold">gj2ascii</span>
+asc <span style="color:#666">=</span> []
+<span style="color:#007020;font-weight:bold">with</span> fiona<span style="color:#666">.</span>open(<span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">fire_perimeters.shp</span><span style="color:#4070a0">&#39;</span>) <span style="color:#007020;font-weight:bold">as</span> poly:
+    b0 <span style="color:#666">=</span> poly<span style="color:#666">.</span>next()
+    asc<span style="color:#666">.</span>append(gj2ascii<span style="color:#666">.</span>render(b0, <span style="color:#40a070">100</span>, char<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">.</span><span style="color:#4070a0">&#39;</span>, fill<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0"> </span><span style="color:#4070a0">&#39;</span>,bbox<span style="color:#666">=</span>poly<span style="color:#666">.</span>bounds))
+    <span style="color:#007020;font-weight:bold">for</span> shp <span style="color:#007020;font-weight:bold">in</span> poly:
+        <span style="color:#007020;font-weight:bold">if</span> shp[<span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">properties</span><span style="color:#4070a0">&#39;</span>][<span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">Category</span><span style="color:#4070a0">&#39;</span>]<span style="color:#666">==</span><span style="color:#40a070">2</span>:
+            <span style="color:#60a0b0;font-style:italic"># is really a burn</span>
+            asc<span style="color:#666">.</span>append(gj2ascii<span style="color:#666">.</span>render(shp, <span style="color:#40a070">100</span>, char<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">+</span><span style="color:#4070a0">&#39;</span>, fill<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0"> </span><span style="color:#4070a0">&#39;</span>,bbox<span style="color:#666">=</span>poly<span style="color:#666">.</span>bounds))
+<span style="color:#60a0b0;font-style:italic"># stacking operation</span>
+stacked <span style="color:#666">=</span> gj2ascii<span style="color:#666">.</span>stack(asc, fill<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0"> </span><span style="color:#4070a0">&#39;</span>)
+<span style="color:#007020;font-weight:bold">print</span>(stacked)
+</code></pre></div><p><img src="/img/asci1.png" alt="text based"></p>
+<p>Okay, it works! <code>gj2ascii</code> also has some nice options to &lsquo;modernize&rsquo; the ASCII to be a little less 70s FORTRAN readout, however. One is the simple addition of a colour map which switches the characters for blocks of colour.</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#60a0b0;font-style:italic"># Choose colour map</span>
+colormap <span style="color:#666">=</span> {
+    <span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">+</span><span style="color:#4070a0">&#39;</span>: <span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">red</span><span style="color:#4070a0">&#39;</span>,
+    <span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">.</span><span style="color:#4070a0">&#39;</span>: <span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">blue</span><span style="color:#4070a0">&#39;</span>,
+}
+<span style="color:#007020;font-weight:bold">print</span>(gj2ascii<span style="color:#666">.</span>style(stacked, colormap))
+</code></pre></div><p><img src="/img/asci2.png" alt="colour blocks"></p>
+<p>Which is already considerably more visually informative.  And of course, if you really must:</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#60a0b0;font-style:italic"># Choose colour map</span>
+colormap <span style="color:#666">=</span> {
+    <span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">+</span><span style="color:#4070a0">&#39;</span>: <span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">:fire:</span><span style="color:#4070a0">&#39;</span>,
+    <span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">.</span><span style="color:#4070a0">&#39;</span>: <span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">:herb:</span><span style="color:#4070a0">&#39;</span>,
+}
+<span style="color:#007020;font-weight:bold">print</span>(gj2ascii<span style="color:#666">.</span>style(stacked, colormap))
+</code></pre></div><p><img src="/img/asci3.png" alt="emojis"></p>
+<p>Note for the emojis you need the <a href="https://pypi.python.org/pypi/emoji/">emojis</a> package.</p>
+        </div>
+      </div>
+    </div>
+    
+<script type="text/javascript"
+    src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  </script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({ tex2jax: {inlineMath: [["$","$"],["\\(","\\)"]]} })
+</script>
+
+
+
+<div class="footer">
+  
+  <p>Copyright James Brennan 2019. Powered by Hugo.</p>
+  
+</div>
+
+  </div>
+  <script src="http://james-brennan.github.io/js/slim.js"></script>
+  <script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-56616557-2', 'auto');
+ga('send', 'pageview');
+
+</script>
+
+
+</body>
+
+</html>

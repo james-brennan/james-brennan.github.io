@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title> Fast and easy gridding of point data with geopandas &middot; James Brennan </title>
+
+
+<link rel="stylesheet" href="http://james-brennan.github.io/css/slim.css">
+<link rel="stylesheet" href="http://james-brennan.github.io/css/highlight.min.css">
+<link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Source+Code+Pro' rel='stylesheet' type='text/css'>
+
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+<link rel="shortcut icon" href="/favicon.ico">
+
+
+<link href="" rel="alternate" type="application/rss+xml" title="James Brennan" />
+
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+  <h1 class="site-title"><a href="http://james-brennan.github.io/">James Brennan</a></h1>
+  <p class="site-tagline">A blog about scientific computing, statistics, geoscience and remote sensing. </p>
+  <div class="nav">
+    <a class="nav-btn" href="#">
+      <span class="ci ci-burger"></span>
+    </a>
+    <ul class="nav-list">
+       
+	  <li class="spacer">&ac;</li>
+
+      <li><a href="https://github.com/james-brennan">Github</a></li> 
+      <li><a href="https://twitter.com/jamesbrennan">Twitter</a></li> 
+    </ul>
+  </div>
+</div>
+
+    <div class="content">
+      <div class="post">
+        <h2 class="post-title"><a href="http://james-brennan.github.io/posts/fast_gridding_geopandas/">Fast and easy gridding of point data with geopandas</a></h2>
+        <div class="post-content">
+          <p><img src="/img/top1.png" alt=""></p>
+<p>This post looks at using the <a href="https://geopandas.org">geopandas</a> library to do fast efficient gridding of point data onto a regular grid. Geopandas is a python package that provides a geospatial extension to pandas &ndash; so that dataframes can store geographic data such as points and polygons.</p>
+<h3 id="data">Data</h3>
+<p>A simple csv of point data provides a useful starting point for this. <code>dob.csv</code> contains locations of wildfires detected by the <a href="https://terra.nasa.gov/about/terra-instruments/modis">NASA MODIS instruments</a> for a year over North and South America.</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#007020;font-weight:bold">import</span> <span style="color:#0e84b5;font-weight:bold">pandas</span> <span style="color:#007020;font-weight:bold">as</span> <span style="color:#0e84b5;font-weight:bold">pd</span>
+<span style="color:#007020;font-weight:bold">import</span> <span style="color:#0e84b5;font-weight:bold">numpy</span> <span style="color:#007020;font-weight:bold">as</span> <span style="color:#0e84b5;font-weight:bold">np</span>
+<span style="color:#007020;font-weight:bold">import</span> <span style="color:#0e84b5;font-weight:bold">matplotlib.pyplot</span> <span style="color:#007020;font-weight:bold">as</span> <span style="color:#0e84b5;font-weight:bold">plt</span>
+
+
+df <span style="color:#666">=</span> pd<span style="color:#666">.</span>read_csv(<span style="color:#4070a0"></span><span style="color:#4070a0">&#34;</span><span style="color:#4070a0">dob.csv</span><span style="color:#4070a0">&#34;</span>, index_col<span style="color:#666">=</span><span style="color:#40a070">0</span>)
+df <span style="color:#666">=</span> df<span style="color:#666">.</span>sort_values(<span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">y</span><span style="color:#4070a0">&#39;</span>)
+df <span style="color:#666">=</span> df<span style="color:#666">.</span>drop(columns<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#34;</span><span style="color:#4070a0">geometry</span><span style="color:#4070a0">&#34;</span>)
+df<span style="color:#666">.</span>head()
+</code></pre></div><table>
+<thead>
+<tr>
+<th align="right"></th>
+<th align="right">x</th>
+<th align="right">y</th>
+<th align="right">dob</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="right">111</td>
+<td align="right">-5.4247e+06</td>
+<td align="right">-4.38456e+06</td>
+<td align="right">206</td>
+</tr>
+<tr>
+<td align="right">110</td>
+<td align="right">-5.42516e+06</td>
+<td align="right">-4.38456e+06</td>
+<td align="right">206</td>
+</tr>
+<tr>
+<td align="right">109</td>
+<td align="right">-5.42238e+06</td>
+<td align="right">-4.38317e+06</td>
+<td align="right">206</td>
+</tr>
+<tr>
+<td align="right">108</td>
+<td align="right">-5.42284e+06</td>
+<td align="right">-4.38317e+06</td>
+<td align="right">206</td>
+</tr>
+<tr>
+<td align="right">107</td>
+<td align="right">-5.42794e+06</td>
+<td align="right">-4.38317e+06</td>
+<td align="right">199</td>
+</tr>
+</tbody>
+</table>
+<p>So as expected the data is essentially a collection of around 230-thousand x and y points in a projected sinusoidal projection (the MODIS projection) and the day of the year (<code>dob</code>) that the fire occurred.</p>
+<h1 id="geopandas">geopandas</h1>
+<p>Given our spatial data is point data with x and y coordinates it&rsquo;s simple to convert the <code>df</code> into a geopandas <code>GeoDataFrame</code>:</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#007020;font-weight:bold">import</span> <span style="color:#0e84b5;font-weight:bold">geopandas</span>
+gdf <span style="color:#666">=</span> geopandas<span style="color:#666">.</span>GeoDataFrame(df, geometry<span style="color:#666">=</span>geopandas<span style="color:#666">.</span>points_from_xy(df<span style="color:#666">.</span>x, df<span style="color:#666">.</span>y), 
+                            crs<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#34;</span><span style="color:#4070a0">+proj=sinu +lon_0=0 +x_0=0 +y_0=0 +a=6371007.181 +b=6371007.181 +units=m +no_defs</span><span style="color:#4070a0">&#34;</span>)
+gdf<span style="color:#666">.</span>head()
+</code></pre></div><table>
+<thead>
+<tr>
+<th align="right"></th>
+<th align="right">x</th>
+<th align="right">y</th>
+<th align="right">dob</th>
+<th align="left">geometry</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="right">111</td>
+<td align="right">-5.4247e+06</td>
+<td align="right">-4.38456e+06</td>
+<td align="right">206</td>
+<td align="left">POINT (-5424696.941458113 -4384559.892867883)</td>
+</tr>
+<tr>
+<td align="right">110</td>
+<td align="right">-5.42516e+06</td>
+<td align="right">-4.38456e+06</td>
+<td align="right">206</td>
+<td align="left">POINT (-5425160.25417464 -4384559.892867883)</td>
+</tr>
+<tr>
+<td align="right">109</td>
+<td align="right">-5.42238e+06</td>
+<td align="right">-4.38317e+06</td>
+<td align="right">206</td>
+<td align="left">POINT (-5422380.377875471 -4383169.954718296)</td>
+</tr>
+<tr>
+<td align="right">108</td>
+<td align="right">-5.42284e+06</td>
+<td align="right">-4.38317e+06</td>
+<td align="right">206</td>
+<td align="left">POINT (-5422843.690592 -4383169.954718296)</td>
+</tr>
+<tr>
+<td align="right">107</td>
+<td align="right">-5.42794e+06</td>
+<td align="right">-4.38317e+06</td>
+<td align="right">199</td>
+<td align="left">POINT (-5427940.130473807 -4383169.954718296)</td>
+</tr>
+</tbody>
+</table>
+<p>So geopandas has taken the <code>x</code> and <code>y</code> fields and made simple point geometries. We don&rsquo;t need the <code>x</code> and <code>y</code> fields anymore so let&rsquo;s drop those and then use geopandas to plot the points:</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">gdf <span style="color:#666">=</span> gdf<span style="color:#666">.</span>drop(columns<span style="color:#666">=</span>[<span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">x</span><span style="color:#4070a0">&#39;</span>, <span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">y</span><span style="color:#4070a0">&#39;</span>])
+gdf<span style="color:#666">.</span>tail()
+</code></pre></div><table>
+<thead>
+<tr>
+<th align="right"></th>
+<th align="right">dob</th>
+<th align="left">geometry</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="right">6</td>
+<td align="right">197</td>
+<td align="left">POINT (-5506239.979567026 6673324.712505849)</td>
+</tr>
+<tr>
+<td align="right">5</td>
+<td align="right">197</td>
+<td align="left">POINT (-5506703.292283554 6673324.712505849)</td>
+</tr>
+<tr>
+<td align="right">4</td>
+<td align="right">205</td>
+<td align="left">POINT (-5507166.605000081 6673324.712505849)</td>
+</tr>
+<tr>
+<td align="right">1</td>
+<td align="right">191</td>
+<td align="left">POINT (-5510409.794015776 6673324.712505849)</td>
+</tr>
+<tr>
+<td align="right">0</td>
+<td align="right">205</td>
+<td align="left">POINT (-5504850.041417442 6674714.650655435)</td>
+</tr>
+</tbody>
+</table>
+<p>Like pandas, geopandas has built in plotting routines:</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">gdf<span style="color:#666">.</span>plot(markersize<span style="color:#666">=</span><span style="color:#666">.</span><span style="color:#40a070">1</span>, figsize<span style="color:#666">=</span>(<span style="color:#40a070">8</span>, <span style="color:#40a070">8</span>))
+</code></pre></div><p><img src="/img/geopandas%20gridding_7_1.png" alt="png"></p>
+<p>So that doesn&rsquo;t make a lot of sense yet although geopandas has correctly plotted a marker for each point using the <code>geometry</code> column of the dataframe.  Let&rsquo;s make a more useful plot of the data:</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">ax <span style="color:#666">=</span> gdf<span style="color:#666">.</span>plot(markersize<span style="color:#666">=</span><span style="color:#666">.</span><span style="color:#40a070">1</span>, figsize<span style="color:#666">=</span>(<span style="color:#40a070">12</span>, <span style="color:#40a070">8</span>), column<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">dob</span><span style="color:#4070a0">&#39;</span>, cmap<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">jet</span><span style="color:#4070a0">&#39;</span>)
+plt<span style="color:#666">.</span>autoscale(False)
+world <span style="color:#666">=</span> geopandas<span style="color:#666">.</span>read_file(geopandas<span style="color:#666">.</span>datasets<span style="color:#666">.</span>get_path(<span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">naturalearth_lowres</span><span style="color:#4070a0">&#39;</span>))
+world<span style="color:#666">.</span>to_crs(gdf<span style="color:#666">.</span>crs)<span style="color:#666">.</span>plot(ax<span style="color:#666">=</span>ax, color<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">none</span><span style="color:#4070a0">&#39;</span>, edgecolor<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">black</span><span style="color:#4070a0">&#39;</span>)
+ax<span style="color:#666">.</span>axis(<span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">off</span><span style="color:#4070a0">&#39;</span>)
+</code></pre></div><p><img src="/img/geopandas%20gridding_9_1.png" alt="png"></p>
+<p>That looks better! A nice feature of geopandas is that it has built on-the-fly reprojection &ndash; we&rsquo;ve taken the <code>world</code> geodataframe and reprojected it from WGS84 to the MODIS sinusoidal projection that the fire data is in with the coordinate reference systems.  <code>world.to_crs(gdf.crs)</code></p>
+<h2 id="gridding-with-geopandas">Gridding with geopandas</h2>
+<p>Turning to the gridding, geopandas has operations for merging geometries and aggregating statistics to overlapping geometries in ways that will be familiar to pandas users.</p>
+<p>First, let&rsquo;s make the grid that the data is being binned into. To make a regular rectangular mesh for the binned data we can loop over the extent of the data and use shapely to produce each individual grid cell as a geometric polygon:</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#60a0b0;font-style:italic"># total area for the grid</span>
+xmin, ymin, xmax, ymax<span style="color:#666">=</span> gdf<span style="color:#666">.</span>total_bounds
+
+<span style="color:#60a0b0;font-style:italic"># how many cells across and down</span>
+n_cells<span style="color:#666">=</span><span style="color:#40a070">30</span>
+cell_size <span style="color:#666">=</span> (xmax<span style="color:#666">-</span>xmin)<span style="color:#666">/</span>n_cells
+
+<span style="color:#60a0b0;font-style:italic"># projection of the grid</span>
+crs <span style="color:#666">=</span> <span style="color:#4070a0"></span><span style="color:#4070a0">&#34;</span><span style="color:#4070a0">+proj=sinu +lon_0=0 +x_0=0 +y_0=0 +a=6371007.181 +b=6371007.181 +units=m +no_defs</span><span style="color:#4070a0">&#34;</span>
+
+<span style="color:#60a0b0;font-style:italic"># create the cells in a loop</span>
+grid_cells <span style="color:#666">=</span> []
+<span style="color:#007020;font-weight:bold">for</span> x0 <span style="color:#007020;font-weight:bold">in</span> np<span style="color:#666">.</span>arange(xmin, xmax<span style="color:#666">+</span>cell_size, cell_size ):
+    <span style="color:#007020;font-weight:bold">for</span> y0 <span style="color:#007020;font-weight:bold">in</span> np<span style="color:#666">.</span>arange(ymin, ymax<span style="color:#666">+</span>cell_size, cell_size):
+        <span style="color:#60a0b0;font-style:italic"># bounds</span>
+        x1 <span style="color:#666">=</span> x0<span style="color:#666">-</span>cell_size
+        y1 <span style="color:#666">=</span> y0<span style="color:#666">+</span>cell_size
+        grid_cells<span style="color:#666">.</span>append( shapely<span style="color:#666">.</span>geometry<span style="color:#666">.</span>box(x0, y0, x1, y1)  )
+cell <span style="color:#666">=</span> geopandas<span style="color:#666">.</span>GeoDataFrame(grid_cells, columns<span style="color:#666">=</span>[<span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">geometry</span><span style="color:#4070a0">&#39;</span>], 
+                                 crs<span style="color:#666">=</span>crs)
+</code></pre></div><p>Plotting the grid over the data shows how the fires are generally clustered into a few regions and we&rsquo;ll end up with many &ldquo;empty&rdquo; grid cells:</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">ax <span style="color:#666">=</span> gdf<span style="color:#666">.</span>plot(markersize<span style="color:#666">=</span><span style="color:#666">.</span><span style="color:#40a070">1</span>, figsize<span style="color:#666">=</span>(<span style="color:#40a070">12</span>, <span style="color:#40a070">8</span>), column<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">dob</span><span style="color:#4070a0">&#39;</span>, cmap<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">jet</span><span style="color:#4070a0">&#39;</span>)
+plt<span style="color:#666">.</span>autoscale(False)
+cell<span style="color:#666">.</span>plot(ax<span style="color:#666">=</span>ax, facecolor<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#34;</span><span style="color:#4070a0">none</span><span style="color:#4070a0">&#34;</span>, edgecolor<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">grey</span><span style="color:#4070a0">&#39;</span>)
+ax<span style="color:#666">.</span>axis(<span style="color:#4070a0"></span><span style="color:#4070a0">&#34;</span><span style="color:#4070a0">off</span><span style="color:#4070a0">&#34;</span>)
+</code></pre></div><p><img src="/img/geopandas%20gridding_21_1.png" alt="png"></p>
+<h2 id="geopandas-sjoin-and-dissolve">geopandas sjoin and dissolve</h2>
+<p>Geopandas can then combine geodataframes based on the geometries of each row, in a manner similar to how vanilla pandas merges based on column values.</p>
+<p><code>sjoin</code> is used to merge the two dataframes:</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">merged <span style="color:#666">=</span> geopandas<span style="color:#666">.</span>sjoin(gdf, cell, how<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">left</span><span style="color:#4070a0">&#39;</span>, op<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">within</span><span style="color:#4070a0">&#39;</span>)
+</code></pre></div><p>so <code>gdf</code> and <code>cell</code> will be merged according to the geometries in <code>cell</code> &ndash; eg each grid using the operator rule <code>within</code> &ndash; or each row of <code>gdf</code> will be associated with the grid cell that its location falls within.</p>
+<p>Now we want to count the number of fires in each grid cell. This can be achieved by aggregating <code>merged</code> so that the number of rows for each grid cell is counted. In geopandas this aggregation process is referred to as dissolving &ndash; i.e. making the data more sparse:</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#60a0b0;font-style:italic"># make a simple count variable that we can sum</span>
+merged[<span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">n_fires</span><span style="color:#4070a0">&#39;</span>]<span style="color:#666">=</span><span style="color:#40a070">1</span>
+<span style="color:#60a0b0;font-style:italic"># Compute stats per grid cell -- aggregate fires to grid cells with dissolve</span>
+dissolve <span style="color:#666">=</span> merged<span style="color:#666">.</span>dissolve(by<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#34;</span><span style="color:#4070a0">index_right</span><span style="color:#4070a0">&#34;</span>, aggfunc<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#34;</span><span style="color:#4070a0">count</span><span style="color:#4070a0">&#34;</span>)
+<span style="color:#60a0b0;font-style:italic"># put this into cell</span>
+cell<span style="color:#666">.</span>loc[dissolve<span style="color:#666">.</span>index, <span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">n_fires</span><span style="color:#4070a0">&#39;</span>]<span style="color:#666">=</span>dissolve<span style="color:#666">.</span>n_fires<span style="color:#666">.</span>values
+<span style="color:#007020;font-weight:bold">del</span> dissolve
+</code></pre></div><p>Then finally let&rsquo;s plot the grid and the number of fires in each grid cell with geopandas:</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">ax <span style="color:#666">=</span> cell<span style="color:#666">.</span>plot(column<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">n_fires</span><span style="color:#4070a0">&#39;</span>, figsize<span style="color:#666">=</span>(<span style="color:#40a070">12</span>, <span style="color:#40a070">8</span>), cmap<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">viridis</span><span style="color:#4070a0">&#39;</span>, vmax<span style="color:#666">=</span><span style="color:#40a070">5000</span>, edgecolor<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#34;</span><span style="color:#4070a0">grey</span><span style="color:#4070a0">&#34;</span>)
+plt<span style="color:#666">.</span>autoscale(False)
+world <span style="color:#666">=</span> geopandas<span style="color:#666">.</span>read_file(geopandas<span style="color:#666">.</span>datasets<span style="color:#666">.</span>get_path(<span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">naturalearth_lowres</span><span style="color:#4070a0">&#39;</span>))
+world<span style="color:#666">.</span>to_crs(cell<span style="color:#666">.</span>crs)<span style="color:#666">.</span>plot(ax<span style="color:#666">=</span>ax, color<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">none</span><span style="color:#4070a0">&#39;</span>, edgecolor<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">black</span><span style="color:#4070a0">&#39;</span>)
+ax<span style="color:#666">.</span>axis(<span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">off</span><span style="color:#4070a0">&#39;</span>)
+</code></pre></div><p><img src="/img/geopandas%20gridding_25_1.png" alt="png"></p>
+<h2 id="r-trees-and-fast-spatial-joins">r-trees and fast spatial joins</h2>
+<p>The reason that spatial joins in geopandas are fast is that geopandas leverages a useful data partitioning algorithm &ndash; the R-tree.  R-trees are data structures which index spatial data in a way that makes identifying data from a spatial region faster than a brute force search approach. An R-tree collects points/geometries nearby each other into a tree-like structure of bounding boxes that define a spatial area that is then a quick method for spatial indexing.</p>
+<p>In geopanads, the r-tree is built when the attribute  <code>gdf.sindex</code> is accessed:</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">r_tree <span style="color:#666">=</span> gdf<span style="color:#666">.</span>sindex
+<span style="color:#007020;font-weight:bold">print</span>(r_tree)
+</code></pre></div><pre><code>rtree.index.Index(bounds=[-11105837.471524423, -4384559.892867883, -4067190.682031316, 6674714.650655435], size=226719)
+</code></pre>
+<p>The r-tree has a leaves method which shows the spatial partitioning structure of each leaf of the r-tree:</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#007020;font-weight:bold">for</span> leaf <span style="color:#007020;font-weight:bold">in</span> r_tree<span style="color:#666">.</span>leaves()[:<span style="color:#40a070">2</span>]:
+    idxs, indices, bbox <span style="color:#666">=</span> leaf
+    <span style="color:#007020;font-weight:bold">print</span>(f<span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">-&gt; points in box {idxs}: </span><span style="color:#4070a0">&#39;</span>,  indices, <span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0;font-weight:bold">\n</span><span style="color:#4070a0"> bounding box: </span><span style="color:#4070a0">&#39;</span>, bbox, <span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0;font-weight:bold">\n</span><span style="color:#4070a0">&#39;</span>)
+    
+<span style="color:#007020;font-weight:bold">print</span>(f<span style="color:#4070a0"></span><span style="color:#4070a0">&#34;</span><span style="color:#4070a0">number of leaves: {len(r_tree.leaves())}</span><span style="color:#4070a0">&#34;</span>)
+</code></pre></div><pre><code>-&gt; points in box 6:  [182654, 182656, 182665, 182663, 182659, 182664, 182655, 182657, 182660, 182652, 182653, 182675, 182677, 182671, 182670, 182674, 182680, 182678, 182673, 182672, 182669, 182668, 182679, 182676, 182686, 182681, 182684, 182687, 182690, 182688, 182685, 182682, 182689, 182683, 182692, 182696, 182693, 182699, 182695, 182697, 182694, 182691, 182698, 182703, 182702, 182706, 182704, 182707, 182701, 182705, 182700, 182710, 182711, 182709, 182708, 182712, 182713, 182714, 182715, 182716, 182718, 182717, 182719, 182721, 182720, 182722, 182728, 182725, 182724, 182729] 
+ bounding box:  [-10882520.74215797, 2750455.9416639777, -10852868.728300184, 2759722.1959945355] 
+
+-&gt; points in box 7:  [182730, 182723, 182727, 182726, 182741, 182733, 182731, 182740, 182739, 182742, 182734, 182732, 182735, 182738, 182736, 182737, 182743, 182756, 182744, 182754, 182746, 182749, 182750, 182747, 182748, 182753, 182752, 182751, 182755, 182745, 182757, 182758, 182760, 182759, 182762, 182761, 182763, 182764, 182767, 182769, 182766, 182768, 182770, 182765, 182776, 182777, 182774, 182772, 182771, 182775, 182773, 182779, 182781, 182780, 182778, 182782, 182784, 182788, 182786, 182785, 182789, 182787, 182783, 182795, 182797, 182791, 182790, 182794, 182793, 182792] 
+ bounding box:  [-10869084.67337866, 2759722.1959945355, -10855648.604599353, 2763892.010443287] 
+
+number of leaves: 3239
+</code></pre>
+<p>Plotting the first 200 bounding boxes shows how the data is partitioned geographically:</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#007020;font-weight:bold">import</span> <span style="color:#0e84b5;font-weight:bold">shapely.geometry</span>
+<span style="color:#007020;font-weight:bold">from</span> <span style="color:#0e84b5;font-weight:bold">descartes</span> <span style="color:#007020;font-weight:bold">import</span> PolygonPatch
+
+ax <span style="color:#666">=</span> gdf<span style="color:#666">.</span>plot(markersize<span style="color:#666">=</span><span style="color:#666">.</span><span style="color:#40a070">1</span>, figsize<span style="color:#666">=</span>(<span style="color:#40a070">12</span>, <span style="color:#40a070">8</span>), column<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">dob</span><span style="color:#4070a0">&#39;</span>, cmap<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">jet</span><span style="color:#4070a0">&#39;</span>)
+plt<span style="color:#666">.</span>autoscale(False)
+
+<span style="color:#007020;font-weight:bold">for</span> leaf <span style="color:#007020;font-weight:bold">in</span> r_tree<span style="color:#666">.</span>leaves()[:<span style="color:#40a070">200</span>]:
+    idxs, indices, bbox <span style="color:#666">=</span> leaf
+    r_box <span style="color:#666">=</span> shapely<span style="color:#666">.</span>geometry<span style="color:#666">.</span>box(<span style="color:#666">*</span>bbox)
+    box_patch <span style="color:#666">=</span> PolygonPatch(r_box, fc<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">None</span><span style="color:#4070a0">&#39;</span>, ec<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">k</span><span style="color:#4070a0">&#39;</span>)
+    ax<span style="color:#666">.</span>add_patch(box_patch)
+    
+world<span style="color:#666">.</span>to_crs(gdf<span style="color:#666">.</span>crs)<span style="color:#666">.</span>plot(ax<span style="color:#666">=</span>ax, color<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">none</span><span style="color:#4070a0">&#39;</span>, edgecolor<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">grey</span><span style="color:#4070a0">&#39;</span>)
+ax<span style="color:#666">.</span>axis(<span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">off</span><span style="color:#4070a0">&#39;</span>)
+</code></pre></div><p><img src="/img/geopandas%20gridding_16_1.png" alt="png"></p>
+        </div>
+      </div>
+    </div>
+    
+<script type="text/javascript"
+    src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  </script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({ tex2jax: {inlineMath: [["$","$"],["\\(","\\)"]]} })
+</script>
+
+
+
+<div class="footer">
+  
+  <p>Copyright James Brennan 2019. Powered by Hugo.</p>
+  
+</div>
+
+  </div>
+  <script src="http://james-brennan.github.io/js/slim.js"></script>
+  <script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-56616557-2', 'auto');
+ga('send', 'pageview');
+
+</script>
+
+
+</body>
+
+</html>

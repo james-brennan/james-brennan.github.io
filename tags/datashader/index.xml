@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>datashader on James Brennan</title>
+    <link>http://james-brennan.github.io/tags/datashader/</link>
+    <description>Recent content in datashader on James Brennan</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <lastBuildDate>Sat, 14 Mar 2020 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="http://james-brennan.github.io/tags/datashader/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Visualising 2 billion pixel rasters with datashader and xarray</title>
+      <link>http://james-brennan.github.io/posts/datashader_raster/</link>
+      <pubDate>Sat, 14 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://james-brennan.github.io/posts/datashader_raster/</guid>
+      <description>&lt;p&gt;&lt;img src=&#34;http://james-brennan.github.io/img/lai2.png&#34; alt=&#34;img&#34;&gt;
+This post looks at visualising large raster datasets with &lt;a href=&#34;https://datashader.org&#34;&gt;Datashader&lt;/a&gt; and &lt;a href=&#34;http://xarray.pydata.org/en/stable/&#34;&gt;xarray&lt;/a&gt;.&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>geopandas on James Brennan</title>
+    <link>http://james-brennan.github.io/tags/geopandas/</link>
+    <description>Recent content in geopandas on James Brennan</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <lastBuildDate>Mon, 16 Mar 2020 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="http://james-brennan.github.io/tags/geopandas/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Fast and easy gridding of point data with geopandas</title>
+      <link>http://james-brennan.github.io/posts/fast_gridding_geopandas/</link>
+      <pubDate>Mon, 16 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://james-brennan.github.io/posts/fast_gridding_geopandas/</guid>
+      <description>&lt;p&gt;&lt;img src=&#34;http://james-brennan.github.io/img/top1.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;This post looks at using the &lt;a href=&#34;https://geopandas.org&#34;&gt;geopandas&lt;/a&gt; library to do fast efficient gridding of point data onto a regular grid. Geopandas is a python package that provides a geospatial extension to pandas &amp;ndash; so that dataframes can store geographic data such as points and polygons.&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

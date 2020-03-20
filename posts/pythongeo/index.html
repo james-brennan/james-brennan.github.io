@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title> Essential packages for geospatial analysis in python &middot; James Brennan </title>
+
+
+<link rel="stylesheet" href="http://james-brennan.github.io/css/slim.css">
+<link rel="stylesheet" href="http://james-brennan.github.io/css/highlight.min.css">
+<link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Source+Code+Pro' rel='stylesheet' type='text/css'>
+
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+<link rel="shortcut icon" href="/favicon.ico">
+
+
+<link href="" rel="alternate" type="application/rss+xml" title="James Brennan" />
+
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+  <h1 class="site-title"><a href="http://james-brennan.github.io/">James Brennan</a></h1>
+  <p class="site-tagline">A blog about scientific computing, statistics, geoscience and remote sensing. </p>
+  <div class="nav">
+    <a class="nav-btn" href="#">
+      <span class="ci ci-burger"></span>
+    </a>
+    <ul class="nav-list">
+       
+	  <li class="spacer">&ac;</li>
+
+      <li><a href="https://github.com/james-brennan">Github</a></li> 
+      <li><a href="https://twitter.com/jamesbrennan">Twitter</a></li> 
+    </ul>
+  </div>
+</div>
+
+    <div class="content">
+      <div class="post">
+        <h2 class="post-title"><a href="http://james-brennan.github.io/posts/pythongeo/">Essential packages for geospatial analysis in python</a></h2>
+        <div class="post-content">
+          <p>Python is fast becoming the defacto standard for geospatial work &ndash; primarily because of its great ecosystem of packages, but also probably whatever you want to do someone has posted an answer for it on <a href="https://gis.stackexchange.com/questions/tagged/python">stackoverflow</a> with attached python code. To save you some of that trouble below is a collection of &ldquo;essential&rdquo;&rdquo; packages for everything geospatial in python.</p>
+<p><img src="https://www.python.org/static/community_logos/python-logo.png" alt="img"></p>
+<h3 id="data-io-and-management">Data I/O and management</h3>
+<ul>
+<li><a href="https://rasterio.readthedocs.io/en/latest/">Rasterio</a> - Reads and writes GeoTIFF and other forms of raster datasets.</li>
+<li><a href="https://gdal.org/">(&hellip;and GDAL)</a> - Geospatial Data Abstraction Library (GDAL) provides a lower-level but more powerful reader and writer of 100s of geospatial formats.</li>
+<li><a href="https://satpy.readthedocs.io/">satpy</a> - Easy to use custom readers for satellite imagery formats from sensors such as MODIS, Sentinel-2&hellip;</li>
+<li><a href="https://fiona.readthedocs.io/en/latest/">fiona</a> -  reading and writing data in <code>*shp, *json</code> and many more formats.</li>
+<li><a href="https://github.com/pyproj4/pyproj">pyproj</a> - Python interface to PROJ (cartographic projections and coordinate transformations library).</li>
+</ul>
+<h3 id="visualisation-packages">Visualisation packages</h3>
+<ul>
+<li><a href="https://matplotlib.org/">matplotlib</a> - &ldquo;publication quality&rdquo; plotting and visualisation.</li>
+<li><a href="https://scitools.org.uk/cartopy/">cartopy</a> - vector and raster geospatial data map making in numerous projections.</li>
+<li><a href="https://datashader.org/">datashader</a> -  graphics pipeline system for multi-TB data visualisation suitable for point and raster data.</li>
+<li><a href="https://residentmario.github.io/geoplot/index.html">geoplot</a> - raster/vector cartographic plotting library (choropleth, cartograms!, points, kernel density etc).</li>
+<li><a href="https://pypi.org/project/descartes/">descartes</a> - Plot Shapely or GeoJSON-like geometric objects with matplotlib.</li>
+</ul>
+<h3 id="downloading-data">Downloading data</h3>
+<ul>
+<li>
+<p><a href="https://github.com/sentinelsat/sentinelsat">sentinelsat</a> - search and download Copernicus Sentinel satellite images from the command line or python.</p>
+</li>
+<li>
+<p><a href="http://www.pymodis.org/">pyModis</a> - Collection of python scripts for downloading and mosaicing MODIS data.</p>
+</li>
+</ul>
+<h3 id="computation-stack">&ldquo;Computation stack&rdquo;</h3>
+<ul>
+<li>
+<p><a href="https://www.scipy.org/">scipy</a> - modules for scientific computing in python: optimization, linear algebra, integration, interpolation, FFT image processing.</p>
+</li>
+<li>
+<p><a href="https://scikit-learn.org/">sk-learn</a> - classifciaton, regression, clustering machine learning tools for python.</p>
+</li>
+<li>
+<p><a href="https://scikit-image.org/">sk-image</a> collection of algorithms for image processing.</p>
+</li>
+<li>
+<p><a href="https://www.statsmodels.org/">statsmodels</a> - package for statistical models (linear/logistic and robust regresson amongst others) as well as stastical tests (e.g. ANOVA, t-tests&hellip;).</p>
+</li>
+<li>
+<p><a href="https://www.tensorflow.org/">tensorflow</a> - &ldquo;end-to-end&rdquo; deep learning library.</p>
+</li>
+<li>
+<p><a href="https://numpy.org/">numpy</a> - efficient multi-dimensional array storage and processing.</p>
+</li>
+<li>
+<p><a href="http://xarray.pydata.org/en/stable/">xarray</a> - multi-dimensional labeled array library including larger than memory functionality with dask.</p>
+</li>
+<li>
+<p><a href="https://dask.org/">dask / dask.distributed</a> - Data structures for parallel and out-of-core data processing in python.</p>
+</li>
+<li>
+<p><a href="https://pandas.pydata.org/">pandas</a> - package for data analysis of tabular-style data.</p>
+</li>
+<li>
+<p><a href="https://geopandas.org/">geopandas</a> - extends pandas for operations on geometric types like polygons and points + includes processing extensions for geometric join, merge etc.</p>
+</li>
+<li>
+<p><a href="https://github.com/giswqs/whitebox-python">whitebox-python</a> Python package is built on <a href="https://jblindsay.github.io/ghrg/WhiteboxTools/index.html">WhiteboxTools</a> which provides algorithms for distance buffering, raster classification, image enhancement and spatial hydrological analysis.</p>
+</li>
+</ul>
+<h3 id="organsing-chaos">Organsing chaos</h3>
+<ul>
+<li>
+<p><a href="https://jupyter.org/">jupyter</a> - Interactive computing for python (and many other languages) in the web browser &ndash; &ldquo;create and share documents that contain live code, equations, visualizations and narrative text&rdquo;.</p>
+</li>
+<li>
+<p><a href="https://pangeo.io/packages.html#packages">pangeo</a> - Combinations of python geospatial packages suitable for HPC and cloud computing.</p>
+</li>
+<li>
+<p><a href="https://github.com/spotify/luigi">luigi</a>  - workflow management package that can track dependencies between different scripts/processing tasks. Scalable to HPC batch systems with <a href="https://github.com/nils-braun/b2luigi">b2luigi</a>.</p>
+</li>
+</ul>
+        </div>
+      </div>
+    </div>
+    
+<script type="text/javascript"
+    src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  </script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({ tex2jax: {inlineMath: [["$","$"],["\\(","\\)"]]} })
+</script>
+
+
+
+<div class="footer">
+  
+  <p>Copyright James Brennan 2019. Powered by Hugo.</p>
+  
+</div>
+
+  </div>
+  <script src="http://james-brennan.github.io/js/slim.js"></script>
+  <script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-56616557-2', 'auto');
+ga('send', 'pageview');
+
+</script>
+
+
+</body>
+
+</html>
