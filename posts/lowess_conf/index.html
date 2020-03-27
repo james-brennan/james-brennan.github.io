@@ -7,8 +7,8 @@
 <title> Confidence intervals for LOWESS models in python &middot; James Brennan </title>
 
 
-<link rel="stylesheet" href="http://james-brennan.github.io/css/slim.css">
-<link rel="stylesheet" href="http://james-brennan.github.io/css/highlight.min.css">
+<link rel="stylesheet" href="https://james-brennan.github.io/css/slim.css">
+<link rel="stylesheet" href="https://james-brennan.github.io/css/highlight.min.css">
 <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Source+Code+Pro' rel='stylesheet' type='text/css'>
 
 <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
@@ -22,7 +22,7 @@
 <body>
   <div class="container">
     <div class="header">
-  <h1 class="site-title"><a href="http://james-brennan.github.io/">James Brennan</a></h1>
+  <h1 class="site-title"><a href="https://james-brennan.github.io/">James Brennan</a></h1>
   <p class="site-tagline">A blog about scientific computing, statistics, geoscience and remote sensing. </p>
   <div class="nav">
     <a class="nav-btn" href="#">
@@ -40,9 +40,9 @@
 
     <div class="content">
       <div class="post">
-        <h2 class="post-title"><a href="http://james-brennan.github.io/posts/lowess_conf/">Confidence intervals for LOWESS models in python</a></h2>
+        <h2 class="post-title"><a href="https://james-brennan.github.io/posts/lowess_conf/">Confidence intervals for LOWESS models in python</a></h2>
         <div class="post-content">
-          <p>LOWESS (or also referred to as LOESS for <em>locally-weighted scatterplot smoothing</em>) is a non-parametric regression method for smoothing data.</p>
+          <p>LOWESS (or also referred to as LOESS for <em>locally-weighted scatterplot smoothing</em>) is a non-parametric regression method for smoothing data. But how do we get uncertainties on the curve?</p>
 <p>The &ldquo;non-parametric&rdquo;-ness of the method refers to the fact that unlike linear or non-linear regression, the model can&rsquo;t be parameterised &ndash; we can&rsquo;t write the model as the sum of several parametric terms such as with linear regression:</p>
 <p>$$ y = \beta_0 + \beta_1 x $$</p>
 <p>Instead, LOWESS attempts to fit a linear model for each observation based on nearby (or <em>local</em>) observations. This makes the method more versatile than fitting some n-order polynomial to wiggly data but of course, means that we do not have global parameters such as $ \beta_0 $ and $\beta_1$ with which to test hypotheses. To start looking at LOWESS methods, let&rsquo;s create some nonsense data which has some interesting nonmonotonic response and plot it.</p>
@@ -90,7 +90,7 @@ smooths <span style="color:#666">=</span> np<span style="color:#666">.</span>sta
 plt<span style="color:#666">.</span>plot(xgrid, smooths, color<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">tomato</span><span style="color:#4070a0">&#39;</span>, alpha<span style="color:#666">=</span><span style="color:#40a070">0.25</span>)
 plt<span style="color:#666">.</span>plot(x, y, <span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">k.</span><span style="color:#4070a0">&#39;</span>)
 </code></pre></div><p><img src="/img/lowess1_9_2.png" alt="png"></p>
-<p>We can then use the individual fits to provide the mean and standard error of the LOWESS model:</p>
+<p>We can then use the individual fits to provide the mean $\mu$ and standard error $\sigma$ of the LOWESS model:</p>
 <div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">mean <span style="color:#666">=</span> np<span style="color:#666">.</span>nanmean(smooths, axis<span style="color:#666">=</span><span style="color:#40a070">1</span>)
 stderr <span style="color:#666">=</span> scipy<span style="color:#666">.</span>stats<span style="color:#666">.</span>sem(smooths, axis<span style="color:#666">=</span><span style="color:#40a070">1</span>)
 stderr <span style="color:#666">=</span> np<span style="color:#666">.</span>nanstd(smooths, axis<span style="color:#666">=</span><span style="color:#40a070">1</span>, ddof<span style="color:#666">=</span><span style="color:#40a070">0</span>)
@@ -112,7 +112,7 @@ plt<span style="color:#666">.</span>plot(xgrid, mean, color<span style="color:#6
 plt<span style="color:#666">.</span>plot(x, y, <span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">k.</span><span style="color:#4070a0">&#39;</span>)
 </code></pre></div><p><img src="/img/lowess1_13_1.png" alt="png"></p>
 <h1 id="writing-a-custom-lowess-smoother">Writing a custom LOWESS smoother</h1>
-<p>Notice the similarity in the mean+std confidence interval and the percentile-based confidence interval. Actually, under certain assumptions, these should be the same because of the way LOWESS works. LOWESS smoothers essentially fits a unique linear regression for every data point but including nearby data points to estimate the slope and intercept so that the correlation between data points provides a smooth curve. We can understand this a bit more clearly by estimating the curve locally for a couple of observations with linear regression:</p>
+<p>Notice the similarity in the $\mu + 1.96\sigma$ confidence interval and the percentile-based 95% confidence interval. Actually, under certain assumptions about the errors in the data, these should be the same. This is because LOWESS smoothers essentially fit a unique linear regression for every data point by including nearby data points to estimate the slope and intercept. The correlation in nearby data points helps ensure that we get a smooth curve fit.  We can understand this a bit more clearly by estimating the curve locally for a couple of observations with linear regression:</p>
 <div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#007020;font-weight:bold">import</span> <span style="color:#0e84b5;font-weight:bold">scipy.stats</span>
 order <span style="color:#666">=</span> np<span style="color:#666">.</span>argsort(x) <span style="color:#60a0b0;font-style:italic"># order the points</span>
 k <span style="color:#666">=</span> <span style="color:#40a070">50</span>
@@ -147,7 +147,7 @@ plt<span style="color:#666">.</span>xlabel(<span style="color:#4070a0"></span><s
 plt<span style="color:#666">.</span>ylabel(<span style="color:#4070a0"></span><span style="color:#4070a0">&#34;</span><span style="color:#4070a0">(1 - np.abs(d)**3)**3</span><span style="color:#4070a0">&#34;</span>)
 </code></pre></div><p><img src="/img/lowess1_20_1.png" alt="png"></p>
 <h2 id="fitting-the-lowess-curve">Fitting the LOWESS curve</h2>
-<p>Let&rsquo;s specify what we have a bit more clearly, two vectors providing the x and y observations:</p>
+<p>It&rsquo;s helpful (well necessary) to delve into the LOWESS mathematics at this point. The observations (a collection of x and y points we&rsquo;ll say) are composed of $x$ and $y$ vectors:</p>
 <p>$$ x = [x_1 \cdots x_N] $$</p>
 <p>$$ y =  [y_1 \cdots y_N] $$</p>
 <p>For observation $x_i$, the LOWESS fitting starts with calculating the distance between $x_i$ and each other observation $x_j$ provides:</p>
@@ -156,7 +156,7 @@ plt<span style="color:#666">.</span>ylabel(<span style="color:#4070a0"></span><s
 <p>$$ w_i = (1 - |d_{ij}|^3)^3  $$</p>
 <p>With $w$ we solve a standard weighted least squares system:</p>
 <p>$$ \hat{\beta} = \left(\mathbf{X}^T \mathbf{W}  \mathbf{X} \right)^{-1} \mathbf{X}^T \mathbf{W} y $$</p>
-<p>where $\mathbf{X}$ is for a first-order LOWESS:</p>
+<p>where $\mathbf{X}$ is specified as a first order model:</p>
 <p>$$
 \begin{equation}
 \mathbf{X} =
@@ -167,19 +167,19 @@ plt<span style="color:#666">.</span>ylabel(<span style="color:#4070a0"></span><s
 \end{bmatrix}
 \end{equation}
 $$</p>
-<p>which is a linear model with an intercept (1 values) and the slope. $\mathbf{W}$ is just a diagonal matrix formed from $w_i$:</p>
+<p>which is a linear model with an intercept (1 values) and the slope. It&rsquo;s possible to use higher order polynomials of course such as $x^2$ but we&rsquo;ll stick with the simplest case here.  $\mathbf{W}$ is just a diagonal matrix formed from the weights $w_i$:</p>
 <p>$$ \mathbf{W} = \begin{bmatrix}
 w_1 &amp;  &amp; \\\<br>
 &amp; \ddots &amp; \\\<br>
 &amp;  &amp; w_N
 \end{bmatrix} $$</p>
-<p>Solving the system provides $\hat{\beta}$ - the intercept $\beta_0$ and slope $\beta_1$. The LOWESS smoothed observation $\hat{y}_{sm}$ is providing from using the row of the system corresponding to $i$:</p>
+<p>Solving the system provides $\hat{\beta}$ - the intercept $\beta_0$ and slope $\beta_1$. The LOWESS smoothed observation $\hat{y}_{sm}$ is fitted/predicted from the row of the system corresponding to $i$:</p>
 <p>$$ \hat{y}_{sm} = \mathbf{X}_i \hat{\beta}  $$</p>
-<p>So algorithmically we loop over each observation $i$ update the $\mathbf{W}$ with the new weights and resolve the system to update $\hat{\beta}$.</p>
-<p>In code this relatively simple to implement:</p>
+<p>So algorithmically we loop over each observation $i$ update the $\mathbf{W}$ with the new weights and resolve the least squares system above to update $\hat{\beta}$ and then predict each $\hat{y}_{sm}$.</p>
+<p>In code this relatively simple to implement for one observation $i$:</p>
 <div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">dist <span style="color:#666">=</span> np<span style="color:#666">.</span>abs((x[i]<span style="color:#666">-</span>x))
 w <span style="color:#666">=</span> tricube(dist)
-<span style="color:#60a0b0;font-style:italic"># form linear system with the weights</span>
+<span style="color:#60a0b0;font-style:italic"># form linear system + apply the weights</span>
 A <span style="color:#666">=</span> np<span style="color:#666">.</span>stack([w, x<span style="color:#666">*</span>w])<span style="color:#666">.</span>T
 b <span style="color:#666">=</span> w <span style="color:#666">*</span> y
 ATA <span style="color:#666">=</span> A<span style="color:#666">.</span>T<span style="color:#666">.</span>dot(A)
@@ -187,28 +187,28 @@ ATb <span style="color:#666">=</span> A<span style="color:#666">.</span>T<span s
 <span style="color:#60a0b0;font-style:italic"># solve the system</span>
 sol <span style="color:#666">=</span> np<span style="color:#666">.</span>linalg<span style="color:#666">.</span>solve(ATA, ATb)
 <span style="color:#60a0b0;font-style:italic"># predict for the observation only</span>
-yest <span style="color:#666">=</span> A[i]<span style="color:#666">.</span>dot(sol)<span style="color:#60a0b0;font-style:italic"># equiv of A.dot(yest) just for i</span>
+yest <span style="color:#666">=</span> A[i]<span style="color:#666">.</span>dot(sol)
 </code></pre></div><h2 id="confidence-intervals-for-lowess">Confidence intervals for LOWESS</h2>
-<p>Because the LOWESS smoother for any individual prediction is essentially weighted linear least squares, the propagation of uncertainty principles are well understood. With any linear model (with normal errors in the observations $y$) the uncertainty in the parameters $var(\hat{\beta})$ are provided from the posterior covariance matrix which is:</p>
+<p>Because the LOWESS smoother for any individual prediction is essentially weighted linear least squares, the propagation of uncertainty principles are well understood. With any linear model (with normal errors in the observations $y$) the uncertainty in the parameters $var(\hat{\beta})$ are provided from the posterior covariance matrix:</p>
 <p>$$\sigma^2\left(\mathbf{X}^T  \mathbf{X}\right)^{-1}$$</p>
 <p>The diagonal of this matrix provides $var(\hat{\beta})$:</p>
 <p>$$ var(\hat{\beta}) = \text{diag} \left[ \sigma^2 \left(\mathbf{X}^T  \mathbf{X}\right)^{-1} \right] $$</p>
-<p>$\sigma^2$ is important - it is our estimate of the uncertainty in the initial observations. For this approach to work, we assume that observations have an error model of the form:</p>
+<p>$\sigma^2$ is <em>important</em> - it is our estimate of the uncertainty in the initial observations. For this approach to work, we are assuming that the observations have an error model of the form:</p>
 <p>$$ y = y_\text{true} + \mathcal{N}(0, \sigma^2) $$</p>
-<p>The variance $\sigma^2$ provides an indication of the spread in the observations away from our model of the observations:</p>
+<p>The observational error $\sigma^2$ provides an indication of the spread in the observations away from our model of the observations:</p>
 <p>$$ \hat{y}_{sm} = f(x) + \epsilon $$</p>
-<p>where $f(x)$ is the LOWESS smoothing model and $\epsilon$ is the error arising in the prediction because of the observations. In some cases, we know what $\sigma^2$ is, but often we don&rsquo;t. One option to estimate $\sigma^2$ is to assume that our model is perfect and the residuals between the model and observations $\hat{y}_{sm}-y$ provides a good measure. The root mean square error (RMSE) provides often a good estimate of $\sigma$:</p>
+<p>where $f(x)$ is the LOWESS smoothing model and $\epsilon$ is $\mathcal{N}(0, \sigma^2)$ &ndash; the error arising in the prediction because of the observations. In some cases, we know what $\sigma^2$ is, but often we don&rsquo;t. One option to estimate $\sigma^2$ is to assume that our model is perfect and the residuals between the model and observations $(\hat{y}_{sm}-y)$ provides a good estimate. The root mean square error (RMSE) provides this estimate of $\sigma$:</p>
 <p>$$ \sigma = \sqrt{\frac{\sum_i^{N}( \hat{y}_{sm} - y_i  )^2}{N}} $$</p>
-<p>With an estimate of $\sigma$ we can then estimate $var(\hat{\beta})$ correctly and provide a confidence interval based on the assumption that the uncertainty in the parameters is normally distributed:</p>
+<p>With an estimate of $\sigma$ we can then estimate $var(\hat{\beta})$ correctly and provide a confidence interval based on the assumption that the uncertainty in the parameters is normally distributed. For example a 95 confidence interval on the slope parameter $\hat{\beta_1}$ is:</p>
 <p>$$ \text{CI}_{0.95} = \hat{\beta_1} \pm 1.96 \sqrt{var(\hat{\beta_1}) } $$</p>
-<p>So we&rsquo;ve now got a way to get the confidence interval in parameters from the variance $var(\hat{\beta})$ but we really want the confidence interval for the fitted curve $\hat{y}_{sm}$.</p>
+<p>So we&rsquo;ve now got a way to get the confidence interval in parameters $\hat{\beta}$ from the variance $var(\hat{\beta})$ but we really want the confidence interval for the fitted curve $\hat{y}_{sm}$.</p>
 <p>To get this remember that $\hat{y}_{sm}$ is provided by:</p>
 <p>$$ \hat{y}_{sm} = \mathbf{X}_i \hat{\beta} $$</p>
-<p>So we want the variance $var(\hat{y}_{sm})$, which is:</p>
+<p>To get the variance or uncertainty in the prediction $var(\hat{y}_{sm})$ we apply standard least squares uncertainty propagation:</p>
 <p>$$ var(\hat{y}_{sm}) = var(\mathbf{X}_i \hat{\beta}) = \mathbf{X}_i^T \sigma^2 \left(\mathbf{X}^T  \mathbf{X}\right)^{-1} \mathbf{X}_i$$</p>
 <p>In code this relatively simple to implement also:</p>
 <div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">var_y_sm <span style="color:#666">=</span> A[i]<span style="color:#666">.</span>dot(sigma<span style="color:#666">*</span><span style="color:#666">*</span><span style="color:#40a070">2</span> <span style="color:#666">*</span> np<span style="color:#666">.</span>linalg<span style="color:#666">.</span>inv(ATA))<span style="color:#666">.</span>dot(A[i])
-</code></pre></div><p>Wrapping it all up into a <code>lowess</code> function:</p>
+</code></pre></div><p>Wrapping it all up into a <code>lowess</code> function that loops over each observation and fits the curve and uncertainties:</p>
 <div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#007020;font-weight:bold">def</span> <span style="color:#06287e">lowess</span>(x, y, f<span style="color:#666">=</span><span style="color:#40a070">1.</span><span style="color:#666">/</span><span style="color:#40a070">3.</span>):
     <span style="color:#4070a0"></span><span style="color:#4070a0">&#34;&#34;&#34;</span><span style="color:#4070a0">
 </span><span style="color:#4070a0"></span><span style="color:#4070a0">    Basic LOWESS smoother with uncertainty. </span><span style="color:#4070a0">
@@ -287,7 +287,7 @@ plt<span style="color:#666">.</span>legend(loc<span style="color:#666">=</span><
 </div>
 
   </div>
-  <script src="http://james-brennan.github.io/js/slim.js"></script>
+  <script src="https://james-brennan.github.io/js/slim.js"></script>
   <script>
 (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
