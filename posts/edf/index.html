@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title> Estimating CDFs from data done right &middot; James Brennan </title>
+
+
+<link rel="stylesheet" href="https://james-brennan.github.io/css/slim.css">
+<link rel="stylesheet" href="https://james-brennan.github.io/css/highlight.min.css">
+<link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Source+Code+Pro' rel='stylesheet' type='text/css'>
+
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+<link rel="shortcut icon" href="/favicon.ico">
+
+
+<link href="" rel="alternate" type="application/rss+xml" title="James Brennan" />
+
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+  <h1 class="site-title"><a href="https://james-brennan.github.io/">James Brennan</a></h1>
+  <p class="site-tagline">A blog about scientific computing, statistics, geoscience and remote sensing. </p>
+  <div class="nav">
+    <a class="nav-btn" href="#">
+      <span class="ci ci-burger"></span>
+    </a>
+    <ul class="nav-list">
+       
+	  <li class="spacer">&ac;</li>
+
+      <li><a href="https://github.com/james-brennan">Github</a></li> 
+      <li><a href="https://twitter.com/jamesbrennan">Twitter</a></li> 
+    </ul>
+  </div>
+</div>
+
+    <div class="content">
+      <div class="post">
+        <h2 class="post-title"><a href="https://james-brennan.github.io/posts/edf/">Estimating CDFs from data done right</a></h2>
+        <div class="post-content">
+          <p>Typically when we have some data an initial exploratory analysis is to consider how our data varies. Lots of the time we might have a good idea of the statistical distribution our data is likely drawn from, measurements collected by a satellite might follow a normal distribution. We could use our data to estimate the moments of the Normal distribution to get our population distribution. Sometimes though we do not have a good idea of whether our distribution follows a parametric distribution and want to turn to non-parametric methods. We do this by estimating the <a href="https://en.wikipedia.org/wiki/Empirical_distribution_function">empirical distribution function</a> (the empirical cumulative distribution function CDF) of our data.</p>
+<p>To start, we&rsquo;ll sample some data from our (un)known population:</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#007020;font-weight:bold">import</span> <span style="color:#0e84b5;font-weight:bold">scipy.stats</span>
+<span style="color:#007020;font-weight:bold">import</span> <span style="color:#0e84b5;font-weight:bold">matplotlib.pyplot</span> <span style="color:#007020;font-weight:bold">as</span> <span style="color:#0e84b5;font-weight:bold">plt</span>
+<span style="color:#007020;font-weight:bold">import</span> <span style="color:#0e84b5;font-weight:bold">seaborn</span> <span style="color:#007020;font-weight:bold">as</span> <span style="color:#0e84b5;font-weight:bold">sns</span>
+<span style="color:#007020;font-weight:bold">import</span> <span style="color:#0e84b5;font-weight:bold">numpy</span> <span style="color:#007020;font-weight:bold">as</span> <span style="color:#0e84b5;font-weight:bold">np</span>
+<span style="color:#60a0b0;font-style:italic"># create our data</span>
+data <span style="color:#666">=</span> scipy<span style="color:#666">.</span>stats<span style="color:#666">.</span>gamma(<span style="color:#40a070">5</span>,<span style="color:#40a070">1</span>)<span style="color:#666">.</span>rvs(<span style="color:#40a070">200</span>)
+</code></pre></div><p>And producing histograms (frequency counts) of the data is super easy of course:</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">fig, ax <span style="color:#666">=</span> plt<span style="color:#666">.</span>subplots(<span style="color:#40a070">1</span>,<span style="color:#40a070">2</span>, figsize<span style="color:#666">=</span>(<span style="color:#40a070">8</span>, <span style="color:#40a070">3</span>))
+ax[<span style="color:#40a070">0</span>]<span style="color:#666">.</span>hist(data,lw<span style="color:#666">=</span><span style="color:#40a070">1</span>,edgecolor<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">k</span><span style="color:#4070a0">&#39;</span>)
+ax[<span style="color:#40a070">1</span>]<span style="color:#666">.</span>hist(data,lw<span style="color:#666">=</span><span style="color:#40a070">1</span>,edgecolor<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">k</span><span style="color:#4070a0">&#39;</span>, cumulative<span style="color:#666">=</span>True)
+[a<span style="color:#666">.</span>set_xlabel(<span style="color:#4070a0"></span><span style="color:#4070a0">&#34;</span><span style="color:#4070a0">x</span><span style="color:#4070a0">&#34;</span>) <span style="color:#007020;font-weight:bold">for</span> a <span style="color:#007020;font-weight:bold">in</span> ax];
+[a<span style="color:#666">.</span>set_ylabel(<span style="color:#4070a0"></span><span style="color:#4070a0">&#34;</span><span style="color:#4070a0">Frequency</span><span style="color:#4070a0">&#34;</span>) <span style="color:#007020;font-weight:bold">for</span> a <span style="color:#007020;font-weight:bold">in</span> ax];
+sns<span style="color:#666">.</span>despine()
+</code></pre></div><p><img src="/img//EDF_3_0.png" alt="png"></p>
+<p>Where the figure on left is an ordinary histogram (i.e. the number of samples in each frequency bin) and the right is the cumulative count of samples for each bin: the cumulative histogram. Of course at the moment these are not strictly empirical distributions until they are normalised to provide discrete probability and cumulative distribution functions:</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">fig, ax <span style="color:#666">=</span> plt<span style="color:#666">.</span>subplots(<span style="color:#40a070">1</span>,<span style="color:#40a070">2</span>, figsize<span style="color:#666">=</span>(<span style="color:#40a070">8</span>, <span style="color:#40a070">3</span>))
+ax[<span style="color:#40a070">0</span>]<span style="color:#666">.</span>hist(data, lw<span style="color:#666">=</span><span style="color:#40a070">1</span>,edgecolor<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">k</span><span style="color:#4070a0">&#39;</span>, density<span style="color:#666">=</span>True)
+ax[<span style="color:#40a070">1</span>]<span style="color:#666">.</span>hist(data,lw<span style="color:#666">=</span><span style="color:#40a070">1</span>,edgecolor<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">k</span><span style="color:#4070a0">&#39;</span>, cumulative<span style="color:#666">=</span>True, density<span style="color:#666">=</span>True)
+[a<span style="color:#666">.</span>set_xlabel(<span style="color:#4070a0"></span><span style="color:#4070a0">&#34;</span><span style="color:#4070a0">$x$</span><span style="color:#4070a0">&#34;</span>) <span style="color:#007020;font-weight:bold">for</span> a <span style="color:#007020;font-weight:bold">in</span> ax];
+[a<span style="color:#666">.</span>set_ylabel(<span style="color:#4070a0"></span><span style="color:#4070a0">&#34;</span><span style="color:#4070a0">Density</span><span style="color:#4070a0">&#34;</span>) <span style="color:#007020;font-weight:bold">for</span> a <span style="color:#007020;font-weight:bold">in</span> ax];
+sns<span style="color:#666">.</span>despine()
+</code></pre></div><p><img src="/img//EDF_4_0.png" alt="png"></p>
+<h2 id="the-empirical-distribution-function">The empirical distribution function</h2>
+<p>Thinking more about how the cumulative density is produced provides a route for not just relying on matplotlib and provides us with a deeper understanding of the quality of our distribution. The empirical distribution function of our data $\hat{F}(x)$ is the cumulative distribution function (CDF) that cumulatively increases by $1/n$ at each data point $X_i$:</p>
+<p>$$ \hat{F}(x)  = \frac{\sum_{i=1}^{N} \text{I}(X_i \leq x)}{n}$$</p>
+<p>where $\text{I}$ provides an indicator function that essentially provides a mathematical function to count the number of samples below $x$:</p>
+<p>$$ \text{I}(X_i \leq x) = \begin{cases}
+1 &amp; \text{if} &amp; X_i \leq x \\\<br>
+0 &amp; \text{if} &amp; X_i &gt; x
+\end{cases} $$</p>
+<p>$X_i$ is less than or equal to the current value of $x$, $\text{I}(X_i)$ equals 1. So at each increment along $x$ we count the number of observations $[X_i \dots X_N]$ that are below or equal to $x$.</p>
+<p>Let&rsquo;s implement this in python and see how it works:</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#007020;font-weight:bold">def</span> <span style="color:#06287e">edf</span>(data):
+    x0 <span style="color:#666">=</span> data<span style="color:#666">.</span>min() <span style="color:#60a0b0;font-style:italic"># get sample space</span>
+    x1 <span style="color:#666">=</span> data<span style="color:#666">.</span>max()
+    x <span style="color:#666">=</span> np<span style="color:#666">.</span>linspace(x0, x1, <span style="color:#40a070">100</span>) 
+    N <span style="color:#666">=</span> data<span style="color:#666">.</span>size <span style="color:#60a0b0;font-style:italic"># number of observations</span>
+    y <span style="color:#666">=</span> np<span style="color:#666">.</span>zeros_like(x)
+    <span style="color:#007020;font-weight:bold">for</span> i, xx <span style="color:#007020;font-weight:bold">in</span> <span style="color:#007020">enumerate</span>(x):
+        <span style="color:#60a0b0;font-style:italic"># sum the vectorised indicator function </span>
+        y[i] <span style="color:#666">=</span> np<span style="color:#666">.</span>sum(data <span style="color:#666">&lt;</span><span style="color:#666">=</span> xx)<span style="color:#666">/</span>N 
+    <span style="color:#007020;font-weight:bold">return</span> x, y
+
+x, y <span style="color:#666">=</span> edf(data)
+<span style="color:#60a0b0;font-style:italic"># plot it</span>
+plt<span style="color:#666">.</span>plot(x, y, <span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">k-</span><span style="color:#4070a0">&#39;</span>)
+plt<span style="color:#666">.</span>title(<span style="color:#4070a0"></span><span style="color:#4070a0">&#34;</span><span style="color:#4070a0">Empirical distribution function - $</span><span style="color:#4070a0">\</span><span style="color:#4070a0">hat{F}(x)$</span><span style="color:#4070a0">&#34;</span>)
+plt<span style="color:#666">.</span>xlabel(<span style="color:#4070a0"></span><span style="color:#4070a0">&#34;</span><span style="color:#4070a0">$x$</span><span style="color:#4070a0">&#34;</span>)
+plt<span style="color:#666">.</span>ylabel(<span style="color:#4070a0"></span><span style="color:#4070a0">&#34;</span><span style="color:#4070a0">Density</span><span style="color:#4070a0">&#34;</span>)
+plt<span style="color:#666">.</span>plot(data, [<span style="color:#40a070">0.01</span>]<span style="color:#666">*</span><span style="color:#007020">len</span>(data), <span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">|</span><span style="color:#4070a0">&#39;</span>, color<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">k</span><span style="color:#4070a0">&#39;</span>)
+sns<span style="color:#666">.</span>despine()
+</code></pre></div><p><img src="/img//EDF_6_0.png" alt="png"></p>
+<p>$\hat{F}(x)$ looks at least superficially similar to the cumulative density shown in the plot above, increasing rapidly from 0 and then plateaus as the probabilities reach 1. The <code>plt.plot(data, [0.01]*len(data), '|', color='k')</code> here is a <a href="https://stackoverflow.com/questions/17875341/how-to-make-rug-plot-in-matplotlib">nice trick</a> for indicating sample points as we would with a <a href="https://en.wikipedia.org/wiki/Rug_plot">rugplot</a>.</p>
+<h2 id="how-good-is-our-distribution-getting-confidence-intervals">How good is our distribution? Getting confidence intervals</h2>
+<p>If we want to get some sort of idea of how constrained our EDF is we want to put some uncertainties on it.  Ultimately we want an idea of how far our empirical distribution $\hat{F}(x)$ is from the real unknown CDF $F(x)$.</p>
+<p>The <a href="https://en.wikipedia.org/wiki/Dvoretzky%E2%80%93Kiefer%E2%80%93Wolfowitz_inequality">Dvoretzky–Kiefer–Wolfowitz (DKW)</a> inequality provides a method to bound the probability of the agreement between $\hat{F}(x)$ and $F(x)$.  From the DKW inequality, a non-parametric upper and lower confidence interval that bounds $F(x)$ within ($1-\alpha$) is:</p>
+<p>$$ \text{Lower}[\hat{F}(x)] = \text{max} [ \hat{F}(x) - \epsilon, \; 0 ] $$</p>
+<p>$$  \text{Upper}[\hat{F}(x)] = \text{min} [ \hat{F}(x) + \epsilon, \; 1 ] $$</p>
+<p>where $\epsilon$ is:</p>
+<p>$$  \epsilon =  \sqrt{ \frac{1}{2n} \text{log}\left(\frac{2}{\alpha}\right)}$$</p>
+<p>The direct interpretation of $\epsilon$ is that anywhere along the EDF, the probability that $\hat{F}(x)$ is more than $\epsilon$ away from the true CDF $F(x)$ is:</p>
+<p>$$ P(| \hat{F}(x)-{F}(x)| &gt; \epsilon) \leq 2e^{-2n\epsilon^2} $$</p>
+<p>Being a <a href="https://en.wikipedia.org/wiki/Concentration_inequality">concentration inequality</a>, the DKW provides an upper bound on the confidence interval (a looser confidence interval). Adding this to the <code>edf</code> function:</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#007020;font-weight:bold">def</span> <span style="color:#06287e">edf</span>(data, alpha<span style="color:#666">=</span><span style="color:#666">.</span><span style="color:#40a070">05</span>, x0<span style="color:#666">=</span>None, x1<span style="color:#666">=</span>None ):
+    x0 <span style="color:#666">=</span> data<span style="color:#666">.</span>min() <span style="color:#007020;font-weight:bold">if</span> x0 <span style="color:#007020;font-weight:bold">is</span> None <span style="color:#007020;font-weight:bold">else</span> x0
+    x1 <span style="color:#666">=</span> data<span style="color:#666">.</span>max() <span style="color:#007020;font-weight:bold">if</span> x1 <span style="color:#007020;font-weight:bold">is</span> None <span style="color:#007020;font-weight:bold">else</span> x1
+    x <span style="color:#666">=</span> np<span style="color:#666">.</span>linspace(x0, x1, <span style="color:#40a070">100</span>)
+    N <span style="color:#666">=</span> data<span style="color:#666">.</span>size
+    y <span style="color:#666">=</span> np<span style="color:#666">.</span>zeros_like(x)
+    l <span style="color:#666">=</span> np<span style="color:#666">.</span>zeros_like(x)
+    u <span style="color:#666">=</span> np<span style="color:#666">.</span>zeros_like(x)
+    e <span style="color:#666">=</span> np<span style="color:#666">.</span>sqrt(<span style="color:#40a070">1.0</span><span style="color:#666">/</span>(<span style="color:#40a070">2</span><span style="color:#666">*</span>N) <span style="color:#666">*</span> np<span style="color:#666">.</span>log(<span style="color:#40a070">2.</span><span style="color:#666">/</span>alpha))
+    <span style="color:#007020;font-weight:bold">for</span> i, xx <span style="color:#007020;font-weight:bold">in</span> <span style="color:#007020">enumerate</span>(x):
+        y[i] <span style="color:#666">=</span> np<span style="color:#666">.</span>sum(data <span style="color:#666">&lt;</span><span style="color:#666">=</span> xx)<span style="color:#666">/</span>N
+        l[i] <span style="color:#666">=</span> np<span style="color:#666">.</span>maximum( y[i] <span style="color:#666">-</span> e, <span style="color:#40a070">0</span> )
+        u[i] <span style="color:#666">=</span> np<span style="color:#666">.</span>minimum( y[i] <span style="color:#666">+</span> e, <span style="color:#40a070">1</span> )
+    <span style="color:#007020;font-weight:bold">return</span> x, y, l, u
+</code></pre></div><p>To calculate a 95% confidence interval ($1-0.05$):</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">x, y, l, u <span style="color:#666">=</span> edf(data, alpha<span style="color:#666">=</span><span style="color:#40a070">0.05</span>)
+plt<span style="color:#666">.</span>fill_between(x, l, u)
+plt<span style="color:#666">.</span>plot(x, y, <span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">k-</span><span style="color:#4070a0">&#39;</span>)
+plt<span style="color:#666">.</span>title(<span style="color:#4070a0"></span><span style="color:#4070a0">&#34;</span><span style="color:#4070a0">Empirical distribution function - $</span><span style="color:#4070a0">\</span><span style="color:#4070a0">hat{F}(x)$</span><span style="color:#4070a0">&#34;</span>)
+plt<span style="color:#666">.</span>xlabel(<span style="color:#4070a0"></span><span style="color:#4070a0">&#34;</span><span style="color:#4070a0">$x$</span><span style="color:#4070a0">&#34;</span>)
+plt<span style="color:#666">.</span>ylabel(<span style="color:#4070a0"></span><span style="color:#4070a0">&#34;</span><span style="color:#4070a0">Density</span><span style="color:#4070a0">&#34;</span>)
+plt<span style="color:#666">.</span>plot(data, [<span style="color:#40a070">0.01</span>]<span style="color:#666">*</span><span style="color:#007020">len</span>(data), <span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">|</span><span style="color:#4070a0">&#39;</span>, color<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">k</span><span style="color:#4070a0">&#39;</span>)
+sns<span style="color:#666">.</span>despine()
+</code></pre></div><p><img src="/img//EDF_9_0.png" alt="png"></p>
+<p>Which shows that our estimated EDF is not too shabby. The confidence intervals really shine however when we consider the impact of the number of samples we have on the EDF:</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">fig, ax <span style="color:#666">=</span> plt<span style="color:#666">.</span>subplots(<span style="color:#40a070">2</span>,<span style="color:#40a070">2</span>, figsize<span style="color:#666">=</span>(<span style="color:#40a070">8</span>,<span style="color:#40a070">5</span>),
+                             sharex<span style="color:#666">=</span>True, sharey<span style="color:#666">=</span>True, 
+                             tight_layout<span style="color:#666">=</span>True)
+ax <span style="color:#666">=</span> ax<span style="color:#666">.</span>flatten()
+sns<span style="color:#666">.</span>despine()
+<span style="color:#60a0b0;font-style:italic"># make a sample space</span>
+xcdf <span style="color:#666">=</span> np<span style="color:#666">.</span>linspace(<span style="color:#40a070">0</span>, <span style="color:#40a070">14</span>)
+<span style="color:#60a0b0;font-style:italic"># try some different N values</span>
+Nsamps <span style="color:#666">=</span> np<span style="color:#666">.</span>logspace(<span style="color:#40a070">1</span>,<span style="color:#40a070">2</span>, <span style="color:#40a070">4</span>)<span style="color:#666">.</span>astype(<span style="color:#007020">int</span>)
+<span style="color:#007020;font-weight:bold">for</span> k, Ns <span style="color:#007020;font-weight:bold">in</span> <span style="color:#007020">enumerate</span>(Nsamps):
+    data <span style="color:#666">=</span> scipy<span style="color:#666">.</span>stats<span style="color:#666">.</span>gamma(<span style="color:#40a070">5</span>,<span style="color:#40a070">1</span>)<span style="color:#666">.</span>rvs(Ns)
+    <span style="color:#60a0b0;font-style:italic"># calculate edf</span>
+    x, y, l, u <span style="color:#666">=</span> edf(data, x0<span style="color:#666">=</span><span style="color:#40a070">0</span>, x1<span style="color:#666">=</span><span style="color:#40a070">14</span>)
+    ax[k]<span style="color:#666">.</span>fill_between(x, l, u)
+    ax[k]<span style="color:#666">.</span>plot(x, y, <span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">k-</span><span style="color:#4070a0">&#39;</span>)
+    ax[k]<span style="color:#666">.</span>set_title(f<span style="color:#4070a0"></span><span style="color:#4070a0">&#34;</span><span style="color:#4070a0">Samples: {Ns}</span><span style="color:#4070a0">&#34;</span>)
+    ax[k]<span style="color:#666">.</span>set_xlabel(<span style="color:#4070a0"></span><span style="color:#4070a0">&#34;</span><span style="color:#4070a0">$x$</span><span style="color:#4070a0">&#34;</span>)
+    ax[k]<span style="color:#666">.</span>set_ylabel(<span style="color:#4070a0"></span><span style="color:#4070a0">&#34;</span><span style="color:#4070a0">Density</span><span style="color:#4070a0">&#34;</span>)
+    ax[k]<span style="color:#666">.</span>plot(xcdf, scipy<span style="color:#666">.</span>stats<span style="color:#666">.</span>gamma(<span style="color:#40a070">5</span>,<span style="color:#40a070">1</span>)<span style="color:#666">.</span>cdf(xcdf), 
+                <span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">k--</span><span style="color:#4070a0">&#39;</span>, linewidth<span style="color:#666">=</span><span style="color:#40a070">1</span>   )
+    ax[k]<span style="color:#666">.</span>plot(data, [<span style="color:#40a070">0.01</span>]<span style="color:#666">*</span><span style="color:#007020">len</span>(data), <span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">|</span><span style="color:#4070a0">&#39;</span>, color<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">k</span><span style="color:#4070a0">&#39;</span>)
+</code></pre></div><p><img src="/img//EDF_11_0.png" alt="png"></p>
+<p>So the width of 95% confidence interval shrinks proportionally to $N$, providing us with a clear measure of the trust we can put in our cumulative distribution. We can get an idea of the width of the confidence interval from considering $\epsilon$ as a function of the number of observations $N$:</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">N <span style="color:#666">=</span> np<span style="color:#666">.</span>logspace(<span style="color:#40a070">1</span>, <span style="color:#40a070">4</span>)
+plt<span style="color:#666">.</span>plot(N, np<span style="color:#666">.</span>sqrt( <span style="color:#40a070">1.0</span><span style="color:#666">/</span>(<span style="color:#40a070">2</span><span style="color:#666">*</span>N) <span style="color:#666">*</span>np<span style="color:#666">.</span>log(<span style="color:#40a070">2.</span><span style="color:#666">/</span><span style="color:#666">.</span><span style="color:#40a070">32</span>)), label<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">$1</span><span style="color:#4070a0">\</span><span style="color:#4070a0">sigma$</span><span style="color:#4070a0">&#39;</span>)
+plt<span style="color:#666">.</span>plot(N, np<span style="color:#666">.</span>sqrt( <span style="color:#40a070">1.0</span><span style="color:#666">/</span>(<span style="color:#40a070">2</span><span style="color:#666">*</span>N) <span style="color:#666">*</span>np<span style="color:#666">.</span>log(<span style="color:#40a070">2.</span><span style="color:#666">/</span><span style="color:#666">.</span><span style="color:#40a070">05</span>)), label<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">$2</span><span style="color:#4070a0">\</span><span style="color:#4070a0">sigma$</span><span style="color:#4070a0">&#39;</span>)
+plt<span style="color:#666">.</span>semilogx()
+plt<span style="color:#666">.</span>ylabel(<span style="color:#4070a0"></span><span style="color:#4070a0">&#34;</span><span style="color:#4070a0">$</span><span style="color:#4070a0">\</span><span style="color:#4070a0">epsilon$</span><span style="color:#4070a0">&#34;</span>)
+plt<span style="color:#666">.</span>xlabel(<span style="color:#4070a0"></span><span style="color:#4070a0">&#34;</span><span style="color:#4070a0">Number of samples</span><span style="color:#4070a0">&#34;</span>)
+plt<span style="color:#666">.</span>legend(loc<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">best</span><span style="color:#4070a0">&#39;</span>)
+sns<span style="color:#666">.</span>despine()
+</code></pre></div><p><img src="/img//EDF_13_0.png" alt="png"></p>
+        </div>
+      </div>
+    </div>
+    
+<script type="text/javascript"
+    src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  </script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({ tex2jax: {inlineMath: [["$","$"],["\\(","\\)"]]} })
+</script>
+
+
+
+<div class="footer">
+  
+  <p>Copyright James Brennan 2019. Powered by Hugo.</p>
+  
+</div>
+
+  </div>
+  <script src="https://james-brennan.github.io/js/slim.js"></script>
+  <script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-56616557-2', 'auto');
+ga('send', 'pageview');
+
+</script>
+
+
+</body>
+
+</html>

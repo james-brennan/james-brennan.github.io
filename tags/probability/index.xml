@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>uncertainty on James Brennan</title>
-    <link>https://james-brennan.github.io/tags/uncertainty/</link>
-    <description>Recent content in uncertainty on James Brennan</description>
+    <title>probability on James Brennan</title>
+    <link>https://james-brennan.github.io/tags/probability/</link>
+    <description>Recent content in probability on James Brennan</description>
     <generator>Hugo -- gohugo.io</generator>
     <lastBuildDate>Sat, 11 Apr 2020 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="https://james-brennan.github.io/tags/uncertainty/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://james-brennan.github.io/tags/probability/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
@@ -17,15 +17,6 @@
       
       <guid>https://james-brennan.github.io/posts/edf/</guid>
       <description>&lt;p&gt;Typically when we have some data an initial exploratory analysis is to consider how our data varies. Lots of the time we might have a good idea of the statistical distribution our data is likely drawn from, measurements collected by a satellite might follow a normal distribution. We could use our data to estimate the moments of the Normal distribution to get our population distribution. Sometimes though we do not have a good idea of whether our distribution follows a parametric distribution and want to turn to non-parametric methods. We do this by estimating the &lt;a href=&#34;https://en.wikipedia.org/wiki/Empirical_distribution_function&#34;&gt;empirical distribution function&lt;/a&gt; (the empirical cumulative distribution function CDF) of our data.&lt;/p&gt;</description>
-    </item>
-    
-    <item>
-      <title>Confidence intervals for LOWESS models in python</title>
-      <link>https://james-brennan.github.io/posts/lowess_conf/</link>
-      <pubDate>Mon, 23 Mar 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://james-brennan.github.io/posts/lowess_conf/</guid>
-      <description>&lt;p&gt;LOWESS (or also referred to as LOESS for &lt;em&gt;locally-weighted scatterplot smoothing&lt;/em&gt;) is a non-parametric regression method for smoothing data. But how do we get uncertainties on the curve?&lt;/p&gt;</description>
     </item>
     
   </channel>
