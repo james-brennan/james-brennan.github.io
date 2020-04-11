@@ -16,8 +16,7 @@
       <pubDate>Sat, 14 Mar 2020 00:00:00 +0000</pubDate>
       
       <guid>https://james-brennan.github.io/posts/datashader_raster/</guid>
-      <description>&lt;p&gt;&lt;img src=&#34;https://james-brennan.github.io/img/lai2.png&#34; alt=&#34;img&#34;&gt;
-This post looks at visualising large raster datasets with &lt;a href=&#34;https://datashader.org&#34;&gt;Datashader&lt;/a&gt; and &lt;a href=&#34;http://xarray.pydata.org/en/stable/&#34;&gt;xarray&lt;/a&gt;.&lt;/p&gt;</description>
+      <description>&lt;p&gt;This post looks at visualising large raster datasets with &lt;a href=&#34;https://datashader.org&#34;&gt;Datashader&lt;/a&gt; and &lt;a href=&#34;http://xarray.pydata.org/en/stable/&#34;&gt;xarray&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
     
     <item>

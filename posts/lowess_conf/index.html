@@ -1,150 +1,187 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
-<title> Confidence intervals for LOWESS models in python &middot; James Brennan </title>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"><title>Confidence intervals for LOWESS models in python - James Brennan</title><meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta itemprop="name" content="Confidence intervals for LOWESS models in python">
+<meta itemprop="description" content="LOWESS (or also referred to as LOESS for locally-weighted scatterplot smoothing) is a non-parametric regression method for smoothing data. But how do we get uncertainties on the curve?">
+<meta itemprop="datePublished" content="2020-03-23T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2020-03-23T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="1841">
 
 
-<link rel="stylesheet" href="https://james-brennan.github.io/css/slim.css">
-<link rel="stylesheet" href="https://james-brennan.github.io/css/highlight.min.css">
-<link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Source+Code+Pro' rel='stylesheet' type='text/css'>
 
-<link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
-<link rel="shortcut icon" href="/favicon.ico">
+<meta itemprop="keywords" content="python,uncertainty,statistics," /><meta property="og:title" content="Confidence intervals for LOWESS models in python" />
+<meta property="og:description" content="LOWESS (or also referred to as LOESS for locally-weighted scatterplot smoothing) is a non-parametric regression method for smoothing data. But how do we get uncertainties on the curve?" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://james-brennan.github.io/posts/lowess_conf/" />
+<meta property="article:published_time" content="2020-03-23T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-03-23T00:00:00+00:00" /><meta property="og:site_name" content="James Brennan" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Confidence intervals for LOWESS models in python"/>
+<meta name="twitter:description" content="LOWESS (or also referred to as LOESS for locally-weighted scatterplot smoothing) is a non-parametric regression method for smoothing data. But how do we get uncertainties on the curve?"/>
+<link href='https://fonts.googleapis.com/css?family=Playfair+Display:700' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" type="text/css" media="screen" href="https://james-brennan.github.io/css/normalize.css" />
+	<link rel="stylesheet" type="text/css" media="screen" href="https://james-brennan.github.io/css/main.css" />
 
-
-<link href="" rel="alternate" type="application/rss+xml" title="James Brennan" />
-
+	<script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+		<script src="https://james-brennan.github.io/js/main.js"></script>
 </head>
 
 <body>
-  <div class="container">
-    <div class="header">
-  <h1 class="site-title"><a href="https://james-brennan.github.io/">James Brennan</a></h1>
-  <p class="site-tagline">A blog about scientific computing, statistics, geoscience and remote sensing. </p>
-  <div class="nav">
-    <a class="nav-btn" href="#">
-      <span class="ci ci-burger"></span>
-    </a>
-    <ul class="nav-list">
-       
-	  <li class="spacer">&ac;</li>
+	<div class="container wrapper">
+		<div class="header">
+	
+		<div class="avatar">
+			<a href="https://james-brennan.github.io/">
+				<img src="/img/avatar.jpg" alt="James Brennan" />
+			</a>
+		</div>
+	
+	<h1 class="site-title"><a href="https://james-brennan.github.io/">James Brennan</a></h1>
+	<div class="site-description"><p>A blog about scientific computing, statistics, geoscience and remote sensing.</p><nav class="nav social">
+			<ul class="flat"><li><a href="https://github.com/james-brennan/" title="Github"><i data-feather="github"></i></a></li><li><a href="https://twitter.com/jamesbrennan/" title="Twitter"><i data-feather="twitter"></i></a></li><li><a href="/index.xml" title="RSS"><i data-feather="rss"></i></a></li></ul>
+		</nav></div>
 
-      <li><a href="https://github.com/james-brennan">Github</a></li> 
-      <li><a href="https://twitter.com/jamesbrennan">Twitter</a></li> 
-    </ul>
-  </div>
+	<nav class="nav">
+		<ul class="flat">
+			
+			<li>
+				<a href="/">Home</a>
+			</li>
+			
+			<li>
+				<a href="/posts">All posts</a>
+			</li>
+			
+			<li>
+				<a href="/tags">Tags</a>
+			</li>
+			
+		</ul>
+	</nav>
 </div>
 
-    <div class="content">
-      <div class="post">
-        <h2 class="post-title"><a href="https://james-brennan.github.io/posts/lowess_conf/">Confidence intervals for LOWESS models in python</a></h2>
-        <div class="post-content">
-          <p>LOWESS (or also referred to as LOESS for <em>locally-weighted scatterplot smoothing</em>) is a non-parametric regression method for smoothing data. But how do we get uncertainties on the curve?</p>
+
+		<div class="post">
+			<div class="post-header">
+				
+					<div class="meta">
+						<div class="date">
+							<span class="day">23</span>
+							<span class="rest">Mar 2020</span>
+						</div>
+					</div>
+				
+				<div class="matter">
+					<h1 class="title">Confidence intervals for LOWESS models in python</h1>
+				</div>
+			</div>
+					
+			<div class="markdown">
+				<p>LOWESS (or also referred to as LOESS for <em>locally-weighted scatterplot smoothing</em>) is a non-parametric regression method for smoothing data. But how do we get uncertainties on the curve?</p>
 <p>The &ldquo;non-parametric&rdquo;-ness of the method refers to the fact that unlike linear or non-linear regression, the model can&rsquo;t be parameterised &ndash; we can&rsquo;t write the model as the sum of several parametric terms such as with linear regression:</p>
 <p>$$ y = \beta_0 + \beta_1 x $$</p>
 <p>Instead, LOWESS attempts to fit a linear model for each observation based on nearby (or <em>local</em>) observations. This makes the method more versatile than fitting some n-order polynomial to wiggly data but of course, means that we do not have global parameters such as $ \beta_0 $ and $\beta_1$ with which to test hypotheses. To start looking at LOWESS methods, let&rsquo;s create some nonsense data which has some interesting nonmonotonic response and plot it.</p>
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#007020;font-weight:bold">import</span> <span style="color:#0e84b5;font-weight:bold">numpy</span> <span style="color:#007020;font-weight:bold">as</span> <span style="color:#0e84b5;font-weight:bold">np</span>
-<span style="color:#007020;font-weight:bold">import</span> <span style="color:#0e84b5;font-weight:bold">matplotlib.pyplot</span> <span style="color:#007020;font-weight:bold">as</span> <span style="color:#0e84b5;font-weight:bold">plt</span>
-<span style="color:#007020;font-weight:bold">import</span> <span style="color:#0e84b5;font-weight:bold">seaborn</span> <span style="color:#007020;font-weight:bold">as</span> <span style="color:#0e84b5;font-weight:bold">sns</span>
-<span style="color:#007020;font-weight:bold">import</span> <span style="color:#0e84b5;font-weight:bold">matplotlib.pyplot</span> <span style="color:#007020;font-weight:bold">as</span> <span style="color:#0e84b5;font-weight:bold">plt</span>
-sns<span style="color:#666">.</span>set_style(<span style="color:#4070a0"></span><span style="color:#4070a0">&#34;</span><span style="color:#4070a0">white</span><span style="color:#4070a0">&#34;</span>)
-plt<span style="color:#666">.</span>rc(<span style="color:#4070a0"></span><span style="color:#4070a0">&#34;</span><span style="color:#4070a0">axes.spines</span><span style="color:#4070a0">&#34;</span>, top<span style="color:#666">=</span>False, right<span style="color:#666">=</span>False)
-sns<span style="color:#666">.</span>set_context(<span style="color:#4070a0"></span><span style="color:#4070a0">&#34;</span><span style="color:#4070a0">paper</span><span style="color:#4070a0">&#34;</span>)
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#00a">import</span> <span style="color:#0aa;text-decoration:underline">numpy</span> <span style="color:#00a">as</span> <span style="color:#0aa;text-decoration:underline">np</span>
+<span style="color:#00a">import</span> <span style="color:#0aa;text-decoration:underline">matplotlib.pyplot</span> <span style="color:#00a">as</span> <span style="color:#0aa;text-decoration:underline">plt</span>
+<span style="color:#00a">import</span> <span style="color:#0aa;text-decoration:underline">seaborn</span> <span style="color:#00a">as</span> <span style="color:#0aa;text-decoration:underline">sns</span>
+<span style="color:#00a">import</span> <span style="color:#0aa;text-decoration:underline">matplotlib.pyplot</span> <span style="color:#00a">as</span> <span style="color:#0aa;text-decoration:underline">plt</span>
+sns.set_style(<span style="color:#a50"></span><span style="color:#a50">&#34;</span><span style="color:#a50">white</span><span style="color:#a50">&#34;</span>)
+plt.rc(<span style="color:#a50"></span><span style="color:#a50">&#34;</span><span style="color:#a50">axes.spines</span><span style="color:#a50">&#34;</span>, top=False, right=False)
+sns.set_context(<span style="color:#a50"></span><span style="color:#a50">&#34;</span><span style="color:#a50">paper</span><span style="color:#a50">&#34;</span>)
 
-<span style="color:#60a0b0;font-style:italic"># make some data</span>
-x <span style="color:#666">=</span> <span style="color:#40a070">5</span><span style="color:#666">*</span>np<span style="color:#666">.</span>random<span style="color:#666">.</span>random(<span style="color:#40a070">100</span>)
-y <span style="color:#666">=</span> np<span style="color:#666">.</span>sin(x) <span style="color:#666">*</span> <span style="color:#40a070">3</span><span style="color:#666">*</span>np<span style="color:#666">.</span>exp(<span style="color:#666">-</span>x) <span style="color:#666">+</span> np<span style="color:#666">.</span>random<span style="color:#666">.</span>normal(<span style="color:#40a070">0</span>, <span style="color:#40a070">0.2</span>, <span style="color:#40a070">100</span>)
-plt<span style="color:#666">.</span>plot(x, y, <span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">k.</span><span style="color:#4070a0">&#39;</span>)
+<span style="color:#aaa;font-style:italic"># make some data</span>
+x = <span style="color:#099">5</span>*np.random.random(<span style="color:#099">100</span>)
+y = np.sin(x) * <span style="color:#099">3</span>*np.exp(-x) + np.random.normal(<span style="color:#099">0</span>, <span style="color:#099">0.2</span>, <span style="color:#099">100</span>)
+plt.plot(x, y, <span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">k.</span><span style="color:#a50">&#39;</span>)
 </code></pre></div><p><img src="/img/lowess1_3_1.png" alt="png"></p>
 <h1 id="statsmodels">statsmodels</h1>
 <p>Python package <a href="https://www.statsmodels.org/">statsmodels</a> has an efficient LOWESS smoother built-in which provides the obvious choice for doing a <a href="https://www.statsmodels.org/stable/generated/statsmodels.nonparametric.smoothers_lowess.lowess.html">lowess smoother</a> in python:</p>
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#007020;font-weight:bold">from</span> <span style="color:#0e84b5;font-weight:bold">statsmodels.nonparametric.smoothers_lowess</span> <span style="color:#007020;font-weight:bold">import</span> lowess <span style="color:#007020;font-weight:bold">as</span>  sm_lowess
-sm_x, sm_y <span style="color:#666">=</span> sm_lowess(y, x,  frac<span style="color:#666">=</span><span style="color:#40a070">1.</span><span style="color:#666">/</span><span style="color:#40a070">5.</span>, 
-                           it<span style="color:#666">=</span><span style="color:#40a070">5</span>, return_sorted <span style="color:#666">=</span> True)<span style="color:#666">.</span>T
-plt<span style="color:#666">.</span>plot(sm_x, sm_y, color<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">tomato</span><span style="color:#4070a0">&#39;</span>)
-plt<span style="color:#666">.</span>plot(x, y, <span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">k.</span><span style="color:#4070a0">&#39;</span>)
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#00a">from</span> <span style="color:#0aa;text-decoration:underline">statsmodels.nonparametric.smoothers_lowess</span> <span style="color:#00a">import</span> lowess <span style="color:#00a">as</span>  sm_lowess
+sm_x, sm_y = sm_lowess(y, x,  frac=<span style="color:#099">1.</span>/<span style="color:#099">5.</span>, 
+                           it=<span style="color:#099">5</span>, return_sorted = True).T
+plt.plot(sm_x, sm_y, color=<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">tomato</span><span style="color:#a50">&#39;</span>)
+plt.plot(x, y, <span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">k.</span><span style="color:#a50">&#39;</span>)
 </code></pre></div><p><img src="/img/lowess1_5_1.png" alt="png"></p>
 <p>So that looks fairly sensible, <code>sm_lowess</code> has picked out the main structure in the data but not overfitted the curve to any of the noise in the data.</p>
 <p>Of course, judging the quality of the fit is difficult because we don&rsquo;t really have an idea of the uncertainty. Ideally, we&rsquo;d have a LOWESS method which provides us a confidence interval on the fit of the model so we can see which individual observations are within the fit and those outside of the fitted curve.</p>
 <h1 id="bootstrapping">Bootstrapping</h1>
 <p>One obvious way to get a confidence interval around the LOWESS fit is to use bootstrapping to provide an estimate of the spread of the curve. We&rsquo;ll sample from the observations to change the distribution of points for each fit each time:</p>
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#007020;font-weight:bold">import</span> <span style="color:#0e84b5;font-weight:bold">scipy.interpolate</span>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#00a">import</span> <span style="color:#0aa;text-decoration:underline">scipy.interpolate</span>
 
-<span style="color:#007020;font-weight:bold">def</span> <span style="color:#06287e">smooth</span>(x, y, xgrid):
-    samples <span style="color:#666">=</span> np<span style="color:#666">.</span>random<span style="color:#666">.</span>choice(<span style="color:#007020">len</span>(x), <span style="color:#40a070">50</span>, replace<span style="color:#666">=</span>True)
-    y_s <span style="color:#666">=</span> y[samples]
-    x_s <span style="color:#666">=</span> x[samples]
-    y_sm <span style="color:#666">=</span> sm_lowess(y_s,x_s, frac<span style="color:#666">=</span><span style="color:#40a070">1.</span><span style="color:#666">/</span><span style="color:#40a070">5.</span>, it<span style="color:#666">=</span><span style="color:#40a070">5</span>,
-                     return_sorted <span style="color:#666">=</span> False)
-    <span style="color:#60a0b0;font-style:italic"># regularly sample it onto the grid</span>
-    y_grid <span style="color:#666">=</span> scipy<span style="color:#666">.</span>interpolate<span style="color:#666">.</span>interp1d(x_s, y_sm, 
-                                        fill_value<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">extrapolate</span><span style="color:#4070a0">&#39;</span>)(xgrid)
-    <span style="color:#007020;font-weight:bold">return</span> y_grid
+<span style="color:#00a">def</span> <span style="color:#0a0">smooth</span>(x, y, xgrid):
+    samples = np.random.choice(<span style="color:#0aa">len</span>(x), <span style="color:#099">50</span>, replace=True)
+    y_s = y[samples]
+    x_s = x[samples]
+    y_sm = sm_lowess(y_s,x_s, frac=<span style="color:#099">1.</span>/<span style="color:#099">5.</span>, it=<span style="color:#099">5</span>,
+                     return_sorted = False)
+    <span style="color:#aaa;font-style:italic"># regularly sample it onto the grid</span>
+    y_grid = scipy.interpolate.interp1d(x_s, y_sm, 
+                                        fill_value=<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">extrapolate</span><span style="color:#a50">&#39;</span>)(xgrid)
+    <span style="color:#00a">return</span> y_grid
 </code></pre></div><p>So <code>smooth</code> samples 50% of the observations and fits the LOWESS model. Also because statsmodels doest not provide the solution on an interpolated, and we&rsquo;re randomly sampling each, the solution is interpolated to the same 1d grid each time specified with <code>xgrid</code>.  Let&rsquo;s run <code>smooth</code> 100 times and plot each lowess solution:</p>
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">xgrid <span style="color:#666">=</span> np<span style="color:#666">.</span>linspace(x<span style="color:#666">.</span>min(),x<span style="color:#666">.</span>max())
-K <span style="color:#666">=</span> <span style="color:#40a070">100</span>
-smooths <span style="color:#666">=</span> np<span style="color:#666">.</span>stack([smooth(x, y, xgrid) <span style="color:#007020;font-weight:bold">for</span> k <span style="color:#007020;font-weight:bold">in</span> <span style="color:#007020">range</span>(K)])<span style="color:#666">.</span>T
-plt<span style="color:#666">.</span>plot(xgrid, smooths, color<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">tomato</span><span style="color:#4070a0">&#39;</span>, alpha<span style="color:#666">=</span><span style="color:#40a070">0.25</span>)
-plt<span style="color:#666">.</span>plot(x, y, <span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">k.</span><span style="color:#4070a0">&#39;</span>)
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">xgrid = np.linspace(x.min(),x.max())
+K = <span style="color:#099">100</span>
+smooths = np.stack([smooth(x, y, xgrid) <span style="color:#00a">for</span> k <span style="color:#00a">in</span> <span style="color:#0aa">range</span>(K)]).T
+plt.plot(xgrid, smooths, color=<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">tomato</span><span style="color:#a50">&#39;</span>, alpha=<span style="color:#099">0.25</span>)
+plt.plot(x, y, <span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">k.</span><span style="color:#a50">&#39;</span>)
 </code></pre></div><p><img src="/img/lowess1_9_2.png" alt="png"></p>
 <p>We can then use the individual fits to provide the mean $\mu$ and standard error $\sigma$ of the LOWESS model:</p>
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">mean <span style="color:#666">=</span> np<span style="color:#666">.</span>nanmean(smooths, axis<span style="color:#666">=</span><span style="color:#40a070">1</span>)
-stderr <span style="color:#666">=</span> scipy<span style="color:#666">.</span>stats<span style="color:#666">.</span>sem(smooths, axis<span style="color:#666">=</span><span style="color:#40a070">1</span>)
-stderr <span style="color:#666">=</span> np<span style="color:#666">.</span>nanstd(smooths, axis<span style="color:#666">=</span><span style="color:#40a070">1</span>, ddof<span style="color:#666">=</span><span style="color:#40a070">0</span>)
-<span style="color:#60a0b0;font-style:italic"># plot it</span>
-plt<span style="color:#666">.</span>fill_between(xgrid, mean<span style="color:#666">-</span><span style="color:#40a070">1.96</span><span style="color:#666">*</span>stderr,
-                     mean<span style="color:#666">+</span><span style="color:#40a070">1.96</span><span style="color:#666">*</span>stderr, alpha<span style="color:#666">=</span><span style="color:#40a070">0.25</span>)
-plt<span style="color:#666">.</span>plot(xgrid, mean, color<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">tomato</span><span style="color:#4070a0">&#39;</span>)
-plt<span style="color:#666">.</span>plot(x, y, <span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">k.</span><span style="color:#4070a0">&#39;</span>)
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">mean = np.nanmean(smooths, axis=<span style="color:#099">1</span>)
+stderr = scipy.stats.sem(smooths, axis=<span style="color:#099">1</span>)
+stderr = np.nanstd(smooths, axis=<span style="color:#099">1</span>, ddof=<span style="color:#099">0</span>)
+<span style="color:#aaa;font-style:italic"># plot it</span>
+plt.fill_between(xgrid, mean-<span style="color:#099">1.96</span>*stderr,
+                     mean+<span style="color:#099">1.96</span>*stderr, alpha=<span style="color:#099">0.25</span>)
+plt.plot(xgrid, mean, color=<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">tomato</span><span style="color:#a50">&#39;</span>)
+plt.plot(x, y, <span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">k.</span><span style="color:#a50">&#39;</span>)
 </code></pre></div><p><img src="/img/lowess1_11_1.png" alt="png"></p>
 <p>The 95% confidence interval (shaded blue) seems fairly sensible - the uncertainty increases when observations nearby have a large spread (at around x=2) but also at the edges of the plot where the number of observations tends towards zero (at the very edge we only have observations from the left or right to do the smoothing).</p>
 <p>Similarly, because bootstrapping provides draws from the posterior of the LOWESS smooth we can create a true confidence interval from any percentiles:</p>
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">mean <span style="color:#666">=</span> np<span style="color:#666">.</span>nanmean(smooths, axis<span style="color:#666">=</span><span style="color:#40a070">1</span>)
-c25 <span style="color:#666">=</span> np<span style="color:#666">.</span>nanpercentile(smooths, <span style="color:#40a070">2.5</span>, axis<span style="color:#666">=</span><span style="color:#40a070">1</span>) <span style="color:#60a0b0;font-style:italic">#2.5 percent</span>
-c97 <span style="color:#666">=</span> np<span style="color:#666">.</span>nanpercentile(smooths, <span style="color:#40a070">97.5</span>, axis<span style="color:#666">=</span><span style="color:#40a070">1</span>) <span style="color:#60a0b0;font-style:italic"># 97.5 percent</span>
-<span style="color:#60a0b0;font-style:italic"># a 95% confidence interval</span>
-plt<span style="color:#666">.</span>fill_between(xgrid, mean<span style="color:#666">-</span><span style="color:#40a070">1.96</span><span style="color:#666">*</span>stderr,
-                     mean<span style="color:#666">+</span><span style="color:#40a070">1.96</span><span style="color:#666">*</span>stderr, alpha<span style="color:#666">=</span><span style="color:#40a070">0.25</span>)
-plt<span style="color:#666">.</span>plot(xgrid, mean, color<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">tomato</span><span style="color:#4070a0">&#39;</span>)
-plt<span style="color:#666">.</span>plot(x, y, <span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">k.</span><span style="color:#4070a0">&#39;</span>)
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">mean = np.nanmean(smooths, axis=<span style="color:#099">1</span>)
+c25 = np.nanpercentile(smooths, <span style="color:#099">2.5</span>, axis=<span style="color:#099">1</span>) <span style="color:#aaa;font-style:italic">#2.5 percent</span>
+c97 = np.nanpercentile(smooths, <span style="color:#099">97.5</span>, axis=<span style="color:#099">1</span>) <span style="color:#aaa;font-style:italic"># 97.5 percent</span>
+<span style="color:#aaa;font-style:italic"># a 95% confidence interval</span>
+plt.fill_between(xgrid, mean-<span style="color:#099">1.96</span>*stderr,
+                     mean+<span style="color:#099">1.96</span>*stderr, alpha=<span style="color:#099">0.25</span>)
+plt.plot(xgrid, mean, color=<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">tomato</span><span style="color:#a50">&#39;</span>)
+plt.plot(x, y, <span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">k.</span><span style="color:#a50">&#39;</span>)
 </code></pre></div><p><img src="/img/lowess1_13_1.png" alt="png"></p>
 <h1 id="writing-a-custom-lowess-smoother">Writing a custom LOWESS smoother</h1>
 <p>Notice the similarity in the $\mu + 1.96\sigma$ confidence interval and the percentile-based 95% confidence interval. Actually, under certain assumptions about the errors in the data, these should be the same. This is because LOWESS smoothers essentially fit a unique linear regression for every data point by including nearby data points to estimate the slope and intercept. The correlation in nearby data points helps ensure that we get a smooth curve fit.  We can understand this a bit more clearly by estimating the curve locally for a couple of observations with linear regression:</p>
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#007020;font-weight:bold">import</span> <span style="color:#0e84b5;font-weight:bold">scipy.stats</span>
-order <span style="color:#666">=</span> np<span style="color:#666">.</span>argsort(x) <span style="color:#60a0b0;font-style:italic"># order the points</span>
-k <span style="color:#666">=</span> <span style="color:#40a070">50</span>
-xx <span style="color:#666">=</span> x[order][k<span style="color:#666">-</span><span style="color:#40a070">5</span>:k<span style="color:#666">+</span><span style="color:#40a070">5</span>]
-yy <span style="color:#666">=</span> y[order][k<span style="color:#666">-</span><span style="color:#40a070">5</span>:k<span style="color:#666">+</span><span style="color:#40a070">5</span>]
-plt<span style="color:#666">.</span>plot(x, y, <span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">k.</span><span style="color:#4070a0">&#39;</span>)
-plt<span style="color:#666">.</span>plot(xx, yy, <span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">rs</span><span style="color:#4070a0">&#39;</span>)
-res <span style="color:#666">=</span> scipy<span style="color:#666">.</span>stats<span style="color:#666">.</span>linregress(xx, yy)
-plt<span style="color:#666">.</span>plot(xx, res<span style="color:#666">.</span>intercept <span style="color:#666">+</span> res<span style="color:#666">.</span>slope <span style="color:#666">*</span>xx, <span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">r-</span><span style="color:#4070a0">&#39;</span>)
-k <span style="color:#666">=</span> <span style="color:#40a070">60</span>
-xx <span style="color:#666">=</span> x[order][k<span style="color:#666">-</span><span style="color:#40a070">5</span>:k<span style="color:#666">+</span><span style="color:#40a070">5</span>]
-yy <span style="color:#666">=</span> y[order][k<span style="color:#666">-</span><span style="color:#40a070">5</span>:k<span style="color:#666">+</span><span style="color:#40a070">5</span>]
-plt<span style="color:#666">.</span>plot(x, y, <span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">k.</span><span style="color:#4070a0">&#39;</span>)
-plt<span style="color:#666">.</span>plot(xx, yy, <span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">gs</span><span style="color:#4070a0">&#39;</span>)
-res <span style="color:#666">=</span> scipy<span style="color:#666">.</span>stats<span style="color:#666">.</span>linregress(xx, yy)
-plt<span style="color:#666">.</span>plot(xx, res<span style="color:#666">.</span>intercept <span style="color:#666">+</span> res<span style="color:#666">.</span>slope <span style="color:#666">*</span>xx, <span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">g-</span><span style="color:#4070a0">&#39;</span>)
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#00a">import</span> <span style="color:#0aa;text-decoration:underline">scipy.stats</span>
+order = np.argsort(x) <span style="color:#aaa;font-style:italic"># order the points</span>
+k = <span style="color:#099">50</span>
+xx = x[order][k-<span style="color:#099">5</span>:k+<span style="color:#099">5</span>]
+yy = y[order][k-<span style="color:#099">5</span>:k+<span style="color:#099">5</span>]
+plt.plot(x, y, <span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">k.</span><span style="color:#a50">&#39;</span>)
+plt.plot(xx, yy, <span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">rs</span><span style="color:#a50">&#39;</span>)
+res = scipy.stats.linregress(xx, yy)
+plt.plot(xx, res.intercept + res.slope *xx, <span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">r-</span><span style="color:#a50">&#39;</span>)
+k = <span style="color:#099">60</span>
+xx = x[order][k-<span style="color:#099">5</span>:k+<span style="color:#099">5</span>]
+yy = y[order][k-<span style="color:#099">5</span>:k+<span style="color:#099">5</span>]
+plt.plot(x, y, <span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">k.</span><span style="color:#a50">&#39;</span>)
+plt.plot(xx, yy, <span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">gs</span><span style="color:#a50">&#39;</span>)
+res = scipy.stats.linregress(xx, yy)
+plt.plot(xx, res.intercept + res.slope *xx, <span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">g-</span><span style="color:#a50">&#39;</span>)
 </code></pre></div><p><img src="/img/lowess1_16_1.png" alt="png"></p>
 <p>Extending this principle we can get something that looks a bit like the curve from earlier:</p>
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">order <span style="color:#666">=</span> np<span style="color:#666">.</span>argsort(x)
-<span style="color:#007020;font-weight:bold">for</span> k <span style="color:#007020;font-weight:bold">in</span> <span style="color:#007020">range</span>(<span style="color:#40a070">5</span>, <span style="color:#007020">len</span>(y)<span style="color:#666">-</span><span style="color:#40a070">5</span> ):
-    xx <span style="color:#666">=</span> x[order][k<span style="color:#666">-</span><span style="color:#40a070">5</span>:k<span style="color:#666">+</span><span style="color:#40a070">5</span>]
-    yy <span style="color:#666">=</span> y[order][k<span style="color:#666">-</span><span style="color:#40a070">5</span>:k<span style="color:#666">+</span><span style="color:#40a070">5</span>]
-    plt<span style="color:#666">.</span>plot(xx, yy, <span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">.</span><span style="color:#4070a0">&#39;</span>)
-    res <span style="color:#666">=</span> scipy<span style="color:#666">.</span>stats<span style="color:#666">.</span>linregress(xx, yy)
-    plt<span style="color:#666">.</span>plot(xx, res<span style="color:#666">.</span>intercept <span style="color:#666">+</span> res<span style="color:#666">.</span>slope <span style="color:#666">*</span>xx, <span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">-</span><span style="color:#4070a0">&#39;</span>)
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">order = np.argsort(x)
+<span style="color:#00a">for</span> k <span style="color:#00a">in</span> <span style="color:#0aa">range</span>(<span style="color:#099">5</span>, <span style="color:#0aa">len</span>(y)-<span style="color:#099">5</span> ):
+    xx = x[order][k-<span style="color:#099">5</span>:k+<span style="color:#099">5</span>]
+    yy = y[order][k-<span style="color:#099">5</span>:k+<span style="color:#099">5</span>]
+    plt.plot(xx, yy, <span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">.</span><span style="color:#a50">&#39;</span>)
+    res = scipy.stats.linregress(xx, yy)
+    plt.plot(xx, res.intercept + res.slope *xx, <span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">-</span><span style="color:#a50">&#39;</span>)
 </code></pre></div><p><img src="/img/lowess1_18_0.png" alt="png"></p>
 <p>Instead of just selecting the 5 nearest data points and fitting a simple linear regression, LOWESS weights the points based on the proximity of neighbouring points. This is what specifies LOWESS smoothing as just another <a href="https://en.wikipedia.org/wiki/Kernel_smoother">kernel smoother</a> method in which a function $F$ is used to weight observations based on proximity. For LOWESS, the most commonly used function is the <a href="https://en.wikipedia.org/wiki/Kernel_(statistics)#Kernel_functions_in_common_use">tricube</a>:</p>
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">tricube <span style="color:#666">=</span> <span style="color:#007020;font-weight:bold">lambda</span> d : (<span style="color:#40a070">1</span> <span style="color:#666">-</span> np<span style="color:#666">.</span>abs(d)<span style="color:#666">*</span><span style="color:#666">*</span><span style="color:#40a070">3</span>)<span style="color:#666">*</span><span style="color:#666">*</span><span style="color:#40a070">3</span>
-d <span style="color:#666">=</span> np<span style="color:#666">.</span>linspace(<span style="color:#40a070">0</span>,<span style="color:#40a070">1</span>)
-plt<span style="color:#666">.</span>plot(d, tricube(d))
-plt<span style="color:#666">.</span>xlabel(<span style="color:#4070a0"></span><span style="color:#4070a0">&#34;</span><span style="color:#4070a0">$d$</span><span style="color:#4070a0">&#34;</span>)
-plt<span style="color:#666">.</span>ylabel(<span style="color:#4070a0"></span><span style="color:#4070a0">&#34;</span><span style="color:#4070a0">(1 - np.abs(d)**3)**3</span><span style="color:#4070a0">&#34;</span>)
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">tricube = <span style="color:#00a">lambda</span> d : (<span style="color:#099">1</span> - np.abs(d)**<span style="color:#099">3</span>)**<span style="color:#099">3</span>
+d = np.linspace(<span style="color:#099">0</span>,<span style="color:#099">1</span>)
+plt.plot(d, tricube(d))
+plt.xlabel(<span style="color:#a50"></span><span style="color:#a50">&#34;</span><span style="color:#a50">$d$</span><span style="color:#a50">&#34;</span>)
+plt.ylabel(<span style="color:#a50"></span><span style="color:#a50">&#34;</span><span style="color:#a50">(1 - np.abs(d)**3)**3</span><span style="color:#a50">&#34;</span>)
 </code></pre></div><p><img src="/img/lowess1_20_1.png" alt="png"></p>
 <h2 id="fitting-the-lowess-curve">Fitting the LOWESS curve</h2>
 <p>It&rsquo;s helpful (well necessary) to delve into the LOWESS mathematics at this point. The observations (a collection of x and y points we&rsquo;ll say) are composed of $x$ and $y$ vectors:</p>
@@ -177,17 +214,17 @@ w_1 &amp;  &amp; \\\<br>
 <p>$$ \hat{y}_{sm} = \mathbf{X}_i \hat{\beta}  $$</p>
 <p>So algorithmically we loop over each observation $i$ update the $\mathbf{W}$ with the new weights and resolve the least squares system above to update $\hat{\beta}$ and then predict each $\hat{y}_{sm}$.</p>
 <p>In code this relatively simple to implement for one observation $i$:</p>
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">dist <span style="color:#666">=</span> np<span style="color:#666">.</span>abs((x[i]<span style="color:#666">-</span>x))
-w <span style="color:#666">=</span> tricube(dist)
-<span style="color:#60a0b0;font-style:italic"># form linear system + apply the weights</span>
-A <span style="color:#666">=</span> np<span style="color:#666">.</span>stack([w, x<span style="color:#666">*</span>w])<span style="color:#666">.</span>T
-b <span style="color:#666">=</span> w <span style="color:#666">*</span> y
-ATA <span style="color:#666">=</span> A<span style="color:#666">.</span>T<span style="color:#666">.</span>dot(A)
-ATb <span style="color:#666">=</span> A<span style="color:#666">.</span>T<span style="color:#666">.</span>dot(b)
-<span style="color:#60a0b0;font-style:italic"># solve the system</span>
-sol <span style="color:#666">=</span> np<span style="color:#666">.</span>linalg<span style="color:#666">.</span>solve(ATA, ATb)
-<span style="color:#60a0b0;font-style:italic"># predict for the observation only</span>
-yest <span style="color:#666">=</span> A[i]<span style="color:#666">.</span>dot(sol)
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">dist = np.abs((x[i]-x))
+w = tricube(dist)
+<span style="color:#aaa;font-style:italic"># form linear system + apply the weights</span>
+A = np.stack([w, x*w]).T
+b = w * y
+ATA = A.T.dot(A)
+ATb = A.T.dot(b)
+<span style="color:#aaa;font-style:italic"># solve the system</span>
+sol = np.linalg.solve(ATA, ATb)
+<span style="color:#aaa;font-style:italic"># predict for the observation only</span>
+yest = A[i].dot(sol)
 </code></pre></div><h2 id="confidence-intervals-for-lowess">Confidence intervals for LOWESS</h2>
 <p>Because the LOWESS smoother for any individual prediction is essentially weighted linear least squares, the propagation of uncertainty principles are well understood. With any linear model (with normal errors in the observations $y$) the uncertainty in the parameters $var(\hat{\beta})$ are provided from the posterior covariance matrix:</p>
 <p>$$\sigma^2\left(\mathbf{X}^T  \mathbf{X}\right)^{-1}$$</p>
@@ -207,71 +244,85 @@ yest <span style="color:#666">=</span> A[i]<span style="color:#666">.</span>dot(
 <p>To get the variance or uncertainty in the prediction $var(\hat{y}_{sm})$ we apply standard least squares uncertainty propagation:</p>
 <p>$$ var(\hat{y}_{sm}) = var(\mathbf{X}_i \hat{\beta}) = \mathbf{X}_i^T \sigma^2 \left(\mathbf{X}^T  \mathbf{X}\right)^{-1} \mathbf{X}_i$$</p>
 <p>In code this relatively simple to implement also:</p>
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">var_y_sm <span style="color:#666">=</span> A[i]<span style="color:#666">.</span>dot(sigma<span style="color:#666">*</span><span style="color:#666">*</span><span style="color:#40a070">2</span> <span style="color:#666">*</span> np<span style="color:#666">.</span>linalg<span style="color:#666">.</span>inv(ATA))<span style="color:#666">.</span>dot(A[i])
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">var_y_sm = A[i].dot(sigma**<span style="color:#099">2</span> * np.linalg.inv(ATA)).dot(A[i])
 </code></pre></div><p>Wrapping it all up into a <code>lowess</code> function that loops over each observation and fits the curve and uncertainties:</p>
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#007020;font-weight:bold">def</span> <span style="color:#06287e">lowess</span>(x, y, f<span style="color:#666">=</span><span style="color:#40a070">1.</span><span style="color:#666">/</span><span style="color:#40a070">3.</span>):
-    <span style="color:#4070a0"></span><span style="color:#4070a0">&#34;&#34;&#34;</span><span style="color:#4070a0">
-</span><span style="color:#4070a0"></span><span style="color:#4070a0">    Basic LOWESS smoother with uncertainty. </span><span style="color:#4070a0">
-</span><span style="color:#4070a0"></span><span style="color:#4070a0">    Note:</span><span style="color:#4070a0">
-</span><span style="color:#4070a0"></span><span style="color:#4070a0">        - Not robust (so no iteration) and</span><span style="color:#4070a0">
-</span><span style="color:#4070a0"></span><span style="color:#4070a0">             only normally distributed errors. </span><span style="color:#4070a0">
-</span><span style="color:#4070a0"></span><span style="color:#4070a0">        - No higher order polynomials d=1 </span><span style="color:#4070a0">
-</span><span style="color:#4070a0"></span><span style="color:#4070a0">            so linear smoother.</span><span style="color:#4070a0">
-</span><span style="color:#4070a0"></span><span style="color:#4070a0">    </span><span style="color:#4070a0">&#34;&#34;&#34;</span>
-    <span style="color:#60a0b0;font-style:italic"># get some paras</span>
-    xwidth <span style="color:#666">=</span> f<span style="color:#666">*</span>(x<span style="color:#666">.</span>max()<span style="color:#666">-</span>x<span style="color:#666">.</span>min()) <span style="color:#60a0b0;font-style:italic"># effective width after reduction factor</span>
-    N <span style="color:#666">=</span> <span style="color:#007020">len</span>(x) <span style="color:#60a0b0;font-style:italic"># number of obs</span>
-    <span style="color:#60a0b0;font-style:italic"># Don&#39;t assume the data is sorted</span>
-    order <span style="color:#666">=</span> np<span style="color:#666">.</span>argsort(x)
-    <span style="color:#60a0b0;font-style:italic"># storage</span>
-    y_sm <span style="color:#666">=</span> np<span style="color:#666">.</span>zeros_like(y)
-    y_stderr <span style="color:#666">=</span> np<span style="color:#666">.</span>zeros_like(y)
-    <span style="color:#60a0b0;font-style:italic"># define the weigthing function -- clipping too!</span>
-    tricube <span style="color:#666">=</span> <span style="color:#007020;font-weight:bold">lambda</span> d : np<span style="color:#666">.</span>clip((<span style="color:#40a070">1</span><span style="color:#666">-</span> np<span style="color:#666">.</span>abs(d)<span style="color:#666">*</span><span style="color:#666">*</span><span style="color:#40a070">3</span>)<span style="color:#666">*</span><span style="color:#666">*</span><span style="color:#40a070">3</span>, <span style="color:#40a070">0</span>, <span style="color:#40a070">1</span>)
-    <span style="color:#60a0b0;font-style:italic"># run the regression for each observation i</span>
-    <span style="color:#007020;font-weight:bold">for</span> i <span style="color:#007020;font-weight:bold">in</span> <span style="color:#007020">range</span>(N):
-        dist <span style="color:#666">=</span> np<span style="color:#666">.</span>abs((x[order][i]<span style="color:#666">-</span>x[order]))<span style="color:#666">/</span>xwidth
-        w <span style="color:#666">=</span> tricube(dist)
-        <span style="color:#60a0b0;font-style:italic"># form linear system with the weights</span>
-        A <span style="color:#666">=</span> np<span style="color:#666">.</span>stack([w, x[order]<span style="color:#666">*</span>w])<span style="color:#666">.</span>T
-        b <span style="color:#666">=</span> w <span style="color:#666">*</span> y[order]
-        ATA <span style="color:#666">=</span> A<span style="color:#666">.</span>T<span style="color:#666">.</span>dot(A)
-        ATb <span style="color:#666">=</span> A<span style="color:#666">.</span>T<span style="color:#666">.</span>dot(b)
-        <span style="color:#60a0b0;font-style:italic"># solve the syste</span>
-        sol <span style="color:#666">=</span> np<span style="color:#666">.</span>linalg<span style="color:#666">.</span>solve(ATA, ATb)
-        <span style="color:#60a0b0;font-style:italic"># predict for the observation only</span>
-        yest <span style="color:#666">=</span> A[i]<span style="color:#666">.</span>dot(sol)<span style="color:#60a0b0;font-style:italic"># equiv of A.dot(yest) just for k</span>
-        place <span style="color:#666">=</span> order[i]
-        y_sm[place]<span style="color:#666">=</span>yest 
-        sigma2 <span style="color:#666">=</span> (np<span style="color:#666">.</span>sum((A<span style="color:#666">.</span>dot(sol) <span style="color:#666">-</span>y [order])<span style="color:#666">*</span><span style="color:#666">*</span><span style="color:#40a070">2</span>)<span style="color:#666">/</span>N )
-        <span style="color:#60a0b0;font-style:italic"># Calculate the standard error</span>
-        y_stderr[place] <span style="color:#666">=</span> np<span style="color:#666">.</span>sqrt(sigma2 <span style="color:#666">*</span> 
-                                A[i]<span style="color:#666">.</span>dot(np<span style="color:#666">.</span>linalg<span style="color:#666">.</span>inv(ATA)
-                                                    )<span style="color:#666">.</span>dot(A[i]))
-    <span style="color:#007020;font-weight:bold">return</span> y_sm, y_stderr
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#00a">def</span> <span style="color:#0a0">lowess</span>(x, y, f=<span style="color:#099">1.</span>/<span style="color:#099">3.</span>):
+    <span style="color:#a50"></span><span style="color:#a50">&#34;&#34;&#34;</span><span style="color:#a50">
+</span><span style="color:#a50"></span><span style="color:#a50">    Basic LOWESS smoother with uncertainty. </span><span style="color:#a50">
+</span><span style="color:#a50"></span><span style="color:#a50">    Note:</span><span style="color:#a50">
+</span><span style="color:#a50"></span><span style="color:#a50">        - Not robust (so no iteration) and</span><span style="color:#a50">
+</span><span style="color:#a50"></span><span style="color:#a50">             only normally distributed errors. </span><span style="color:#a50">
+</span><span style="color:#a50"></span><span style="color:#a50">        - No higher order polynomials d=1 </span><span style="color:#a50">
+</span><span style="color:#a50"></span><span style="color:#a50">            so linear smoother.</span><span style="color:#a50">
+</span><span style="color:#a50"></span><span style="color:#a50">    </span><span style="color:#a50">&#34;&#34;&#34;</span>
+    <span style="color:#aaa;font-style:italic"># get some paras</span>
+    xwidth = f*(x.max()-x.min()) <span style="color:#aaa;font-style:italic"># effective width after reduction factor</span>
+    N = <span style="color:#0aa">len</span>(x) <span style="color:#aaa;font-style:italic"># number of obs</span>
+    <span style="color:#aaa;font-style:italic"># Don&#39;t assume the data is sorted</span>
+    order = np.argsort(x)
+    <span style="color:#aaa;font-style:italic"># storage</span>
+    y_sm = np.zeros_like(y)
+    y_stderr = np.zeros_like(y)
+    <span style="color:#aaa;font-style:italic"># define the weigthing function -- clipping too!</span>
+    tricube = <span style="color:#00a">lambda</span> d : np.clip((<span style="color:#099">1</span>- np.abs(d)**<span style="color:#099">3</span>)**<span style="color:#099">3</span>, <span style="color:#099">0</span>, <span style="color:#099">1</span>)
+    <span style="color:#aaa;font-style:italic"># run the regression for each observation i</span>
+    <span style="color:#00a">for</span> i <span style="color:#00a">in</span> <span style="color:#0aa">range</span>(N):
+        dist = np.abs((x[order][i]-x[order]))/xwidth
+        w = tricube(dist)
+        <span style="color:#aaa;font-style:italic"># form linear system with the weights</span>
+        A = np.stack([w, x[order]*w]).T
+        b = w * y[order]
+        ATA = A.T.dot(A)
+        ATb = A.T.dot(b)
+        <span style="color:#aaa;font-style:italic"># solve the syste</span>
+        sol = np.linalg.solve(ATA, ATb)
+        <span style="color:#aaa;font-style:italic"># predict for the observation only</span>
+        yest = A[i].dot(sol)<span style="color:#aaa;font-style:italic"># equiv of A.dot(yest) just for k</span>
+        place = order[i]
+        y_sm[place]=yest 
+        sigma2 = (np.sum((A.dot(sol) -y [order])**<span style="color:#099">2</span>)/N )
+        <span style="color:#aaa;font-style:italic"># Calculate the standard error</span>
+        y_stderr[place] = np.sqrt(sigma2 * 
+                                A[i].dot(np.linalg.inv(ATA)
+                                                    ).dot(A[i]))
+    <span style="color:#00a">return</span> y_sm, y_stderr
 
-<span style="color:#60a0b0;font-style:italic">#run it</span>
-y_sm, y_std <span style="color:#666">=</span> lowess(x, y, f<span style="color:#666">=</span><span style="color:#40a070">1.</span><span style="color:#666">/</span><span style="color:#40a070">5.</span>)
-<span style="color:#60a0b0;font-style:italic"># plot it</span>
-plt<span style="color:#666">.</span>plot(x[order], y_sm[order], color<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">tomato</span><span style="color:#4070a0">&#39;</span>, label<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">LOWESS</span><span style="color:#4070a0">&#39;</span>)
-plt<span style="color:#666">.</span>fill_between(x[order], y_sm[order] <span style="color:#666">-</span> <span style="color:#40a070">1.96</span><span style="color:#666">*</span>y_std[order],
-                 y_sm[order] <span style="color:#666">+</span> <span style="color:#40a070">1.96</span><span style="color:#666">*</span>y_std[order], alpha<span style="color:#666">=</span><span style="color:#40a070">0.3</span>, label<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">LOWESS uncertainty</span><span style="color:#4070a0">&#39;</span>)
-plt<span style="color:#666">.</span>plot(x, y, <span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">k.</span><span style="color:#4070a0">&#39;</span>, label<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">Observations</span><span style="color:#4070a0">&#39;</span>)
-plt<span style="color:#666">.</span>legend(loc<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">best</span><span style="color:#4070a0">&#39;</span>)
-<span style="color:#60a0b0;font-style:italic">#run it</span>
-y_sm, y_std <span style="color:#666">=</span> lowess(x, y, f<span style="color:#666">=</span><span style="color:#40a070">1.</span><span style="color:#666">/</span><span style="color:#40a070">5.</span>)
-<span style="color:#60a0b0;font-style:italic"># plot it</span>
-plt<span style="color:#666">.</span>plot(x[order], y_sm[order], color<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">tomato</span><span style="color:#4070a0">&#39;</span>, label<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">LOWESS</span><span style="color:#4070a0">&#39;</span>)
-plt<span style="color:#666">.</span>fill_between(x[order], y_sm[order] <span style="color:#666">-</span> y_std[order],
-                 y_sm[order] <span style="color:#666">+</span> y_std[order], alpha<span style="color:#666">=</span><span style="color:#40a070">0.3</span>, label<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">LOWESS uncertainty</span><span style="color:#4070a0">&#39;</span>)
-plt<span style="color:#666">.</span>plot(x, y, <span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">k.</span><span style="color:#4070a0">&#39;</span>, label<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">Observations</span><span style="color:#4070a0">&#39;</span>)
-plt<span style="color:#666">.</span>legend(loc<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">best</span><span style="color:#4070a0">&#39;</span>)
+<span style="color:#aaa;font-style:italic">#run it</span>
+y_sm, y_std = lowess(x, y, f=<span style="color:#099">1.</span>/<span style="color:#099">5.</span>)
+<span style="color:#aaa;font-style:italic"># plot it</span>
+plt.plot(x[order], y_sm[order], color=<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">tomato</span><span style="color:#a50">&#39;</span>, label=<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">LOWESS</span><span style="color:#a50">&#39;</span>)
+plt.fill_between(x[order], y_sm[order] - <span style="color:#099">1.96</span>*y_std[order],
+                 y_sm[order] + <span style="color:#099">1.96</span>*y_std[order], alpha=<span style="color:#099">0.3</span>, label=<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">LOWESS uncertainty</span><span style="color:#a50">&#39;</span>)
+plt.plot(x, y, <span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">k.</span><span style="color:#a50">&#39;</span>, label=<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">Observations</span><span style="color:#a50">&#39;</span>)
+plt.legend(loc=<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">best</span><span style="color:#a50">&#39;</span>)
+<span style="color:#aaa;font-style:italic">#run it</span>
+y_sm, y_std = lowess(x, y, f=<span style="color:#099">1.</span>/<span style="color:#099">5.</span>)
+<span style="color:#aaa;font-style:italic"># plot it</span>
+plt.plot(x[order], y_sm[order], color=<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">tomato</span><span style="color:#a50">&#39;</span>, label=<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">LOWESS</span><span style="color:#a50">&#39;</span>)
+plt.fill_between(x[order], y_sm[order] - y_std[order],
+                 y_sm[order] + y_std[order], alpha=<span style="color:#099">0.3</span>, label=<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">LOWESS uncertainty</span><span style="color:#a50">&#39;</span>)
+plt.plot(x, y, <span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">k.</span><span style="color:#a50">&#39;</span>, label=<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">Observations</span><span style="color:#a50">&#39;</span>)
+plt.legend(loc=<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">best</span><span style="color:#a50">&#39;</span>)
 </code></pre></div><p><img src="/img/lowess1_22_1.png" alt="png"></p>
-        </div>
-      </div>
-    </div>
-    
-<script type="text/javascript"
+			</div>
+
+			<div class="tags">
+				
+					
+						<ul class="flat">
+							
+							<li><a href="/tags/python">python</a></li>
+							
+							<li><a href="/tags/uncertainty">uncertainty</a></li>
+							
+							<li><a href="/tags/statistics">statistics</a></li>
+							
+						</ul>
+					
+				
+			</div></div>
+	</div>
+	<script type="text/javascript"
     src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
   </script>
 <script type="text/x-mathjax-config">
@@ -279,27 +330,12 @@ plt<span style="color:#666">.</span>legend(loc<span style="color:#666">=</span><
 </script>
 
 
-
-<div class="footer">
-  
-  <p>Copyright James Brennan 2019. Powered by Hugo.</p>
-  
+<div class="footer wrapper">
+	<nav class="nav">
+		<div>2020  <a href="https://github.com/knadh/hugo-ink">Ink</a> theme on <a href="https://gohugo.io">Hugo</a></div>
+	</nav>
 </div>
 
-  </div>
-  <script src="https://james-brennan.github.io/js/slim.js"></script>
-  <script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-ga('create', 'UA-56616557-2', 'auto');
-ga('send', 'pageview');
-
-</script>
-
-
+<script>feather.replace()</script>
 </body>
-
 </html>

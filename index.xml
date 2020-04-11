@@ -11,12 +11,23 @@
     
     
     <item>
+      <title>About</title>
+      <link>https://james-brennan.github.io/about/</link>
+      <pubDate>Sat, 11 Apr 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://james-brennan.github.io/about/</guid>
+      <description>I made a single.html in ./themes/mytheme/layouts/mylayout/single.html
+I am getting a 404 error.
+Any help would be appreciated.</description>
+    </item>
+    
+    <item>
       <title>Estimating CDFs from data done right</title>
       <link>https://james-brennan.github.io/posts/edf/</link>
       <pubDate>Sat, 11 Apr 2020 00:00:00 +0000</pubDate>
       
       <guid>https://james-brennan.github.io/posts/edf/</guid>
-      <description>&lt;p&gt;Typically when we have some data an initial exploratory analysis is to consider how our data varies. Lots of the time we might have a good idea of the statistical distribution our data is likely drawn from, measurements collected by a satellite might follow a normal distribution. We could use our data to estimate the moments of the Normal distribution to get our population distribution. Sometimes though we do not have a good idea of whether our distribution follows a parametric distribution and want to turn to non-parametric methods. We do this by estimating the &lt;a href=&#34;https://en.wikipedia.org/wiki/Empirical_distribution_function&#34;&gt;empirical distribution function&lt;/a&gt; (the empirical cumulative distribution function CDF) of our data.&lt;/p&gt;</description>
+      <description>&lt;p&gt;This post looks at estimating empirical cumulative density functions (CDFs) and their confidence intervals from data.&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -34,8 +45,7 @@
       <pubDate>Mon, 16 Mar 2020 00:00:00 +0000</pubDate>
       
       <guid>https://james-brennan.github.io/posts/fast_gridding_geopandas/</guid>
-      <description>&lt;p&gt;&lt;img src=&#34;https://james-brennan.github.io/img/top1.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
-&lt;p&gt;This post looks at using the &lt;a href=&#34;https://geopandas.org&#34;&gt;geopandas&lt;/a&gt; library to do fast efficient gridding of point data onto a regular grid. Geopandas is a python package that provides a geospatial extension to pandas &amp;ndash; so that dataframes can store geographic data such as points and polygons.&lt;/p&gt;</description>
+      <description>&lt;p&gt;This post looks at using the &lt;a href=&#34;https://geopandas.org&#34;&gt;geopandas&lt;/a&gt; library to do fast efficient gridding of point data onto a regular grid.&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -44,8 +54,7 @@
       <pubDate>Sat, 14 Mar 2020 00:00:00 +0000</pubDate>
       
       <guid>https://james-brennan.github.io/posts/datashader_raster/</guid>
-      <description>&lt;p&gt;&lt;img src=&#34;https://james-brennan.github.io/img/lai2.png&#34; alt=&#34;img&#34;&gt;
-This post looks at visualising large raster datasets with &lt;a href=&#34;https://datashader.org&#34;&gt;Datashader&lt;/a&gt; and &lt;a href=&#34;http://xarray.pydata.org/en/stable/&#34;&gt;xarray&lt;/a&gt;.&lt;/p&gt;</description>
+      <description>&lt;p&gt;This post looks at visualising large raster datasets with &lt;a href=&#34;https://datashader.org&#34;&gt;Datashader&lt;/a&gt; and &lt;a href=&#34;http://xarray.pydata.org/en/stable/&#34;&gt;xarray&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
     
     <item>

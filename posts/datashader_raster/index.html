@@ -1,56 +1,92 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
-<title> Visualising 2 billion pixel rasters with datashader and xarray &middot; James Brennan </title>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"><title>Visualising 2 billion pixel rasters with datashader and xarray - James Brennan</title><meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta itemprop="name" content="Visualising 2 billion pixel rasters with datashader and xarray">
+<meta itemprop="description" content="This post looks at visualising large raster datasets with Datashader and xarray.">
+<meta itemprop="datePublished" content="2020-03-14T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2020-03-14T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="1904">
 
 
-<link rel="stylesheet" href="https://james-brennan.github.io/css/slim.css">
-<link rel="stylesheet" href="https://james-brennan.github.io/css/highlight.min.css">
-<link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Source+Code+Pro' rel='stylesheet' type='text/css'>
 
-<link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
-<link rel="shortcut icon" href="/favicon.ico">
+<meta itemprop="keywords" content="datashader,xarray,visualisation,python,raster," /><meta property="og:title" content="Visualising 2 billion pixel rasters with datashader and xarray" />
+<meta property="og:description" content="This post looks at visualising large raster datasets with Datashader and xarray." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://james-brennan.github.io/posts/datashader_raster/" />
+<meta property="article:published_time" content="2020-03-14T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-03-14T00:00:00+00:00" /><meta property="og:site_name" content="James Brennan" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Visualising 2 billion pixel rasters with datashader and xarray"/>
+<meta name="twitter:description" content="This post looks at visualising large raster datasets with Datashader and xarray."/>
+<link href='https://fonts.googleapis.com/css?family=Playfair+Display:700' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" type="text/css" media="screen" href="https://james-brennan.github.io/css/normalize.css" />
+	<link rel="stylesheet" type="text/css" media="screen" href="https://james-brennan.github.io/css/main.css" />
 
-
-<link href="" rel="alternate" type="application/rss+xml" title="James Brennan" />
-
+	<script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+		<script src="https://james-brennan.github.io/js/main.js"></script>
 </head>
 
 <body>
-  <div class="container">
-    <div class="header">
-  <h1 class="site-title"><a href="https://james-brennan.github.io/">James Brennan</a></h1>
-  <p class="site-tagline">A blog about scientific computing, statistics, geoscience and remote sensing. </p>
-  <div class="nav">
-    <a class="nav-btn" href="#">
-      <span class="ci ci-burger"></span>
-    </a>
-    <ul class="nav-list">
-       
-	  <li class="spacer">&ac;</li>
+	<div class="container wrapper">
+		<div class="header">
+	
+		<div class="avatar">
+			<a href="https://james-brennan.github.io/">
+				<img src="/img/avatar.jpg" alt="James Brennan" />
+			</a>
+		</div>
+	
+	<h1 class="site-title"><a href="https://james-brennan.github.io/">James Brennan</a></h1>
+	<div class="site-description"><p>A blog about scientific computing, statistics, geoscience and remote sensing.</p><nav class="nav social">
+			<ul class="flat"><li><a href="https://github.com/james-brennan/" title="Github"><i data-feather="github"></i></a></li><li><a href="https://twitter.com/jamesbrennan/" title="Twitter"><i data-feather="twitter"></i></a></li><li><a href="/index.xml" title="RSS"><i data-feather="rss"></i></a></li></ul>
+		</nav></div>
 
-      <li><a href="https://github.com/james-brennan">Github</a></li> 
-      <li><a href="https://twitter.com/jamesbrennan">Twitter</a></li> 
-    </ul>
-  </div>
+	<nav class="nav">
+		<ul class="flat">
+			
+			<li>
+				<a href="/">Home</a>
+			</li>
+			
+			<li>
+				<a href="/posts">All posts</a>
+			</li>
+			
+			<li>
+				<a href="/tags">Tags</a>
+			</li>
+			
+		</ul>
+	</nav>
 </div>
 
-    <div class="content">
-      <div class="post">
-        <h2 class="post-title"><a href="https://james-brennan.github.io/posts/datashader_raster/">Visualising 2 billion pixel rasters with datashader and xarray</a></h2>
-        <div class="post-content">
-          <p><img src="/img/lai2.png" alt="img">
-This post looks at visualising large raster datasets with <a href="https://datashader.org">Datashader</a> and <a href="http://xarray.pydata.org/en/stable/">xarray</a>.</p>
+
+		<div class="post">
+			<div class="post-header">
+				
+					<div class="meta">
+						<div class="date">
+							<span class="day">14</span>
+							<span class="rest">Mar 2020</span>
+						</div>
+					</div>
+				
+				<div class="matter">
+					<h1 class="title">Visualising 2 billion pixel rasters with datashader and xarray</h1>
+				</div>
+			</div>
+					
+			<div class="markdown">
+				<p>This post looks at visualising large raster datasets with <a href="https://datashader.org">Datashader</a> and <a href="http://xarray.pydata.org/en/stable/">xarray</a>.</p>
 <p><a href="https://datashader.org">Datashader</a> is a python package for visualising large datasets through rasterisation. Linked with other modern python packages such as <a href="https://dask.org">dask</a> and <a href="http://xarray.pydata.org/en/stable/">xarray</a> allow for larger-than-memory dataset processing and distributed computing and visualisation of TB datasets.</p>
 <h3 id="the-data">The data</h3>
 <p>The data to visualise is a scientific dataset with satellite observations from the <a href="https://modis.gsfc.nasa.gov/about/">NASA MODIS instruments</a>. A dataset of vegetation leaf area index (LAI) &ndash; essentially the average number of leaves on the trees recorded by the instrument is provided in the <a href="https://lpdaac.usgs.gov/products/mcd15a2hv006/">MCD15</a> data product.</p>
 <p>The raster dataset is provided as smaller datasets split into geographic tiles to make the size more manageable &ndash; the data is collected globally at 500 metres! So the observations are split into individual files which correspond to geographic tiles of about 1200km in size. This format is referred to as the <a href="https://modis.gsfc.nasa.gov/about/">MODIS grid</a> and is shown in the image below:</p>
 <p><img src="/img/modis_tiles.png" alt="modis_tiles"></p>
 <p>To produce a visualisation covering the entire land surface means dealing with the some ~270 individual products which comprise the global product.</p>
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ ls MCD15A2H.A2019001.*
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ ls MCD15A2H.A2019001.*
     MCD15A2H.A2019001.h00v08.006.2019014203755.hdf  MCD15A2H.A2019001.h14v10.006.2019014203827.hdf  MCD15A2H.A2019001.h24v02.006.2019014203845.hdf
     MCD15A2H.A2019001.h00v09.006.2019014203829.hdf  MCD15A2H.A2019001.h14v11.006.2019014203821.hdf  MCD15A2H.A2019001.h24v03.006.2019014203846.hdf
     MCD15A2H.A2019001.h00v10.006.2019014203819.hdf  MCD15A2H.A2019001.h14v14.006.2019014203820.hdf  MCD15A2H.A2019001.h24v04.006.2019014203839.hdf
@@ -62,83 +98,83 @@ This post looks at visualising large raster datasets with <a href="https://datas
     MCD15A2H.A2019001.h14v03.006.2019014203900.hdf  MCD15A2H.A2019001.h23v09.006.2019014203850.hdf  MCD15A2H.A2019001.h35v10.006.2019014203908.hdf
 
 $ ls MCD15A2H.A2019001.* | wc -l
-    <span style="color:#40a070">274</span> 
+    <span style="color:#099">274</span> 
 </code></pre></div><p>So as expected the data is cut into each tile and stored in a separate file with  <code>A2019001</code> referring to the date of the product (1st January 2019) and the tile such as <code>h15v07</code>. Each is stored as a hdf file which provides several nice features. Given this is geospatial raster data, we&rsquo;ll use <a href="https://gdal.org">GDAL</a> to interpret and pre-process the data.  Let&rsquo;s use the <code>gdalinfo</code> to look inside one of these:</p>
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ gdalinfo MCD15A2H.A2019001.h13v12.006.2019014203752.hdf
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ gdalinfo MCD15A2H.A2019001.h13v12.006.2019014203752.hdf
 
-Driver: HDF4/Hierarchical Data Format Release <span style="color:#40a070">4</span>
+Driver: HDF4/Hierarchical Data Format Release <span style="color:#099">4</span>
 Files: MCD15A2H.A2019001.h13v12.006.2019014203752.hdf
-Size is 512, <span style="color:#40a070">512</span>
+Size is 512, <span style="color:#099">512</span>
 Metadata:
-  <span style="color:#bb60d5">ALGORITHMPACKAGEACCEPTANCEDATE</span><span style="color:#666">=</span>10-01-2004
-  <span style="color:#bb60d5">ALGORITHMPACKAGEMATURITYCODE</span><span style="color:#666">=</span>Normal
-  <span style="color:#bb60d5">ALGORITHMPACKAGENAME</span><span style="color:#666">=</span>MCDPR_15A2
+  <span style="color:#a00">ALGORITHMPACKAGEACCEPTANCEDATE</span>=10-01-2004
+  <span style="color:#a00">ALGORITHMPACKAGEMATURITYCODE</span>=Normal
+  <span style="color:#a00">ALGORITHMPACKAGENAME</span>=MCDPR_15A2
 
     ⋮
     ⋮
     ⋮
 
-  <span style="color:#bb60d5">TileID</span><span style="color:#666">=</span><span style="color:#40a070">51013012</span>
-  <span style="color:#bb60d5">UM_VERSION</span><span style="color:#666">=</span>U.MONTANA MODIS PGE34 Vers 5.0.4 Rev <span style="color:#40a070">4</span> Release 10.18.2006 23:59
-  <span style="color:#bb60d5">VERSIONID</span><span style="color:#666">=</span><span style="color:#40a070">6</span>
-  <span style="color:#bb60d5">VERTICALTILENUMBER</span><span style="color:#666">=</span><span style="color:#40a070">12</span>
-  <span style="color:#bb60d5">WESTBOUNDINGCOORDINATE</span><span style="color:#666">=</span>-65.2703644573188
+  <span style="color:#a00">TileID</span>=<span style="color:#099">51013012</span>
+  <span style="color:#a00">UM_VERSION</span>=U.MONTANA MODIS PGE34 Vers 5.0.4 Rev <span style="color:#099">4</span> Release 10.18.2006 23:59
+  <span style="color:#a00">VERSIONID</span>=<span style="color:#099">6</span>
+  <span style="color:#a00">VERTICALTILENUMBER</span>=<span style="color:#099">12</span>
+  <span style="color:#a00">WESTBOUNDINGCOORDINATE</span>=-65.2703644573188
 Subdatasets:
-  <span style="color:#bb60d5">SUBDATASET_1_NAME</span><span style="color:#666">=</span>HDF4_EOS:EOS_GRID:<span style="color:#4070a0">&#34;MCD15A2H.A2019001.h13v12.006.2019014203752.hdf&#34;</span>:MOD_Grid_MOD15A2H:Fpar_500m
-  <span style="color:#bb60d5">SUBDATASET_1_DESC</span><span style="color:#666">=</span><span style="color:#666">[</span>2400x2400<span style="color:#666">]</span> Fpar_500m MOD_Grid_MOD15A2H <span style="color:#666">(</span>8-bit unsigned integer<span style="color:#666">)</span>
-  <span style="color:#bb60d5">SUBDATASET_2_NAME</span><span style="color:#666">=</span>HDF4_EOS:EOS_GRID:<span style="color:#4070a0">&#34;MCD15A2H.A2019001.h13v12.006.2019014203752.hdf&#34;</span>:MOD_Grid_MOD15A2H:Lai_500m
-  <span style="color:#bb60d5">SUBDATASET_2_DESC</span><span style="color:#666">=</span><span style="color:#666">[</span>2400x2400<span style="color:#666">]</span> Lai_500m MOD_Grid_MOD15A2H <span style="color:#666">(</span>8-bit unsigned integer<span style="color:#666">)</span>
-  <span style="color:#bb60d5">SUBDATASET_3_NAME</span><span style="color:#666">=</span>HDF4_EOS:EOS_GRID:<span style="color:#4070a0">&#34;MCD15A2H.A2019001.h13v12.006.2019014203752.hdf&#34;</span>:MOD_Grid_MOD15A2H:FparLai_QC
-  <span style="color:#bb60d5">SUBDATASET_3_DESC</span><span style="color:#666">=</span><span style="color:#666">[</span>2400x2400<span style="color:#666">]</span> FparLai_QC MOD_Grid_MOD15A2H <span style="color:#666">(</span>8-bit unsigned integer<span style="color:#666">)</span>
-  <span style="color:#bb60d5">SUBDATASET_4_NAME</span><span style="color:#666">=</span>HDF4_EOS:EOS_GRID:<span style="color:#4070a0">&#34;MCD15A2H.A2019001.h13v12.006.2019014203752.hdf&#34;</span>:MOD_Grid_MOD15A2H:FparExtra_QC
-  <span style="color:#bb60d5">SUBDATASET_4_DESC</span><span style="color:#666">=</span><span style="color:#666">[</span>2400x2400<span style="color:#666">]</span> FparExtra_QC MOD_Grid_MOD15A2H <span style="color:#666">(</span>8-bit unsigned integer<span style="color:#666">)</span>
-  <span style="color:#bb60d5">SUBDATASET_5_NAME</span><span style="color:#666">=</span>HDF4_EOS:EOS_GRID:<span style="color:#4070a0">&#34;MCD15A2H.A2019001.h13v12.006.2019014203752.hdf&#34;</span>:MOD_Grid_MOD15A2H:FparStdDev_500m
-  <span style="color:#bb60d5">SUBDATASET_5_DESC</span><span style="color:#666">=</span><span style="color:#666">[</span>2400x2400<span style="color:#666">]</span> FparStdDev_500m MOD_Grid_MOD15A2H <span style="color:#666">(</span>8-bit unsigned integer<span style="color:#666">)</span>
-  <span style="color:#bb60d5">SUBDATASET_6_NAME</span><span style="color:#666">=</span>HDF4_EOS:EOS_GRID:<span style="color:#4070a0">&#34;MCD15A2H.A2019001.h13v12.006.2019014203752.hdf&#34;</span>:MOD_Grid_MOD15A2H:LaiStdDev_500m
-  <span style="color:#bb60d5">SUBDATASET_6_DESC</span><span style="color:#666">=</span><span style="color:#666">[</span>2400x2400<span style="color:#666">]</span> LaiStdDev_500m MOD_Grid_MOD15A2H <span style="color:#666">(</span>8-bit unsigned integer<span style="color:#666">)</span>
+  <span style="color:#a00">SUBDATASET_1_NAME</span>=HDF4_EOS:EOS_GRID:<span style="color:#a50">&#34;MCD15A2H.A2019001.h13v12.006.2019014203752.hdf&#34;</span>:MOD_Grid_MOD15A2H:Fpar_500m
+  <span style="color:#a00">SUBDATASET_1_DESC</span>=[2400x2400] Fpar_500m MOD_Grid_MOD15A2H (8-bit unsigned integer)
+  <span style="color:#a00">SUBDATASET_2_NAME</span>=HDF4_EOS:EOS_GRID:<span style="color:#a50">&#34;MCD15A2H.A2019001.h13v12.006.2019014203752.hdf&#34;</span>:MOD_Grid_MOD15A2H:Lai_500m
+  <span style="color:#a00">SUBDATASET_2_DESC</span>=[2400x2400] Lai_500m MOD_Grid_MOD15A2H (8-bit unsigned integer)
+  <span style="color:#a00">SUBDATASET_3_NAME</span>=HDF4_EOS:EOS_GRID:<span style="color:#a50">&#34;MCD15A2H.A2019001.h13v12.006.2019014203752.hdf&#34;</span>:MOD_Grid_MOD15A2H:FparLai_QC
+  <span style="color:#a00">SUBDATASET_3_DESC</span>=[2400x2400] FparLai_QC MOD_Grid_MOD15A2H (8-bit unsigned integer)
+  <span style="color:#a00">SUBDATASET_4_NAME</span>=HDF4_EOS:EOS_GRID:<span style="color:#a50">&#34;MCD15A2H.A2019001.h13v12.006.2019014203752.hdf&#34;</span>:MOD_Grid_MOD15A2H:FparExtra_QC
+  <span style="color:#a00">SUBDATASET_4_DESC</span>=[2400x2400] FparExtra_QC MOD_Grid_MOD15A2H (8-bit unsigned integer)
+  <span style="color:#a00">SUBDATASET_5_NAME</span>=HDF4_EOS:EOS_GRID:<span style="color:#a50">&#34;MCD15A2H.A2019001.h13v12.006.2019014203752.hdf&#34;</span>:MOD_Grid_MOD15A2H:FparStdDev_500m
+  <span style="color:#a00">SUBDATASET_5_DESC</span>=[2400x2400] FparStdDev_500m MOD_Grid_MOD15A2H (8-bit unsigned integer)
+  <span style="color:#a00">SUBDATASET_6_NAME</span>=HDF4_EOS:EOS_GRID:<span style="color:#a50">&#34;MCD15A2H.A2019001.h13v12.006.2019014203752.hdf&#34;</span>:MOD_Grid_MOD15A2H:LaiStdDev_500m
+  <span style="color:#a00">SUBDATASET_6_DESC</span>=[2400x2400] LaiStdDev_500m MOD_Grid_MOD15A2H (8-bit unsigned integer)
 Corner Coordinates:
-Upper Left  <span style="color:#666">(</span>    0.0,    0.0<span style="color:#666">)</span>
-Lower Left  <span style="color:#666">(</span>    0.0,  512.0<span style="color:#666">)</span>
-Upper Right <span style="color:#666">(</span>  512.0,    0.0<span style="color:#666">)</span>
-Lower Right <span style="color:#666">(</span>  512.0,  512.0<span style="color:#666">)</span>
-Center      <span style="color:#666">(</span>  256.0,  256.0<span style="color:#666">)</span>
+Upper Left  (    0.0,    0.0)
+Lower Left  (    0.0,  512.0)
+Upper Right (  512.0,    0.0)
+Lower Right (  512.0,  512.0)
+Center      (  256.0,  256.0)
 </code></pre></div><p>I&rsquo;ve omitted some of the metadata but the key information is the <code>Subdatasets</code> field which details the individual variables contained within the file. We&rsquo;re interested in the LAI field which contains the leaf area index data:</p>
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ gdalinfo HDF4_EOS:EOS_GRID:<span style="color:#4070a0">&#34;MCD15A2H.A2019001.h13v12.006.2019014203752.hdf&#34;</span>:MOD_Grid_MOD15A2H:Lai_500m
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ gdalinfo HDF4_EOS:EOS_GRID:<span style="color:#a50">&#34;MCD15A2H.A2019001.h13v12.006.2019014203752.hdf&#34;</span>:MOD_Grid_MOD15A2H:Lai_500m
 
 Driver: HDF4Image/HDF4 Dataset
 Files: MCD15A2H.A2019001.h13v12.006.2019014203752.hdf
-Size is 2400, <span style="color:#40a070">2400</span>
+Size is 2400, <span style="color:#099">2400</span>
 
     ⋮
     ⋮
     ⋮
 
 Corner Coordinates:
-Upper Left  <span style="color:#666">(</span>-5559752.598,-3335851.559<span style="color:#666">)</span> <span style="color:#666">(</span> 57d44<span style="color:#4070a0">&#39; 6.10&#34;W, 30d 0&#39;</span> 0.00<span style="color:#4070a0">&#34;S)
-</span><span style="color:#4070a0">Lower Left  (-5559752.598,-4447802.079) ( 65d16&#39;13.31&#34;</span>W, 40d 0<span style="color:#4070a0">&#39; 0.00&#34;S)
-</span><span style="color:#4070a0">Upper Right (-4447802.079,-3335851.559) ( 46d11&#39;</span>16.88<span style="color:#4070a0">&#34;W, 30d 0&#39; 0.00&#34;</span>S<span style="color:#666">)</span>
-Lower Right <span style="color:#666">(</span>-4447802.079,-4447802.079<span style="color:#666">)</span> <span style="color:#666">(</span> 52d12<span style="color:#4070a0">&#39;58.65&#34;W, 40d 0&#39;</span> 0.00<span style="color:#4070a0">&#34;S)
-</span><span style="color:#4070a0">Center      (-5003777.339,-3891826.819) ( 54d56&#39; 5.48&#34;</span>W, 35d 0<span style="">&#39;</span> 0.00<span style="color:#4070a0">&#34;</span><span style="color:#4070a0">S)
-</span><span style="color:#4070a0">Band 1 Block=2400x416 Type=Byte, ColorInterp=Gray
-</span><span style="color:#4070a0">  Description = MOD15A2H MODIS/Terra Gridded 500M Leaf Area Index LAI (8-day composite)
-</span><span style="color:#4070a0">  NoData Value=255
-</span><span style="color:#4070a0">  Unit Type: m^2/m^2
-</span><span style="color:#4070a0">  Offset: 0,   Scale:0.1
+Upper Left  (-5559752.598,-3335851.559) ( 57d44<span style="color:#a50">&#39; 6.10&#34;W, 30d 0&#39;</span> 0.00<span style="color:#a50">&#34;S)
+</span><span style="color:#a50">Lower Left  (-5559752.598,-4447802.079) ( 65d16&#39;13.31&#34;</span>W, 40d 0<span style="color:#a50">&#39; 0.00&#34;S)
+</span><span style="color:#a50">Upper Right (-4447802.079,-3335851.559) ( 46d11&#39;</span>16.88<span style="color:#a50">&#34;W, 30d 0&#39; 0.00&#34;</span>S)
+Lower Right (-4447802.079,-4447802.079) ( 52d12<span style="color:#a50">&#39;58.65&#34;W, 40d 0&#39;</span> 0.00<span style="color:#a50">&#34;S)
+</span><span style="color:#a50">Center      (-5003777.339,-3891826.819) ( 54d56&#39; 5.48&#34;</span>W, 35d 0<span style="color:#f00;background-color:#faa">&#39;</span> 0.00<span style="color:#a50">&#34;</span><span style="color:#a50">S)
+</span><span style="color:#a50">Band 1 Block=2400x416 Type=Byte, ColorInterp=Gray
+</span><span style="color:#a50">  Description = MOD15A2H MODIS/Terra Gridded 500M Leaf Area Index LAI (8-day composite)
+</span><span style="color:#a50">  NoData Value=255
+</span><span style="color:#a50">  Unit Type: m^2/m^2
+</span><span style="color:#a50">  Offset: 0,   Scale:0.1
 </span></code></pre></div><p>So this provides information about only the LAI data &ndash; most importantly that the data is a [2400x2400] raster image and the geographic extent.</p>
 <h3 id="virtual-files-with-gdal">Virtual files with GDAL</h3>
 <p>To visualise the whole dataset will require that we get data from each file and pass it to datashader for imaging. Arranging each file into its geographic area for this would be quite cumbersome. Instead <a href="https://gdal.org">GDAL</a> can do the heavy lifting given the geographic information contained in each hdf file. We also don&rsquo;t want to just blindly copy the individual files into one big file and keep this on disk - because why duplicate the data? <code>gdalbuildvrt</code> provides a solution for programmatically storing the processing of these individual files into one global raster:</p>
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ gdalbuildvrt --help
-Usage: gdalbuildvrt <span style="color:#666">[</span>-tileindex field_name<span style="color:#666">]</span>
-                    <span style="color:#666">[</span>-resolution <span style="color:#666">{</span>highest|lowest|average|user<span style="color:#666">}</span><span style="color:#666">]</span>
-                    <span style="color:#666">[</span>-te xmin ymin xmax ymax<span style="color:#666">]</span> <span style="color:#666">[</span>-tr xres yres<span style="color:#666">]</span> <span style="color:#666">[</span>-tap<span style="color:#666">]</span>
-                    <span style="color:#666">[</span>-separate<span style="color:#666">]</span> <span style="color:#666">[</span>-b band<span style="color:#666">]</span> <span style="color:#666">[</span>-sd subdataset<span style="color:#666">]</span>
-                    <span style="color:#666">[</span>-allow_projection_difference<span style="color:#666">]</span> <span style="color:#666">[</span>-q<span style="color:#666">]</span>
-                    <span style="color:#666">[</span>-addalpha<span style="color:#666">]</span> <span style="color:#666">[</span>-hidenodata<span style="color:#666">]</span>
-                    <span style="color:#666">[</span>-srcnodata <span style="color:#4070a0">&#34;value [value...]&#34;</span><span style="color:#666">]</span> <span style="color:#666">[</span>-vrtnodata <span style="color:#4070a0">&#34;value [value...]&#34;</span><span style="color:#666">]</span>
-                    <span style="color:#666">[</span>-a_srs srs_def<span style="color:#666">]</span>
-                    <span style="color:#666">[</span>-r <span style="color:#666">{</span>nearest,bilinear,cubic,cubicspline,lanczos,average,mode<span style="color:#666">}</span><span style="color:#666">]</span>
-                    <span style="color:#666">[</span>-oo <span style="color:#bb60d5">NAME</span><span style="color:#666">=</span>VALUE<span style="color:#666">]</span>*
-                    <span style="color:#666">[</span>-input_file_list my_list.txt<span style="color:#666">]</span> <span style="color:#666">[</span>-overwrite<span style="color:#666">]</span> output.vrt <span style="color:#666">[</span>gdalfile<span style="color:#666">]</span>*
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ gdalbuildvrt --help
+Usage: gdalbuildvrt [-tileindex field_name]
+                    [-resolution {highest|lowest|average|user}]
+                    [-te xmin ymin xmax ymax] [-tr xres yres] [-tap]
+                    [-separate] [-b band] [-sd subdataset]
+                    [-allow_projection_difference] [-q]
+                    [-addalpha] [-hidenodata]
+                    [-srcnodata <span style="color:#a50">&#34;value [value...]&#34;</span>] [-vrtnodata <span style="color:#a50">&#34;value [value...]&#34;</span>]
+                    [-a_srs srs_def]
+                    [-r {nearest,bilinear,cubic,cubicspline,lanczos,average,mode}]
+                    [-oo <span style="color:#a00">NAME</span>=VALUE]*
+                    [-input_file_list my_list.txt] [-overwrite] output.vrt [gdalfile]*
 
 e.g.
   % gdalbuildvrt doq_index.vrt doq/*.tif
@@ -149,14 +185,14 @@ NOTES:
     Otherwise, the files are considered as tiles of a larger mosaic.
   o -b option selects a band to add into vrt.  Multiple bands can be listed.
     By default all bands are queried.
-  o The default tile index field is <span style="color:#4070a0">&#39;location&#39;</span> unless otherwise specified by
+  o The default tile index field is <span style="color:#a50">&#39;location&#39;</span> unless otherwise specified by
     -tileindex.
-  o In <span style="color:#007020;font-weight:bold">case</span> the resolution of all input files is not the same, the -resolution
-    flag <span style="color:#007020">enable</span> the user to control the way the output resolution is computed.
+  o In <span style="color:#00a">case</span> the resolution of all input files is not the same, the -resolution
+    flag <span style="color:#0aa">enable</span> the user to control the way the output resolution is computed.
     Average is the default.
   o Input files may be any valid GDAL dataset or a GDAL raster tile index.
   o For a GDAL raster tile index, all entries will be added to the VRT.
-  o If one GDAL dataset is made of several subdatasets and has <span style="color:#40a070">0</span> raster bands,
+  o If one GDAL dataset is made of several subdatasets and has <span style="color:#099">0</span> raster bands,
     its datasets will be added to the VRT rather than the dataset itself.
     Single subdataset could be selected by its number using the -sd option.
   o By default, only datasets of same projection and band characteristics
@@ -164,29 +200,29 @@ NOTES:
 
 FAILURE: No target filename specified.
 </code></pre></div><p>So <code>gdalbuildvrt</code> produces a &ldquo;virtual file&rdquo;: a set of instructions to GDAL to arrange and mosaic the 200 odd rasters.  Let&rsquo;s use <code>gdalbuildvrt</code> on the products to create a virtual raster <code>LAI.vrt</code>:</p>
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ gdalbuildvrt -sd <span style="color:#40a070">2</span> LAI.vrt MCD15A2H.A2019001.* 
-0...10...20...30...40...50...60...70...80...90...100 - <span style="color:#007020;font-weight:bold">done</span>.
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ gdalbuildvrt -sd <span style="color:#099">2</span> LAI.vrt MCD15A2H.A2019001.* 
+0...10...20...30...40...50...60...70...80...90...100 - <span style="color:#00a">done</span>.
 </code></pre></div><p>The created VRT file <code>LAI.vrt</code> is essentially a text-file containing a set of instructions for GDAL to mosaic and project the individual hdf files.</p>
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ cat LAI.vrt | head
-VRTDataset <span style="color:#bb60d5">rasterXSize</span><span style="color:#666">=</span><span style="color:#4070a0">&#34;86400&#34;</span> <span style="color:#bb60d5">rasterYSize</span><span style="color:#666">=</span><span style="color:#4070a0">&#34;31200&#34;</span>&gt;
-  &lt;SRS <span style="color:#bb60d5">dataAxisToSRSAxisMapping</span><span style="color:#666">=</span><span style="color:#4070a0">&#34;1,2&#34;</span>&gt;PROJCS<span style="color:#666">[</span><span style="color:#4070a0">&#34;unnamed&#34;</span>,GEOGCS<span style="color:#666">[</span><span style="color:#4070a0">&#34;Unknown datum based upon the custom spheroid&#34;</span>,DATUM<span style="color:#666">[</span><span style="color:#4070a0">&#34;Not_specified_based_on_custom_spheroid&#34;</span>,SPHEROID<span style="color:#666">[</span><span style="color:#4070a0">&#34;Custom spheroid&#34;</span>,6371007.181,0<span style="color:#666">]</span><span style="color:#666">]</span>,PRIMEM<span style="color:#666">[</span><span style="color:#4070a0">&#34;Greenwich&#34;</span>,0<span style="color:#666">]</span>,UNIT<span style="color:#666">[</span><span style="color:#4070a0">&#34;degree&#34;</span>,0.0174532925199433,AUTHORITY<span style="color:#666">[</span><span style="color:#4070a0">&#34;EPSG&#34;</span>,<span style="color:#4070a0">&#34;9122&#34;</span><span style="color:#666">]</span><span style="color:#666">]</span><span style="color:#666">]</span>,PROJECTION<span style="color:#666">[</span><span style="color:#4070a0">&#34;Sinusoidal&#34;</span><span style="color:#666">]</span>,PARAMETER<span style="color:#666">[</span><span style="color:#4070a0">&#34;longitude_of_center&#34;</span>,0<span style="color:#666">]</span>,PARAMETER<span style="color:#666">[</span><span style="color:#4070a0">&#34;false_easting&#34;</span>,0<span style="color:#666">]</span>,PARAMETER<span style="color:#666">[</span><span style="color:#4070a0">&#34;false_northing&#34;</span>,0<span style="color:#666">]</span>,UNIT<span style="color:#666">[</span><span style="color:#4070a0">&#34;Meter&#34;</span>,1<span style="color:#666">]</span>,AXIS<span style="color:#666">[</span><span style="color:#4070a0">&#34;Easting&#34;</span>,EAST<span style="color:#666">]</span>,AXIS<span style="color:#666">[</span><span style="color:#4070a0">&#34;Northing&#34;</span>,NORTH<span style="color:#666">]</span><span style="color:#666">]</span>&lt;/SRS&gt;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ cat LAI.vrt | head
+VRTDataset <span style="color:#a00">rasterXSize</span>=<span style="color:#a50">&#34;86400&#34;</span> <span style="color:#a00">rasterYSize</span>=<span style="color:#a50">&#34;31200&#34;</span>&gt;
+  &lt;SRS <span style="color:#a00">dataAxisToSRSAxisMapping</span>=<span style="color:#a50">&#34;1,2&#34;</span>&gt;PROJCS[<span style="color:#a50">&#34;unnamed&#34;</span>,GEOGCS[<span style="color:#a50">&#34;Unknown datum based upon the custom spheroid&#34;</span>,DATUM[<span style="color:#a50">&#34;Not_specified_based_on_custom_spheroid&#34;</span>,SPHEROID[<span style="color:#a50">&#34;Custom spheroid&#34;</span>,6371007.181,0]],PRIMEM[<span style="color:#a50">&#34;Greenwich&#34;</span>,0],UNIT[<span style="color:#a50">&#34;degree&#34;</span>,0.0174532925199433,AUTHORITY[<span style="color:#a50">&#34;EPSG&#34;</span>,<span style="color:#a50">&#34;9122&#34;</span>]]],PROJECTION[<span style="color:#a50">&#34;Sinusoidal&#34;</span>],PARAMETER[<span style="color:#a50">&#34;longitude_of_center&#34;</span>,0],PARAMETER[<span style="color:#a50">&#34;false_easting&#34;</span>,0],PARAMETER[<span style="color:#a50">&#34;false_northing&#34;</span>,0],UNIT[<span style="color:#a50">&#34;Meter&#34;</span>,1],AXIS[<span style="color:#a50">&#34;Easting&#34;</span>,EAST],AXIS[<span style="color:#a50">&#34;Northing&#34;</span>,NORTH]]&lt;/SRS&gt;
   &lt;GeoTransform&gt; -2.0015109353999998e+07,  4.6331271652777122e+02,  0.0000000000000000e+00,  7.7836536376670003e+06,  0.0000000000000000e+00, -4.6331271652778770e+02&lt;/GeoTransform&gt;
-  &lt;VRTRasterBand <span style="color:#bb60d5">dataType</span><span style="color:#666">=</span><span style="color:#4070a0">&#34;Byte&#34;</span> <span style="color:#bb60d5">band</span><span style="color:#666">=</span><span style="color:#4070a0">&#34;1&#34;</span>&gt;
+  &lt;VRTRasterBand <span style="color:#a00">dataType</span>=<span style="color:#a50">&#34;Byte&#34;</span> <span style="color:#a00">band</span>=<span style="color:#a50">&#34;1&#34;</span>&gt;
     &lt;NoDataValue&gt;255&lt;/NoDataValue&gt;
     &lt;Scale&gt;0.1&lt;/Scale&gt;
     &lt;ColorInterp&gt;Gray&lt;/ColorInterp&gt;
     &lt;ComplexSource&gt;
-      &lt;SourceFilename <span style="color:#bb60d5">relativeToVRT</span><span style="color:#666">=</span><span style="color:#4070a0">&#34;0&#34;</span>&gt;HDF4_EOS:EOS_GRID:<span style="color:#4070a0">&#34;MCD15A2H.A2019001.h00v08.006.2019014203755.hdf&#34;</span>:MOD_Grid_MOD15A2H:Lai_500m&lt;/SourceFilename&gt;
+      &lt;SourceFilename <span style="color:#a00">relativeToVRT</span>=<span style="color:#a50">&#34;0&#34;</span>&gt;HDF4_EOS:EOS_GRID:<span style="color:#a50">&#34;MCD15A2H.A2019001.h00v08.006.2019014203755.hdf&#34;</span>:MOD_Grid_MOD15A2H:Lai_500m&lt;/SourceFilename&gt;
       &lt;SourceBand&gt;1&lt;/SourceBand&gt;
 
 $ cat LAI.vrt | tail
 
     &lt;ComplexSource&gt;
-      &lt;SourceFilename <span style="color:#bb60d5">relativeToVRT</span><span style="color:#666">=</span><span style="color:#4070a0">&#34;0&#34;</span>&gt;HDF4_EOS:EOS_GRID:<span style="color:#4070a0">&#34;MCD15A2H.A2019001.h35v10.006.2019014203908.hdf&#34;</span>:MOD_Grid_MOD15A2H:Lai_500m&lt;/SourceFilename&gt;
+      &lt;SourceFilename <span style="color:#a00">relativeToVRT</span>=<span style="color:#a50">&#34;0&#34;</span>&gt;HDF4_EOS:EOS_GRID:<span style="color:#a50">&#34;MCD15A2H.A2019001.h35v10.006.2019014203908.hdf&#34;</span>:MOD_Grid_MOD15A2H:Lai_500m&lt;/SourceFilename&gt;
       &lt;SourceBand&gt;1&lt;/SourceBand&gt;
-      &lt;SourceProperties <span style="color:#bb60d5">RasterXSize</span><span style="color:#666">=</span><span style="color:#4070a0">&#34;2400&#34;</span> <span style="color:#bb60d5">RasterYSize</span><span style="color:#666">=</span><span style="color:#4070a0">&#34;2400&#34;</span> <span style="color:#bb60d5">DataType</span><span style="color:#666">=</span><span style="color:#4070a0">&#34;Byte&#34;</span> <span style="color:#bb60d5">BlockXSize</span><span style="color:#666">=</span><span style="color:#4070a0">&#34;2400&#34;</span> <span style="color:#bb60d5">BlockYSize</span><span style="color:#666">=</span><span style="color:#4070a0">&#34;416&#34;</span> /&gt;
-      &lt;SrcRect <span style="color:#bb60d5">xOff</span><span style="color:#666">=</span><span style="color:#4070a0">&#34;0&#34;</span> <span style="color:#bb60d5">yOff</span><span style="color:#666">=</span><span style="color:#4070a0">&#34;0&#34;</span> <span style="color:#bb60d5">xSize</span><span style="color:#666">=</span><span style="color:#4070a0">&#34;2400&#34;</span> <span style="color:#bb60d5">ySize</span><span style="color:#666">=</span><span style="color:#4070a0">&#34;2400&#34;</span> /&gt;
-      &lt;DstRect <span style="color:#bb60d5">xOff</span><span style="color:#666">=</span><span style="color:#4070a0">&#34;84000&#34;</span> <span style="color:#bb60d5">yOff</span><span style="color:#666">=</span><span style="color:#4070a0">&#34;19200&#34;</span> <span style="color:#bb60d5">xSize</span><span style="color:#666">=</span><span style="color:#4070a0">&#34;2400&#34;</span> <span style="color:#bb60d5">ySize</span><span style="color:#666">=</span><span style="color:#4070a0">&#34;2400&#34;</span> /&gt;
+      &lt;SourceProperties <span style="color:#a00">RasterXSize</span>=<span style="color:#a50">&#34;2400&#34;</span> <span style="color:#a00">RasterYSize</span>=<span style="color:#a50">&#34;2400&#34;</span> <span style="color:#a00">DataType</span>=<span style="color:#a50">&#34;Byte&#34;</span> <span style="color:#a00">BlockXSize</span>=<span style="color:#a50">&#34;2400&#34;</span> <span style="color:#a00">BlockYSize</span>=<span style="color:#a50">&#34;416&#34;</span> /&gt;
+      &lt;SrcRect <span style="color:#a00">xOff</span>=<span style="color:#a50">&#34;0&#34;</span> <span style="color:#a00">yOff</span>=<span style="color:#a50">&#34;0&#34;</span> <span style="color:#a00">xSize</span>=<span style="color:#a50">&#34;2400&#34;</span> <span style="color:#a00">ySize</span>=<span style="color:#a50">&#34;2400&#34;</span> /&gt;
+      &lt;DstRect <span style="color:#a00">xOff</span>=<span style="color:#a50">&#34;84000&#34;</span> <span style="color:#a00">yOff</span>=<span style="color:#a50">&#34;19200&#34;</span> <span style="color:#a00">xSize</span>=<span style="color:#a50">&#34;2400&#34;</span> <span style="color:#a00">ySize</span>=<span style="color:#a50">&#34;2400&#34;</span> /&gt;
       &lt;NODATA&gt;255&lt;/NODATA&gt;
     &lt;/ComplexSource&gt;
   &lt;/VRTRasterBand&gt;
@@ -194,156 +230,174 @@ $ cat LAI.vrt | tail
 </code></pre></div><p>In this case the file is fairly simple to decipher (well atleast bits). Each file is a <code>ComplexSource</code> and the subdataset for each file isolated as <code>HDF4_EOS:EOS_GRID:&quot;MCD15A2H.A2019001.h35v10.006.2019014203908.hdf&quot;:MOD_Grid_MOD15A2H:Lai_500m</code>.
 <code>&lt;SrcRect xOff=&quot;0&quot; yOff=&quot;0&quot; xSize=&quot;2400&quot; ySize=&quot;2400&quot; /&gt;</code> indicates where to get the input (<code>Src</code>) data in the file and <code>&lt;DstRect xOff=&quot;84000&quot; yOff=&quot;19200&quot; xSize=&quot;2400&quot; ySize=&quot;2400&quot; /&gt;</code> explains where to place this data in the virtual file. In this case 19200 pixels down and 84000 across. The VRT file therefore provides a virtual representation of the MODIS tile grid shown in the image above.</p>
 <p>And like with the hdf files, <code>gdalinfo</code> provides information on the newly created vrt:</p>
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ gdalinfo LAI.vrt
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ gdalinfo LAI.vrt
 Driver: VRT/Virtual Raster
 Files: LAI.vrt
-Size is 86400, <span style="color:#40a070">31200</span>
+Size is 86400, <span style="color:#099">31200</span>
 Coordinate System is:
-PROJCRS<span style="color:#666">[</span><span style="color:#4070a0">&#34;unnamed&#34;</span>,
-    BASEGEOGCRS<span style="color:#666">[</span><span style="color:#4070a0">&#34;Unknown datum based upon the custom spheroid&#34;</span>,
-        DATUM<span style="color:#666">[</span><span style="color:#4070a0">&#34;Not_specified_based_on_custom_spheroid&#34;</span>,
-            ELLIPSOID<span style="color:#666">[</span><span style="color:#4070a0">&#34;Custom spheroid&#34;</span>,6371007.181,0,
-                LENGTHUNIT<span style="color:#666">[</span><span style="color:#4070a0">&#34;metre&#34;</span>,1,
-                    ID<span style="color:#666">[</span><span style="color:#4070a0">&#34;EPSG&#34;</span>,9001<span style="color:#666">]</span><span style="color:#666">]</span><span style="color:#666">]</span><span style="color:#666">]</span>,
-        PRIMEM<span style="color:#666">[</span><span style="color:#4070a0">&#34;Greenwich&#34;</span>,0,
-            ANGLEUNIT<span style="color:#666">[</span><span style="color:#4070a0">&#34;degree&#34;</span>,0.0174532925199433,
-                ID<span style="color:#666">[</span><span style="color:#4070a0">&#34;EPSG&#34;</span>,9122<span style="color:#666">]</span><span style="color:#666">]</span><span style="color:#666">]</span><span style="color:#666">]</span>,
-    CONVERSION<span style="color:#666">[</span><span style="color:#4070a0">&#34;unnamed&#34;</span>,
-        METHOD<span style="color:#666">[</span><span style="color:#4070a0">&#34;Sinusoidal&#34;</span><span style="color:#666">]</span>,
-        PARAMETER<span style="color:#666">[</span><span style="color:#4070a0">&#34;Longitude of natural origin&#34;</span>,0,
-            ANGLEUNIT<span style="color:#666">[</span><span style="color:#4070a0">&#34;degree&#34;</span>,0.0174532925199433<span style="color:#666">]</span>,
-            ID<span style="color:#666">[</span><span style="color:#4070a0">&#34;EPSG&#34;</span>,8802<span style="color:#666">]</span><span style="color:#666">]</span>,
-        PARAMETER<span style="color:#666">[</span><span style="color:#4070a0">&#34;False easting&#34;</span>,0,
-            LENGTHUNIT<span style="color:#666">[</span><span style="color:#4070a0">&#34;Meter&#34;</span>,1<span style="color:#666">]</span>,
-            ID<span style="color:#666">[</span><span style="color:#4070a0">&#34;EPSG&#34;</span>,8806<span style="color:#666">]</span><span style="color:#666">]</span>,
-        PARAMETER<span style="color:#666">[</span><span style="color:#4070a0">&#34;False northing&#34;</span>,0,
-            LENGTHUNIT<span style="color:#666">[</span><span style="color:#4070a0">&#34;Meter&#34;</span>,1<span style="color:#666">]</span>,
-            ID<span style="color:#666">[</span><span style="color:#4070a0">&#34;EPSG&#34;</span>,8807<span style="color:#666">]</span><span style="color:#666">]</span><span style="color:#666">]</span>,
-    CS<span style="color:#666">[</span>Cartesian,2<span style="color:#666">]</span>,
-        AXIS<span style="color:#666">[</span><span style="color:#4070a0">&#34;easting&#34;</span>,east,
-            ORDER<span style="color:#666">[</span>1<span style="color:#666">]</span>,
-            LENGTHUNIT<span style="color:#666">[</span><span style="color:#4070a0">&#34;Meter&#34;</span>,1<span style="color:#666">]</span><span style="color:#666">]</span>,
-        AXIS<span style="color:#666">[</span><span style="color:#4070a0">&#34;northing&#34;</span>,north,
-            ORDER<span style="color:#666">[</span>2<span style="color:#666">]</span>,
-            LENGTHUNIT<span style="color:#666">[</span><span style="color:#4070a0">&#34;Meter&#34;</span>,1<span style="color:#666">]</span><span style="color:#666">]</span><span style="color:#666">]</span>
+PROJCRS[<span style="color:#a50">&#34;unnamed&#34;</span>,
+    BASEGEOGCRS[<span style="color:#a50">&#34;Unknown datum based upon the custom spheroid&#34;</span>,
+        DATUM[<span style="color:#a50">&#34;Not_specified_based_on_custom_spheroid&#34;</span>,
+            ELLIPSOID[<span style="color:#a50">&#34;Custom spheroid&#34;</span>,6371007.181,0,
+                LENGTHUNIT[<span style="color:#a50">&#34;metre&#34;</span>,1,
+                    ID[<span style="color:#a50">&#34;EPSG&#34;</span>,9001]]]],
+        PRIMEM[<span style="color:#a50">&#34;Greenwich&#34;</span>,0,
+            ANGLEUNIT[<span style="color:#a50">&#34;degree&#34;</span>,0.0174532925199433,
+                ID[<span style="color:#a50">&#34;EPSG&#34;</span>,9122]]]],
+    CONVERSION[<span style="color:#a50">&#34;unnamed&#34;</span>,
+        METHOD[<span style="color:#a50">&#34;Sinusoidal&#34;</span>],
+        PARAMETER[<span style="color:#a50">&#34;Longitude of natural origin&#34;</span>,0,
+            ANGLEUNIT[<span style="color:#a50">&#34;degree&#34;</span>,0.0174532925199433],
+            ID[<span style="color:#a50">&#34;EPSG&#34;</span>,8802]],
+        PARAMETER[<span style="color:#a50">&#34;False easting&#34;</span>,0,
+            LENGTHUNIT[<span style="color:#a50">&#34;Meter&#34;</span>,1],
+            ID[<span style="color:#a50">&#34;EPSG&#34;</span>,8806]],
+        PARAMETER[<span style="color:#a50">&#34;False northing&#34;</span>,0,
+            LENGTHUNIT[<span style="color:#a50">&#34;Meter&#34;</span>,1],
+            ID[<span style="color:#a50">&#34;EPSG&#34;</span>,8807]]],
+    CS[Cartesian,2],
+        AXIS[<span style="color:#a50">&#34;easting&#34;</span>,east,
+            ORDER[1],
+            LENGTHUNIT[<span style="color:#a50">&#34;Meter&#34;</span>,1]],
+        AXIS[<span style="color:#a50">&#34;northing&#34;</span>,north,
+            ORDER[2],
+            LENGTHUNIT[<span style="color:#a50">&#34;Meter&#34;</span>,1]]]
 Data axis to CRS axis mapping: 1,2
-<span style="color:#bb60d5">Origin</span> <span style="color:#666">=</span> <span style="color:#666">(</span>-20015109.353999998420477,7783653.637667000293732<span style="color:#666">)</span>
-Pixel <span style="color:#bb60d5">Size</span> <span style="color:#666">=</span> <span style="color:#666">(</span>463.312716527771215,-463.312716527787700<span style="color:#666">)</span>
+<span style="color:#a00">Origin</span> = (-20015109.353999998420477,7783653.637667000293732)
+Pixel <span style="color:#a00">Size</span> = (463.312716527771215,-463.312716527787700)
 Corner Coordinates:
-Upper Left  <span style="color:#666">(</span>-20015109.354, 7783653.638<span style="color:#666">)</span> <span style="color:#666">(</span>166d17<span style="color:#4070a0">&#39; 5.25&#34;W, 70d 0&#39;</span> 0.00<span style="color:#4070a0">&#34;N)
-</span><span style="color:#4070a0">Lower Left  (-20015109.354,-6671703.118) (  0d 0&#39; 0.00&#34;</span>E, 60d 0<span style="color:#4070a0">&#39; 0.00&#34;S)
-</span><span style="color:#4070a0">Upper Right (20015109.354, 7783653.638) (166d17&#39;</span> 5.25<span style="color:#4070a0">&#34;E, 70d 0&#39; 0.00&#34;</span>N<span style="color:#666">)</span>
-Lower Right <span style="color:#666">(</span>20015109.354,-6671703.118<span style="color:#666">)</span> <span style="color:#666">(</span>  0d 0<span style="color:#4070a0">&#39; 0.00&#34;W, 60d 0&#39;</span> 0.00<span style="color:#4070a0">&#34;S)
-</span><span style="color:#4070a0">Center      (      -0.000,  555975.260) (  0d 0&#39; 0.00&#34;</span>W,  5d 0<span style="">&#39;</span> 0.00<span style="color:#4070a0">&#34;</span><span style="color:#4070a0">N)
-</span><span style="color:#4070a0">Band 1 Block=128x128 Type=Byte, ColorInterp=Gray
-</span><span style="color:#4070a0">  NoData Value=255
-</span><span style="color:#4070a0">  Offset: 0,   Scale:0.1
+Upper Left  (-20015109.354, 7783653.638) (166d17<span style="color:#a50">&#39; 5.25&#34;W, 70d 0&#39;</span> 0.00<span style="color:#a50">&#34;N)
+</span><span style="color:#a50">Lower Left  (-20015109.354,-6671703.118) (  0d 0&#39; 0.00&#34;</span>E, 60d 0<span style="color:#a50">&#39; 0.00&#34;S)
+</span><span style="color:#a50">Upper Right (20015109.354, 7783653.638) (166d17&#39;</span> 5.25<span style="color:#a50">&#34;E, 70d 0&#39; 0.00&#34;</span>N)
+Lower Right (20015109.354,-6671703.118) (  0d 0<span style="color:#a50">&#39; 0.00&#34;W, 60d 0&#39;</span> 0.00<span style="color:#a50">&#34;S)
+</span><span style="color:#a50">Center      (      -0.000,  555975.260) (  0d 0&#39; 0.00&#34;</span>W,  5d 0<span style="color:#f00;background-color:#faa">&#39;</span> 0.00<span style="color:#a50">&#34;</span><span style="color:#a50">N)
+</span><span style="color:#a50">Band 1 Block=128x128 Type=Byte, ColorInterp=Gray
+</span><span style="color:#a50">  NoData Value=255
+</span><span style="color:#a50">  Offset: 0,   Scale:0.1
 </span></code></pre></div><p>So <code>LAI.vrt</code> has one raster band, a scaling factor to rescale the data to fall between 0.0-2.55 rather than 0-255 which match the expected units of LAI itself. The size of the raster is 86400 pixels &ldquo;tall&rdquo; and 31200 pixels wide, which means it contains 2695680000 pixels &ndash; i.e some ~2.69 billion!</p>
 <h3 id="xarray-for-out-of-memory-rasters">xarray for out-of-memory rasters</h3>
 <p>Loading <code>LAI.vrt</code> is remarkably simple thanks to the <a href="http://xarray.pydata.org/en/stable/#">xarray</a> and <a href="https://rasterio.readthedocs.io/en/latest/">rasterio</a> python package which is built ontop of GDAL.</p>
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#007020;font-weight:bold">import</span> <span style="color:#0e84b5;font-weight:bold">xarray</span> <span style="color:#007020;font-weight:bold">as</span> <span style="color:#0e84b5;font-weight:bold">xr</span>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#00a">import</span> <span style="color:#0aa;text-decoration:underline">xarray</span> <span style="color:#00a">as</span> <span style="color:#0aa;text-decoration:underline">xr</span>
 
-In [<span style="color:#40a070">2</span>]: da <span style="color:#666">=</span> xr<span style="color:#666">.</span>open_rasterio(<span style="color:#4070a0"></span><span style="color:#4070a0">&#34;</span><span style="color:#4070a0">LAI.vrt</span><span style="color:#4070a0">&#34;</span>)
+In [<span style="color:#099">2</span>]: da = xr.open_rasterio(<span style="color:#a50"></span><span style="color:#a50">&#34;</span><span style="color:#a50">LAI.vrt</span><span style="color:#a50">&#34;</span>)
 
-In [<span style="color:#40a070">3</span>]: da
-Out[<span style="color:#40a070">3</span>]:
-<span style="color:#666">&lt;</span>xarray<span style="color:#666">.</span>DataArray (band: <span style="color:#40a070">1</span>, y: <span style="color:#40a070">31200</span>, x: <span style="color:#40a070">86400</span>)<span style="color:#666">&gt;</span>
-[<span style="color:#40a070">2695680000</span> values <span style="color:#007020;font-weight:bold">with</span> dtype<span style="color:#666">=</span>uint8]
+In [<span style="color:#099">3</span>]: da
+Out[<span style="color:#099">3</span>]:
+&lt;xarray.DataArray (band: <span style="color:#099">1</span>, y: <span style="color:#099">31200</span>, x: <span style="color:#099">86400</span>)&gt;
+[<span style="color:#099">2695680000</span> values <span style="color:#00a">with</span> dtype=uint8]
 Coordinates:
-  <span style="color:#666">*</span> band     (band) int64 <span style="color:#40a070">1</span>
-  <span style="color:#666">*</span> y        (y) float64 <span style="color:#40a070">7.783e+06</span> <span style="color:#40a070">7.783e+06</span> <span style="color:#40a070">7.782e+06</span> <span style="color:#666">.</span><span style="color:#666">.</span><span style="color:#666">.</span> <span style="color:#666">-</span><span style="color:#40a070">6.671e+06</span> <span style="color:#666">-</span><span style="color:#40a070">6.671e+06</span>
-  <span style="color:#666">*</span> x        (x) float64 <span style="color:#666">-</span><span style="color:#40a070">2.001e+07</span> <span style="color:#666">-</span><span style="color:#40a070">2.001e+07</span> <span style="color:#666">.</span><span style="color:#666">.</span><span style="color:#666">.</span> <span style="color:#40a070">2.001e+07</span> <span style="color:#40a070">2.001e+07</span>
+  * band     (band) int64 <span style="color:#099">1</span>
+  * y        (y) float64 <span style="color:#099">7.783e+06</span> <span style="color:#099">7.783e+06</span> <span style="color:#099">7.782e+06</span> ... -<span style="color:#099">6.671e+06</span> -<span style="color:#099">6.671e+06</span>
+  * x        (x) float64 -<span style="color:#099">2.001e+07</span> -<span style="color:#099">2.001e+07</span> ... <span style="color:#099">2.001e+07</span> <span style="color:#099">2.001e+07</span>
 Attributes:
-    transform:   (<span style="color:#40a070">463.3127165277712</span>, <span style="color:#40a070">0.0</span>, <span style="color:#666">-</span><span style="color:#40a070">20015109.354</span>, <span style="color:#40a070">0.0</span>, <span style="color:#666">-</span><span style="color:#40a070">463.3127165277</span><span style="color:#666">.</span><span style="color:#666">.</span><span style="color:#666">.</span>
-    crs:         <span style="color:#666">+</span>proj<span style="color:#666">=</span>sinu <span style="color:#666">+</span>lon_0<span style="color:#666">=</span><span style="color:#40a070">0</span> <span style="color:#666">+</span>x_0<span style="color:#666">=</span><span style="color:#40a070">0</span> <span style="color:#666">+</span>y_0<span style="color:#666">=</span><span style="color:#40a070">0</span> <span style="color:#666">+</span>R<span style="color:#666">=</span><span style="color:#40a070">6371007.181</span> <span style="color:#666">+</span>units<span style="color:#666">=</span>m <span style="color:#666">+</span>n<span style="color:#666">.</span><span style="color:#666">.</span><span style="color:#666">.</span>
-    res:         (<span style="color:#40a070">463.3127165277712</span>, <span style="color:#40a070">463.3127165277877</span>)
-    is_tiled:    <span style="color:#40a070">1</span>
-    nodatavals:  (<span style="color:#40a070">255.0</span>,)
-    scales:      (<span style="color:#40a070">0.1</span>,)
-    offsets:     (<span style="color:#40a070">0.0</span>,)
+    transform:   (<span style="color:#099">463.3127165277712</span>, <span style="color:#099">0.0</span>, -<span style="color:#099">20015109.354</span>, <span style="color:#099">0.0</span>, -<span style="color:#099">463.3127165277</span>...
+    crs:         +proj=sinu +lon_0=<span style="color:#099">0</span> +x_0=<span style="color:#099">0</span> +y_0=<span style="color:#099">0</span> +R=<span style="color:#099">6371007.181</span> +units=m +n...
+    res:         (<span style="color:#099">463.3127165277712</span>, <span style="color:#099">463.3127165277877</span>)
+    is_tiled:    <span style="color:#099">1</span>
+    nodatavals:  (<span style="color:#099">255.0</span>,)
+    scales:      (<span style="color:#099">0.1</span>,)
+    offsets:     (<span style="color:#099">0.0</span>,)
 </code></pre></div><p>Crucially though, xarray has recognised that the <code>LAI.vrt</code> is actually a file composed of many smaller files which chunked together make the fall raster.   The <code>is_tiled:    1</code> attribute means that xarray knows that essentially every 2400x2400 pixels correspond to a new hdf file which needs to be read into memory and processed. This means that xarray can optimise opening only files needed to visualise a certain area, for example only opening files which cover South America. This also means that the whole 2 billion pixels do not need to be simultaneously read into memory. Though in reality, 2.69bn bytes is only ~3Gb.</p>
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">In [<span style="color:#40a070">4</span>]: da<span style="color:#666">.</span>nbytes <span style="color:#666">/</span> <span style="color:#40a070">1e+9</span>
-   <span style="color:#666">.</span><span style="color:#666">.</span><span style="color:#666">.</span>:
-Out[<span style="color:#40a070">4</span>]: <span style="color:#40a070">2.69568</span>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">In [<span style="color:#099">4</span>]: da.nbytes / <span style="color:#099">1e+9</span>
+   ...:
+Out[<span style="color:#099">4</span>]: <span style="color:#099">2.69568</span>
 </code></pre></div><p>xarray DataArrays behave similarly to numpy arrays, with fancy slice indexing:</p>
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">In [<span style="color:#40a070">5</span>]: da[<span style="color:#40a070">0</span>, <span style="color:#40a070">8000</span>:<span style="color:#40a070">12000</span>, <span style="color:#40a070">5000</span>:<span style="color:#40a070">7000</span>]
-Out[<span style="color:#40a070">5</span>]:
-<span style="color:#666">&lt;</span>xarray<span style="color:#666">.</span>DataArray (y: <span style="color:#40a070">4000</span>, x: <span style="color:#40a070">2000</span>)<span style="color:#666">&gt;</span>
-[<span style="color:#40a070">8000000</span> values <span style="color:#007020;font-weight:bold">with</span> dtype<span style="color:#666">=</span>uint8]
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">In [<span style="color:#099">5</span>]: da[<span style="color:#099">0</span>, <span style="color:#099">8000</span>:<span style="color:#099">12000</span>, <span style="color:#099">5000</span>:<span style="color:#099">7000</span>]
+Out[<span style="color:#099">5</span>]:
+&lt;xarray.DataArray (y: <span style="color:#099">4000</span>, x: <span style="color:#099">2000</span>)&gt;
+[<span style="color:#099">8000000</span> values <span style="color:#00a">with</span> dtype=uint8]
 Coordinates:
-    band     int64 <span style="color:#40a070">1</span>
-  <span style="color:#666">*</span> y        (y) float64 <span style="color:#40a070">4.077e+06</span> <span style="color:#40a070">4.076e+06</span> <span style="color:#40a070">4.076e+06</span> <span style="color:#666">.</span><span style="color:#666">.</span><span style="color:#666">.</span> <span style="color:#40a070">2.225e+06</span> <span style="color:#40a070">2.224e+06</span>
-  <span style="color:#666">*</span> x        (x) float64 <span style="color:#666">-</span><span style="color:#40a070">1.77e+07</span> <span style="color:#666">-</span><span style="color:#40a070">1.77e+07</span> <span style="color:#666">-</span><span style="color:#40a070">1.77e+07</span> <span style="color:#666">.</span><span style="color:#666">.</span><span style="color:#666">.</span> <span style="color:#666">-</span><span style="color:#40a070">1.677e+07</span> <span style="color:#666">-</span><span style="color:#40a070">1.677e+07</span>
+    band     int64 <span style="color:#099">1</span>
+  * y        (y) float64 <span style="color:#099">4.077e+06</span> <span style="color:#099">4.076e+06</span> <span style="color:#099">4.076e+06</span> ... <span style="color:#099">2.225e+06</span> <span style="color:#099">2.224e+06</span>
+  * x        (x) float64 -<span style="color:#099">1.77e+07</span> -<span style="color:#099">1.77e+07</span> -<span style="color:#099">1.77e+07</span> ... -<span style="color:#099">1.677e+07</span> -<span style="color:#099">1.677e+07</span>
 Attributes:
-    transform:   (<span style="color:#40a070">463.3127165277712</span>, <span style="color:#40a070">0.0</span>, <span style="color:#666">-</span><span style="color:#40a070">20015109.354</span>, <span style="color:#40a070">0.0</span>, <span style="color:#666">-</span><span style="color:#40a070">463.3127165277</span><span style="color:#666">.</span><span style="color:#666">.</span><span style="color:#666">.</span>
-    crs:         <span style="color:#666">+</span>proj<span style="color:#666">=</span>sinu <span style="color:#666">+</span>lon_0<span style="color:#666">=</span><span style="color:#40a070">0</span> <span style="color:#666">+</span>x_0<span style="color:#666">=</span><span style="color:#40a070">0</span> <span style="color:#666">+</span>y_0<span style="color:#666">=</span><span style="color:#40a070">0</span> <span style="color:#666">+</span>R<span style="color:#666">=</span><span style="color:#40a070">6371007.181</span> <span style="color:#666">+</span>units<span style="color:#666">=</span>m <span style="color:#666">+</span>n<span style="color:#666">.</span><span style="color:#666">.</span><span style="color:#666">.</span>
-    res:         (<span style="color:#40a070">463.3127165277712</span>, <span style="color:#40a070">463.3127165277877</span>)
-    is_tiled:    <span style="color:#40a070">1</span>
-    nodatavals:  (<span style="color:#40a070">255.0</span>,)
-    scales:      (<span style="color:#40a070">0.1</span>,)
-    offsets:     (<span style="color:#40a070">0.0</span>,)
+    transform:   (<span style="color:#099">463.3127165277712</span>, <span style="color:#099">0.0</span>, -<span style="color:#099">20015109.354</span>, <span style="color:#099">0.0</span>, -<span style="color:#099">463.3127165277</span>...
+    crs:         +proj=sinu +lon_0=<span style="color:#099">0</span> +x_0=<span style="color:#099">0</span> +y_0=<span style="color:#099">0</span> +R=<span style="color:#099">6371007.181</span> +units=m +n...
+    res:         (<span style="color:#099">463.3127165277712</span>, <span style="color:#099">463.3127165277877</span>)
+    is_tiled:    <span style="color:#099">1</span>
+    nodatavals:  (<span style="color:#099">255.0</span>,)
+    scales:      (<span style="color:#099">0.1</span>,)
+    offsets:     (<span style="color:#099">0.0</span>,)
 </code></pre></div><p>The key difference here is that the array remains stored on disk in the individual hdf files. We&rsquo;ve not loaded the data into memory until:</p>
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">In [<span style="color:#40a070">7</span>]: da[<span style="color:#40a070">0</span>, <span style="color:#40a070">12000</span>:<span style="color:#40a070">14000</span>, <span style="color:#40a070">5000</span>:<span style="color:#40a070">7000</span>]<span style="color:#666">.</span>values
-Out[<span style="color:#40a070">7</span>]:
-array([[<span style="color:#40a070">255</span>, <span style="color:#40a070">255</span>, <span style="color:#40a070">255</span>, <span style="color:#666">.</span><span style="color:#666">.</span><span style="color:#666">.</span>, <span style="color:#40a070">255</span>, <span style="color:#40a070">255</span>, <span style="color:#40a070">255</span>],
-       [<span style="color:#40a070">255</span>, <span style="color:#40a070">255</span>, <span style="color:#40a070">255</span>, <span style="color:#666">.</span><span style="color:#666">.</span><span style="color:#666">.</span>, <span style="color:#40a070">255</span>, <span style="color:#40a070">255</span>, <span style="color:#40a070">255</span>],
-       [<span style="color:#40a070">255</span>, <span style="color:#40a070">255</span>, <span style="color:#40a070">255</span>, <span style="color:#666">.</span><span style="color:#666">.</span><span style="color:#666">.</span>, <span style="color:#40a070">255</span>, <span style="color:#40a070">255</span>, <span style="color:#40a070">255</span>],
-       <span style="color:#666">.</span><span style="color:#666">.</span><span style="color:#666">.</span>,
-       [<span style="color:#40a070">254</span>, <span style="color:#40a070">254</span>, <span style="color:#40a070">254</span>, <span style="color:#666">.</span><span style="color:#666">.</span><span style="color:#666">.</span>, <span style="color:#40a070">254</span>, <span style="color:#40a070">254</span>, <span style="color:#40a070">254</span>],
-       [<span style="color:#40a070">254</span>, <span style="color:#40a070">254</span>, <span style="color:#40a070">254</span>, <span style="color:#666">.</span><span style="color:#666">.</span><span style="color:#666">.</span>, <span style="color:#40a070">254</span>, <span style="color:#40a070">254</span>, <span style="color:#40a070">254</span>],
-       [<span style="color:#40a070">254</span>, <span style="color:#40a070">254</span>, <span style="color:#40a070">254</span>, <span style="color:#666">.</span><span style="color:#666">.</span><span style="color:#666">.</span>, <span style="color:#40a070">254</span>, <span style="color:#40a070">254</span>, <span style="color:#40a070">254</span>]], dtype<span style="color:#666">=</span>uint8)
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">In [<span style="color:#099">7</span>]: da[<span style="color:#099">0</span>, <span style="color:#099">12000</span>:<span style="color:#099">14000</span>, <span style="color:#099">5000</span>:<span style="color:#099">7000</span>].values
+Out[<span style="color:#099">7</span>]:
+array([[<span style="color:#099">255</span>, <span style="color:#099">255</span>, <span style="color:#099">255</span>, ..., <span style="color:#099">255</span>, <span style="color:#099">255</span>, <span style="color:#099">255</span>],
+       [<span style="color:#099">255</span>, <span style="color:#099">255</span>, <span style="color:#099">255</span>, ..., <span style="color:#099">255</span>, <span style="color:#099">255</span>, <span style="color:#099">255</span>],
+       [<span style="color:#099">255</span>, <span style="color:#099">255</span>, <span style="color:#099">255</span>, ..., <span style="color:#099">255</span>, <span style="color:#099">255</span>, <span style="color:#099">255</span>],
+       ...,
+       [<span style="color:#099">254</span>, <span style="color:#099">254</span>, <span style="color:#099">254</span>, ..., <span style="color:#099">254</span>, <span style="color:#099">254</span>, <span style="color:#099">254</span>],
+       [<span style="color:#099">254</span>, <span style="color:#099">254</span>, <span style="color:#099">254</span>, ..., <span style="color:#099">254</span>, <span style="color:#099">254</span>, <span style="color:#099">254</span>],
+       [<span style="color:#099">254</span>, <span style="color:#099">254</span>, <span style="color:#099">254</span>, ..., <span style="color:#099">254</span>, <span style="color:#099">254</span>, <span style="color:#099">254</span>]], dtype=uint8)
 </code></pre></div><h3 id="visualisation-with-datashader">Visualisation with datashader</h3>
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#007020;font-weight:bold">import</span> <span style="color:#0e84b5;font-weight:bold">datashader</span> <span style="color:#007020;font-weight:bold">as</span> <span style="color:#0e84b5;font-weight:bold">ds</span>
-<span style="color:#007020;font-weight:bold">from</span> <span style="color:#0e84b5;font-weight:bold">datashader</span> <span style="color:#007020;font-weight:bold">import</span> transfer_functions <span style="color:#007020;font-weight:bold">as</span> tf 
-<span style="color:#007020;font-weight:bold">from</span> <span style="color:#0e84b5;font-weight:bold">datashader</span> <span style="color:#007020;font-weight:bold">import</span> utils
-<span style="color:#007020;font-weight:bold">from</span> <span style="color:#0e84b5;font-weight:bold">colorcet</span> <span style="color:#007020;font-weight:bold">import</span> palette
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#00a">import</span> <span style="color:#0aa;text-decoration:underline">datashader</span> <span style="color:#00a">as</span> <span style="color:#0aa;text-decoration:underline">ds</span>
+<span style="color:#00a">from</span> <span style="color:#0aa;text-decoration:underline">datashader</span> <span style="color:#00a">import</span> transfer_functions <span style="color:#00a">as</span> tf 
+<span style="color:#00a">from</span> <span style="color:#0aa;text-decoration:underline">datashader</span> <span style="color:#00a">import</span> utils
+<span style="color:#00a">from</span> <span style="color:#0aa;text-decoration:underline">colorcet</span> <span style="color:#00a">import</span> palette
 </code></pre></div><p>The principle behind datashader is rasterisation of the data and then imaging. So a dataset of points will be first rasterized to produce you guessed it &ndash; an xarray.DataArray. Because <code>da</code> is already a raster datashader we provide it directly with <code>raster()</code>:</p>
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#60a0b0;font-style:italic"># colors</span>
-cmap <span style="color:#666">=</span> palette[<span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">kgy</span><span style="color:#4070a0">&#39;</span>]
-bg_col <span style="color:#666">=</span> <span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">black</span><span style="color:#4070a0">&#39;</span>
-ys, xs <span style="color:#666">=</span> <span style="color:#007020">int</span>(da<span style="color:#666">.</span>shape[<span style="color:#40a070">1</span>]<span style="color:#666">*</span><span style="color:#40a070">0.02</span>), <span style="color:#007020">int</span>(da<span style="color:#666">.</span>shape[<span style="color:#40a070">2</span>]<span style="color:#666">*</span><span style="color:#40a070">0.02</span>)
-agg <span style="color:#666">=</span>  ds<span style="color:#666">.</span>Canvas(plot_width<span style="color:#666">=</span>xs, plot_height<span style="color:#666">=</span>ys)<span style="color:#666">.</span>raster(da[<span style="color:#40a070">0</span>], 
-                  downsample_method<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">mean</span><span style="color:#4070a0">&#39;</span>)
-img <span style="color:#666">=</span> tf<span style="color:#666">.</span>shade(agg, cmap<span style="color:#666">=</span>cmap)
-img <span style="color:#666">=</span> tf<span style="color:#666">.</span>set_background(img, bg_col)
-utils<span style="color:#666">.</span>export_image(img<span style="color:#666">=</span>img, filename<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">lai</span><span style="color:#4070a0">&#39;</span>, fmt<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#34;</span><span style="color:#4070a0">.png</span><span style="color:#4070a0">&#34;</span>, 
-                    background<span style="color:#666">=</span>None)
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#aaa;font-style:italic"># colors</span>
+cmap = palette[<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">kgy</span><span style="color:#a50">&#39;</span>]
+bg_col = <span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">black</span><span style="color:#a50">&#39;</span>
+ys, xs = <span style="color:#0aa">int</span>(da.shape[<span style="color:#099">1</span>]*<span style="color:#099">0.02</span>), <span style="color:#0aa">int</span>(da.shape[<span style="color:#099">2</span>]*<span style="color:#099">0.02</span>)
+agg =  ds.Canvas(plot_width=xs, plot_height=ys).raster(da[<span style="color:#099">0</span>], 
+                  downsample_method=<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">mean</span><span style="color:#a50">&#39;</span>)
+img = tf.shade(agg, cmap=cmap)
+img = tf.set_background(img, bg_col)
+utils.export_image(img=img, filename=<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">lai</span><span style="color:#a50">&#39;</span>, fmt=<span style="color:#a50"></span><span style="color:#a50">&#34;</span><span style="color:#a50">.png</span><span style="color:#a50">&#34;</span>, 
+                    background=None)
 </code></pre></div><p>Which produces the following:</p>
 <p><img src="/img/lai.png" alt="img"></p>
 <p>Which is perfectly serviceable &ndash; the high LAI areas of the tropics can be made out with the darker greens but the visualisation would be improved by masking out the fill values. Anything greater than 150 (a LAI of 15) is fill:</p>
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">da <span style="color:#666">=</span> da<span style="color:#666">.</span>where(da <span style="color:#666">&lt;</span> <span style="color:#40a070">150.</span>)  
-agg <span style="color:#666">=</span>  ds<span style="color:#666">.</span>Canvas(plot_width<span style="color:#666">=</span>xs, plot_height<span style="color:#666">=</span>ys)<span style="color:#666">.</span>raster(da[<span style="color:#40a070">0</span>], 
-                    downsample_method<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">mean</span><span style="color:#4070a0">&#39;</span>)
-img <span style="color:#666">=</span> tf<span style="color:#666">.</span>shade(agg, cmap<span style="color:#666">=</span>cmap)
-img <span style="color:#666">=</span> tf<span style="color:#666">.</span>set_background(img, bg_col)
-utils<span style="color:#666">.</span>export_image(img<span style="color:#666">=</span>img, filename<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">lai2</span><span style="color:#4070a0">&#39;</span>, fmt<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#34;</span><span style="color:#4070a0">.png</span><span style="color:#4070a0">&#34;</span>,
-                     background<span style="color:#666">=</span>None)
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">da = da.where(da &lt; <span style="color:#099">150.</span>)  
+agg =  ds.Canvas(plot_width=xs, plot_height=ys).raster(da[<span style="color:#099">0</span>], 
+                    downsample_method=<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">mean</span><span style="color:#a50">&#39;</span>)
+img = tf.shade(agg, cmap=cmap)
+img = tf.set_background(img, bg_col)
+utils.export_image(img=img, filename=<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">lai2</span><span style="color:#a50">&#39;</span>, fmt=<span style="color:#a50"></span><span style="color:#a50">&#34;</span><span style="color:#a50">.png</span><span style="color:#a50">&#34;</span>,
+                     background=None)
 </code></pre></div><p><img src="/img/lai2.png" alt="img"></p>
 <p>That&rsquo;s much better! The true areas of highest LAI now pop out in bright green, and the oceans and deserts are now black. It&rsquo;s also, of course, possible to focus in on one continent to get a better view of detail patterns:</p>
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">africa <span style="color:#666">=</span> da[<span style="color:#40a070">0</span>, :, :]
-ys, xs <span style="color:#666">=</span> <span style="color:#007020">int</span>(africa<span style="color:#666">.</span>shape[<span style="color:#40a070">1</span>]<span style="color:#666">*</span><span style="color:#40a070">0.02</span>), <span style="color:#007020">int</span>(africa<span style="color:#666">.</span>shape[<span style="color:#40a070">2</span>]<span style="color:#666">*</span><span style="color:#40a070">0.02</span>)
-agg <span style="color:#666">=</span>  ds<span style="color:#666">.</span>Canvas(plot_width<span style="color:#666">=</span>xs, plot_height<span style="color:#666">=</span>ys)<span style="color:#666">.</span>raster(africa[<span style="color:#40a070">0</span>], 
-                  downsample_method<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">mean</span><span style="color:#4070a0">&#39;</span>)
-img <span style="color:#666">=</span> tf<span style="color:#666">.</span>shade(agg, cmap<span style="color:#666">=</span>cmap)
-img <span style="color:#666">=</span> tf<span style="color:#666">.</span>set_background(img, bg_col)
-utils<span style="color:#666">.</span>export_image(img<span style="color:#666">=</span>img, filename<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">lai_africa</span><span style="color:#4070a0">&#39;</span>, 
-                    fmt<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#34;</span><span style="color:#4070a0">.png</span><span style="color:#4070a0">&#34;</span>, background<span style="color:#666">=</span>None)
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">africa = da[<span style="color:#099">0</span>, :, :]
+ys, xs = <span style="color:#0aa">int</span>(africa.shape[<span style="color:#099">1</span>]*<span style="color:#099">0.02</span>), <span style="color:#0aa">int</span>(africa.shape[<span style="color:#099">2</span>]*<span style="color:#099">0.02</span>)
+agg =  ds.Canvas(plot_width=xs, plot_height=ys).raster(africa[<span style="color:#099">0</span>], 
+                  downsample_method=<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">mean</span><span style="color:#a50">&#39;</span>)
+img = tf.shade(agg, cmap=cmap)
+img = tf.set_background(img, bg_col)
+utils.export_image(img=img, filename=<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">lai_africa</span><span style="color:#a50">&#39;</span>, 
+                    fmt=<span style="color:#a50"></span><span style="color:#a50">&#34;</span><span style="color:#a50">.png</span><span style="color:#a50">&#34;</span>, background=None)
 </code></pre></div><p><img src="/img/lai_africa.png" alt="img"></p>
 <p>Or zoom into the 500m data even further:</p>
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">africa_zm <span style="color:#666">=</span> da[<span style="color:#40a070">0</span>, <span style="color:#40a070">15500</span>:<span style="color:#40a070">18500</span>, <span style="color:#40a070">48000</span>:<span style="color:#40a070">51000</span>]
-ys, xs <span style="color:#666">=</span> <span style="color:#007020">int</span>(africa_zm<span style="color:#666">.</span>shape[<span style="color:#40a070">0</span>]<span style="color:#666">*</span><span style="color:#40a070">0.5</span>), <span style="color:#007020">int</span>(africa_zm<span style="color:#666">.</span>shape[<span style="color:#40a070">1</span>]<span style="color:#666">*</span><span style="color:#40a070">0.5</span>)
-agg <span style="color:#666">=</span>  ds<span style="color:#666">.</span>Canvas(plot_width<span style="color:#666">=</span>xs, plot_height<span style="color:#666">=</span>ys)<span style="color:#666">.</span>raster(africa_zm, 
-                downsample_method<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">mean</span><span style="color:#4070a0">&#39;</span>)
-img <span style="color:#666">=</span> tf<span style="color:#666">.</span>shade(agg, cmap<span style="color:#666">=</span>cmap)
-img <span style="color:#666">=</span> tf<span style="color:#666">.</span>set_background(img, bg_col)
-utils<span style="color:#666">.</span>export_image(img<span style="color:#666">=</span>img, filename<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#39;</span><span style="color:#4070a0">lai_africa_zoom</span><span style="color:#4070a0">&#39;</span>, 
-              fmt<span style="color:#666">=</span><span style="color:#4070a0"></span><span style="color:#4070a0">&#34;</span><span style="color:#4070a0">.png</span><span style="color:#4070a0">&#34;</span>, background<span style="color:#666">=</span>None)
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">africa_zm = da[<span style="color:#099">0</span>, <span style="color:#099">15500</span>:<span style="color:#099">18500</span>, <span style="color:#099">48000</span>:<span style="color:#099">51000</span>]
+ys, xs = <span style="color:#0aa">int</span>(africa_zm.shape[<span style="color:#099">0</span>]*<span style="color:#099">0.5</span>), <span style="color:#0aa">int</span>(africa_zm.shape[<span style="color:#099">1</span>]*<span style="color:#099">0.5</span>)
+agg =  ds.Canvas(plot_width=xs, plot_height=ys).raster(africa_zm, 
+                downsample_method=<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">mean</span><span style="color:#a50">&#39;</span>)
+img = tf.shade(agg, cmap=cmap)
+img = tf.set_background(img, bg_col)
+utils.export_image(img=img, filename=<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">lai_africa_zoom</span><span style="color:#a50">&#39;</span>, 
+              fmt=<span style="color:#a50"></span><span style="color:#a50">&#34;</span><span style="color:#a50">.png</span><span style="color:#a50">&#34;</span>, background=None)
 </code></pre></div><p><img src="/img/lai_africa_zoom.png" alt="img"></p>
-        </div>
-      </div>
-    </div>
-    
-<script type="text/javascript"
+			</div>
+
+			<div class="tags">
+				
+					
+						<ul class="flat">
+							
+							<li><a href="/tags/datashader">datashader</a></li>
+							
+							<li><a href="/tags/xarray">xarray</a></li>
+							
+							<li><a href="/tags/visualisation">visualisation</a></li>
+							
+							<li><a href="/tags/python">python</a></li>
+							
+							<li><a href="/tags/raster">raster</a></li>
+							
+						</ul>
+					
+				
+			</div></div>
+	</div>
+	<script type="text/javascript"
     src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
   </script>
 <script type="text/x-mathjax-config">
@@ -351,27 +405,12 @@ utils<span style="color:#666">.</span>export_image(img<span style="color:#666">=
 </script>
 
 
-
-<div class="footer">
-  
-  <p>Copyright James Brennan 2019. Powered by Hugo.</p>
-  
+<div class="footer wrapper">
+	<nav class="nav">
+		<div>2020  <a href="https://github.com/knadh/hugo-ink">Ink</a> theme on <a href="https://gohugo.io">Hugo</a></div>
+	</nav>
 </div>
 
-  </div>
-  <script src="https://james-brennan.github.io/js/slim.js"></script>
-  <script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-ga('create', 'UA-56616557-2', 'auto');
-ga('send', 'pageview');
-
-</script>
-
-
+<script>feather.replace()</script>
 </body>
-
 </html>
