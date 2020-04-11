@@ -252,7 +252,7 @@ button,
 
 .container {
   *zoom: 1;
-  width: auto;
+  width: 80%;
   max-width: 42em;
   float: none;
   display: block;
