@@ -5,10 +5,19 @@
     <link>https://james-brennan.github.io/tags/vector/</link>
     <description>Recent content in vector on James Brennan</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Mon, 16 Mar 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 13 May 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://james-brennan.github.io/tags/vector/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Linking python with PostGIS</title>
+      <link>https://james-brennan.github.io/posts/postgis_python/</link>
+      <pubDate>Wed, 13 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://james-brennan.github.io/posts/postgis_python/</guid>
+      <description>GIS databases are sort of a necessary evil. Once your data gets too big for RAM you&amp;rsquo;ve got to start thinking either about relational databases or doing something fancy with dask. PostGIS is a spatial database extender for PostgreSQL object-relational database. In essence, PostGIS puts GIS functions into SQL queries allowing you to run queries and joins based on location. PostgreSQL is big nasty and powerful so this post provides a basic look at utilising PostGIS for the &amp;lsquo;GIS stuff&amp;rsquo; and linking python to a PostGIS database for pre-processing and visualisation.</description>
+    </item>
     
     <item>
       <title>Fast and easy gridding of point data with geopandas</title>

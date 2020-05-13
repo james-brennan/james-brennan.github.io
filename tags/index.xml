@@ -5,10 +5,55 @@
     <link>https://james-brennan.github.io/tags/</link>
     <description>Recent content in Tags on James Brennan</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Sat, 11 Apr 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 13 May 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://james-brennan.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>geopandas</title>
+      <link>https://james-brennan.github.io/tags/geopandas/</link>
+      <pubDate>Wed, 13 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://james-brennan.github.io/tags/geopandas/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>PostGIS</title>
+      <link>https://james-brennan.github.io/tags/postgis/</link>
+      <pubDate>Wed, 13 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://james-brennan.github.io/tags/postgis/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>PostgreSQL</title>
+      <link>https://james-brennan.github.io/tags/postgresql/</link>
+      <pubDate>Wed, 13 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://james-brennan.github.io/tags/postgresql/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>python</title>
+      <link>https://james-brennan.github.io/tags/python/</link>
+      <pubDate>Wed, 13 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://james-brennan.github.io/tags/python/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>vector</title>
+      <link>https://james-brennan.github.io/tags/vector/</link>
+      <pubDate>Wed, 13 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://james-brennan.github.io/tags/vector/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>CDF</title>
@@ -29,15 +74,6 @@
     </item>
     
     <item>
-      <title>python</title>
-      <link>https://james-brennan.github.io/tags/python/</link>
-      <pubDate>Sat, 11 Apr 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://james-brennan.github.io/tags/python/</guid>
-      <description></description>
-    </item>
-    
-    <item>
       <title>statistics</title>
       <link>https://james-brennan.github.io/tags/statistics/</link>
       <pubDate>Sat, 11 Apr 2020 00:00:00 +0000</pubDate>
@@ -52,24 +88,6 @@
       <pubDate>Sat, 11 Apr 2020 00:00:00 +0000</pubDate>
       
       <guid>https://james-brennan.github.io/tags/uncertainty/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>geopandas</title>
-      <link>https://james-brennan.github.io/tags/geopandas/</link>
-      <pubDate>Mon, 16 Mar 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://james-brennan.github.io/tags/geopandas/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>vector</title>
-      <link>https://james-brennan.github.io/tags/vector/</link>
-      <pubDate>Mon, 16 Mar 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://james-brennan.github.io/tags/vector/</guid>
       <description></description>
     </item>
     

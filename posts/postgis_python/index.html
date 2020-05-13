@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"><title>Linking python with PostGIS - James Brennan</title><meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta itemprop="name" content="Linking python with PostGIS">
+<meta itemprop="description" content="GIS databases are sort of a necessary evil. Once your data gets too big for RAM you&rsquo;ve got to start thinking either about relational databases or doing something fancy with dask. PostGIS is a spatial database extender for PostgreSQL object-relational database. In essence, PostGIS puts GIS functions into SQL queries allowing you to run queries and joins based on location. PostgreSQL is big nasty and powerful so this post provides a basic look at utilising PostGIS for the &lsquo;GIS stuff&rsquo; and linking python to a PostGIS database for pre-processing and visualisation.">
+<meta itemprop="datePublished" content="2020-05-13T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2020-05-13T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="1376">
+
+
+
+<meta itemprop="keywords" content="PostGIS,python,PostgreSQL,geopandas,vector," /><meta property="og:title" content="Linking python with PostGIS" />
+<meta property="og:description" content="GIS databases are sort of a necessary evil. Once your data gets too big for RAM you&rsquo;ve got to start thinking either about relational databases or doing something fancy with dask. PostGIS is a spatial database extender for PostgreSQL object-relational database. In essence, PostGIS puts GIS functions into SQL queries allowing you to run queries and joins based on location. PostgreSQL is big nasty and powerful so this post provides a basic look at utilising PostGIS for the &lsquo;GIS stuff&rsquo; and linking python to a PostGIS database for pre-processing and visualisation." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://james-brennan.github.io/posts/postgis_python/" />
+<meta property="article:published_time" content="2020-05-13T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-05-13T00:00:00+00:00" /><meta property="og:site_name" content="James Brennan" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Linking python with PostGIS"/>
+<meta name="twitter:description" content="GIS databases are sort of a necessary evil. Once your data gets too big for RAM you&rsquo;ve got to start thinking either about relational databases or doing something fancy with dask. PostGIS is a spatial database extender for PostgreSQL object-relational database. In essence, PostGIS puts GIS functions into SQL queries allowing you to run queries and joins based on location. PostgreSQL is big nasty and powerful so this post provides a basic look at utilising PostGIS for the &lsquo;GIS stuff&rsquo; and linking python to a PostGIS database for pre-processing and visualisation."/>
+<link href='https://fonts.googleapis.com/css?family=Playfair+Display:700' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" type="text/css" media="screen" href="https://james-brennan.github.io/css/normalize.css" />
+	<link rel="stylesheet" type="text/css" media="screen" href="https://james-brennan.github.io/css/main.css" />
+
+	<script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+		<script src="https://james-brennan.github.io/js/main.js"></script>
+</head>
+
+<body>
+	<div class="container wrapper">
+		<div class="header">
+	
+		<div class="avatar">
+			<a href="https://james-brennan.github.io/">
+				<img src="/img/avatar.jpg" alt="James Brennan" />
+			</a>
+		</div>
+	
+	<h1 class="site-title"><a href="https://james-brennan.github.io/">James Brennan</a></h1>
+	<div class="site-description"><p>A blog about scientific computing, statistics, geoscience and remote sensing.</p><nav class="nav social">
+			<ul class="flat"><li><a href="https://github.com/james-brennan/" title="Github"><i data-feather="github"></i></a></li><li><a href="https://twitter.com/jamesbrennan/" title="Twitter"><i data-feather="twitter"></i></a></li><li><a href="/index.xml" title="RSS"><i data-feather="rss"></i></a></li></ul>
+		</nav></div>
+
+	<nav class="nav">
+		<ul class="flat">
+			
+			<li>
+				<a href="/">Home</a>
+			</li>
+			
+			<li>
+				<a href="/posts">All posts</a>
+			</li>
+			
+			<li>
+				<a href="/tags">Tags</a>
+			</li>
+			
+		</ul>
+	</nav>
+</div>
+
+
+		<div class="post">
+			<div class="post-header">
+				
+					<div class="meta">
+						<div class="date">
+							<span class="day">13</span>
+							<span class="rest">May 2020</span>
+						</div>
+					</div>
+				
+				<div class="matter">
+					<h1 class="title">Linking python with PostGIS</h1>
+				</div>
+			</div>
+					
+			<div class="markdown">
+				<p>GIS databases are sort of a necessary evil. Once your data gets too big for RAM you&rsquo;ve got to start thinking either about relational databases or doing something fancy with <a href="https://dask.org">dask</a>. <a href="https://postgis.net">PostGIS</a> is a spatial database extender for <a href="https://postgresql.org">PostgreSQL</a> object-relational database. In essence, PostGIS puts GIS functions into SQL queries allowing you to run queries and joins based on location. PostgreSQL is big nasty and powerful so this post provides a basic look at utilising PostGIS for the &lsquo;GIS stuff&rsquo; and linking python to a PostGIS database for pre-processing and visualisation.</p>
+<!-- raw HTML omitted -->
+<p>We&rsquo;ll use the excellent python package <a href="https://github.com/gboeing/osmnx">osmnx</a> to load some building and land use data from <a href="https://www.openstreetmap.org">OpenStreetMap</a>.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#00a">import</span> <span style="color:#0aa;text-decoration:underline">osmnx</span> <span style="color:#00a">as</span> <span style="color:#0aa;text-decoration:underline">ox</span>
+<span style="color:#00a">import</span> <span style="color:#0aa;text-decoration:underline">matplotlib.pyplot</span> <span style="color:#00a">as</span> <span style="color:#0aa;text-decoration:underline">plt</span>
+<span style="color:#00a">import</span> <span style="color:#0aa;text-decoration:underline">geopandas</span> <span style="color:#00a">as</span> <span style="color:#0aa;text-decoration:underline">gp</span>
+<span style="color:#aaa;font-style:italic"># get some data</span>
+london = (<span style="color:#099">51.501204</span>, <span style="color:#099">0.001922</span>)
+distance=<span style="color:#099">2000</span>
+buildings = ox.footprints.footprints_from_point(london, distance=distance)
+landuse = ox.footprints.footprints_from_point(london, distance=distance, 
+                                                  footprint_type=<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">landuse</span><span style="color:#a50">&#39;</span>)
+</code></pre></div><p>osmnx provides the data back to us in <a href="https://geopandas.org">geopandas geodataframes</a>. Let&rsquo;s make a plot of the data:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">fig, ax = plt.subplots(figsize=(<span style="color:#099">15</span>, <span style="color:#099">15</span>))
+landuse.plot(column=<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">landuse</span><span style="color:#a50">&#39;</span>, ax=ax)
+buildings.plot(ax=ax, color=<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">None</span><span style="color:#a50">&#39;</span>,lw=<span style="color:#099">1</span>, alpha=<span style="color:#099">1</span>)
+ax.axis(<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">off</span><span style="color:#a50">&#39;</span>)
+</code></pre></div><p><img src="/img/postgis_python_3_1.png" alt="png"></p>
+<h1 id="postgis">PostGIS</h1>
+<p>We&rsquo;ll now dive into Postgres and the PostGIS extension. We can use <code>psql</code> command-line utility for Postgres to execute SQL commands from the terminal to create the database and load the PostGIS extension for Postgres.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">➜   psql -U postgres -c <span style="color:#a50">&#34;CREATE DATABASE london;&#34;</span>
+➜   psql -U postgres -d london -c  <span style="color:#a50">&#34;CREATE EXTENSION postgis;&#34;</span> 
+</code></pre></div><p>To get the dataframes into the <code>london</code> database I&rsquo;m going to save them as shapefiles and use the <code>shp2pgsql</code> command-line utility.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">(buildings[<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">geometry</span><span style="color:#a50">&#39;</span>]).to_file(<span style="color:#a50"></span><span style="color:#a50">&#34;</span><span style="color:#a50">buildings.shp</span><span style="color:#a50">&#34;</span>)
+(landuse[[<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">landuse</span><span style="color:#a50">&#39;</span>, <span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">geometry</span><span style="color:#a50">&#39;</span>]]).to_file(<span style="color:#a50"></span><span style="color:#a50">&#34;</span><span style="color:#a50">landuse.shp</span><span style="color:#a50">&#34;</span>)
+</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">➜   hp2pgsql buildings.shp buildings | psql -U postgres -d london
+</code></pre></div><p>Looking at the command we can see that <code>shp2pgsql</code> produces a set of SQL instructions which we then pipe to  <code>psql</code> to do the actual insertion. If we change the pipe to <code>head</code> we can see the SQL commands that <code>shp2pgsql</code> has generated for us:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">➜   shp2pgsql buildings.shp buildings | head
+
+
+Field fid is an FTDouble with width <span style="color:#099">11</span> and precision <span style="color:#099">0</span>
+Shapefile type: Polygon
+Postgis type: MULTIPOLYGON[2]
+SET CLIENT_ENCODING TO UTF8;
+SET STANDARD_CONFORMING_STRINGS TO ON;
+BEGIN;
+CREATE TABLE <span style="color:#a50">&#34;buildings&#34;</span> (gid serial,
+<span style="color:#a50">&#34;fid&#34;</span> float8);
+ALTER TABLE <span style="color:#a50">&#34;buildings&#34;</span> ADD PRIMARY KEY (gid);
+SELECT AddGeometryColumn(<span style="color:#a50">&#39;&#39;</span>,<span style="color:#a50">&#39;buildings&#39;</span>,<span style="color:#a50">&#39;geom&#39;</span>,<span style="color:#a50">&#39;0&#39;</span>,<span style="color:#a50">&#39;MULTIPOLYGON&#39;</span>,2);
+INSERT INTO <span style="color:#a50">&#34;buildings&#34;</span> (<span style="color:#a50">&#34;fid&#34;</span>,geom) VALUES (<span style="color:#a50">&#39;0&#39;</span>,<span style="color:#a50">&#39;0106000000010000000103000000010000001300000099709EA0038194BFA40DD1329CC0494002E66BE0586194BFEAFE5657AAC04940010BAA57DB5E94BFAEB25B70ABC04940F3A15577764394BFFC219111ABC049405131CEDF844294BF67ECF07CABC049406B9505B8C5A193BFC742194FA9C049400D068D4FB7A293BFC7B8E2E2A8C04940FF9C386F528793BF15281884A8C049400FE8F120E28B93BFE0EC7B79A6C0494020F8CE1E1E7893BF348FB234A6C04940EBFB15D79D9393BF7CAE00F099C04940DAEB38D961A793BF934CF3339AC04940EA36F28AF1AB93BFB20FB22C98C04940F89F466B56C793BF65A07C8B98C049409A10CE0248C893BFFAD51C2098C049407FAC962A076994BF2E3FCB4E9AC04940DD3B0F93156894BF99092BBA9AC04940EBA463737A8394BF4B9AF5189BC0494099709EA0038194BFA40DD1329CC04940&#39;</span>);
+INSERT INTO <span style="color:#a50">&#34;buildings&#34;</span> (<span style="color:#a50">&#34;fid&#34;</span>,geom) VALUES (<span style="color:#a50">&#39;1&#39;</span>,<span style="color:#a50">&#39;0106000000010000000103000000010000000E0000006778584D7C5A92BFFC4FA335ABC04940E2E7BF07AF5D92BF677627E9ABC04940D08E650B523A92BFB2666490BBC04940C043AC59C23592BF8E76DCF0BBC04940CB64DDE45C2F92BF829A1029BCC049408BBBE6FAE36291BF953F845DB9C049407A956BC0D65B91BFAD252E11B9C0494051DEC7D11C5991BF66A77A8DB8C04940BDDD37633D5A91BF7227220DB8C04940A69C2FF65E7C91BFD3C2C0CEA8C049403C534376398091BF3F4BA13DA8C04940FD3CFCEBCB8891BFC8A4750AA8C0494056945C0F705292BFEA888DC3AAC049406778584D7C5A92BFFC4FA335ABC04940&#39;</span>);
+INSERT INTO <span style="color:#a50">&#34;buildings&#34;</span> (<span style="color:#a50">&#34;fid&#34;</span>,geom) VALUES (<span style="color:#a50">&#39;2&#39;</span>,<span style="color:#a50">&#39;01060000000100000001030000000100000005000000158C4AEA043491BFAB35DE67A6C0494093E4B9BE0F0791BF83723678BAC049408647D1B9916890BF1F85EB51B8C049408341881A3B9790BF59857247A4C04940158C4AEA043491BFAB35DE67A6C04940&#39;</span>);
+</code></pre></div><p>Lets repeat this process for the <code>landuse.shp</code> file:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">➜   shp2pgsql landuse.shp landuse | psql -U postgres -d london
+</code></pre></div><p>And check that the tables have actually been added to the database:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">➜  psql -U postgres -d london -c <span style="color:#a50">&#34;\dt&#34;</span>
+
+               List of relations
+ Schema |        Name        | Type  |  Owner   
+--------+--------------------+-------+----------
+ public | buildings          | table | postgres
+ public | landuse            | table | postgres
+ public | spatial_ref_sys    | table | postgres
+(<span style="color:#099">3</span> rows)
+</code></pre></div><h1 id="doing-gisy-things-with-postgis">Doing GISy things with PostGIS</h1>
+<p>Lets now use PostGIS to do some rudimentary GIS analysis. We&rsquo;re going to look at access to green spaces for the neighbourhood (very roughly!).</p>
+<p>The <code>landuse</code> dataframe defines an associated land use for each polygon. We&rsquo;re interested only in polygons with an associated <code>grass</code> land use class. Let&rsquo;s visualise where the grassy areas defined in <code>landuse</code> are:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">fig, ax = plt.subplots(figsize=(<span style="color:#099">15</span>, <span style="color:#099">15</span>))
+(landuse[landuse[<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">landuse</span><span style="color:#a50">&#39;</span>]==<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">grass</span><span style="color:#a50">&#39;</span>]).plot(column=<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">landuse</span><span style="color:#a50">&#39;</span>, ax=ax, color=<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">g</span><span style="color:#a50">&#39;</span>)
+buildings.plot(ax=ax, color=<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">None</span><span style="color:#a50">&#39;</span>,lw=<span style="color:#099">1</span>,alpha=<span style="color:#099">1</span>)
+ax.axis(<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">off</span><span style="color:#a50">&#39;</span>)
+</code></pre></div><p><img src="/img/postgis_python_4_2.png" alt="png"></p>
+<p>Now, we&rsquo;ll use PostGIS to do some GISy things which we can the visualise later in python. First, we&rsquo;ll consider which of the buildings are within 50m of a grassy area. We can construct an SQL query to do this making sure to limit the analysis to only land use polygons where <code>landuse</code> field (<code>landuse.landuse</code>) is <code>grass</code>:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#00a">SELECT</span> 
+  <span style="color:#00a">DISTINCT</span> buildings.fid,
+  buildings.geom, 
+  landuse.landuse
+<span style="color:#00a">FROM</span> 
+  buildings, landuse
+<span style="color:#00a">WHERE</span>  
+  ST_DWithin(buildings.geom::geography, landuse.geom::geography, <span style="color:#099">50</span>)
+  <span style="color:#00a">AND</span> landuse.landuse=<span style="color:#a50">&#39;</span><span style="color:#a50">grass</span><span style="color:#a50">&#39;</span>;
+</code></pre></div><p>So this is a fairly standard looking SQL query - we select fields we need from the two tables <code>buildings</code> and <code>landuse</code> with some constraints as provided by the <code>WHERE</code>. <a href="https://postgis.net/docs/ST_DWithin.html"><code>ST_DWithin</code></a> within is the PostGIS function doing all the work here. It returns true if the geometries are within the specified distance of one another.</p>
+<p>The use of the <a href="https://postgis.net/workshops/postgis-intro/geography.html">geography keyword</a> <code>buildings.geom::geography</code> is needed because our data is in WGS84 (i.e. latitude/longitude) and we want to do the calculation based on metres. This, of course, means reprojecting the data which is slow so an alternative is to use ST_Distance_Sphere which approximates the calculation in decimal degrees for us. But for good practice and to make the procedure robust to whatever projection the data is in let&rsquo;s stick with the <code>::geography</code> transformation here.</p>
+<p>Also, the <code>DISTINCT</code> command here is important because it prevents us from storing duplicates of each building (for example when a building is within 50m of more than one grassy geometry).</p>
+<p>We can store the query results into a table called <code>within50</code> by adding an <code>INTO</code> statement:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#00a">SELECT</span> 
+  <span style="color:#00a">DISTINCT</span> buildings.fid,
+  buildings.geom, 
+  landuse.landuse
+<span style="color:#00a">INTO</span> within50
+<span style="color:#00a">FROM</span> 
+  buildings, landuse
+<span style="color:#00a">WHERE</span>  
+  ST_DWithin(buildings.geom::geography, landuse.geom::geography, <span style="color:#099">50</span>)
+  <span style="color:#00a">AND</span> landuse.landuse=<span style="color:#a50">&#39;</span><span style="color:#a50">grass</span><span style="color:#a50">&#39;</span>;
+</code></pre></div><p>And let&rsquo;s check the table has been saved:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql">london=# <span style="color:#f00;background-color:#faa">\</span>dt
+               List <span style="color:#00a">of</span> relations
+ <span style="color:#00a">Schema</span> |        Name        | <span style="color:#00a">Type</span>  |  <span style="color:#00a">Owner</span>   
+<span style="color:#aaa;font-style:italic">--------+--------------------+-------+----------
+</span><span style="color:#aaa;font-style:italic"></span> <span style="color:#00a">public</span> | buildings          | <span style="color:#00a">table</span> | postgres
+ <span style="color:#00a">public</span> | landuse            | <span style="color:#00a">table</span> | postgres
+ <span style="color:#00a">public</span> | spatial_ref_sys    | <span style="color:#00a">table</span> | postgres
+ <span style="color:#00a">public</span> | within50           | <span style="color:#00a">table</span> | postgres
+(<span style="color:#099">4</span> <span style="color:#00a">rows</span>)
+</code></pre></div><p>We might wish to generalise this task a bit. How about finding the distance to the nearest grassy area for each building? This an example of a <a href="https://postgis.net/workshops/postgis-intro/knn.html">nearest neighbour search</a>. There are several different ways to do a NN search with PostGIS - though unfortunately all of them are a bit involved. I&rsquo;ve chosen one that hopefully makes some sense:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#00a">SELECT</span> buildings.fid,
+       ST_Distance(buildings.geom::geography, land.geom::geography) <span style="color:#00a">AS</span> dist,
+       buildings.geom
+<span style="color:#00a">INTO</span> buildingsDistances
+<span style="color:#00a">FROM</span> buildings
+<span style="color:#00a">JOIN</span> <span style="color:#00a">LATERAL</span> (
+  <span style="color:#00a">SELECT</span> geom, landuse
+  <span style="color:#00a">FROM</span> landuse
+  <span style="color:#00a">WHERE</span> ST_DWithin(buildings.geom::geography, geom::geography, <span style="color:#099">2000</span>)
+  <span style="color:#00a">AND</span> landuse = <span style="color:#a50">&#39;</span><span style="color:#a50">grass</span><span style="color:#a50">&#39;</span>
+  <span style="color:#00a">ORDER</span> <span style="color:#00a">BY</span> buildings.geom &lt;-&gt; geom
+  <span style="color:#00a">LIMIT</span> <span style="color:#099">1</span>
+) <span style="color:#00a">AS</span> land <span style="color:#00a">ON</span> <span style="color:#00a">true</span>;
+</code></pre></div><p>Breaking this down a bit makes the query more digestible. Key to this is query is the <a href="https://heap.io/blog/engineering/postgresqls-powerful-new-join-type-lateral">LATERAL JOIN</a> method which essentially allows for a join in which the rows of one table are iterated over (as if with a for loop) and the rows matching conditions are then used for the join. The lateral join used here performs the nearest neighbour query and aliases the result as <code>land</code>:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql">(
+  <span style="color:#00a">SELECT</span> geom, landuse
+  <span style="color:#00a">FROM</span> landuse
+  <span style="color:#00a">WHERE</span> ST_DWithin(buildings.geom::geography, geom::geography, <span style="color:#099">2000</span>)
+  <span style="color:#00a">AND</span> landuse = <span style="color:#a50">&#39;</span><span style="color:#a50">grass</span><span style="color:#a50">&#39;</span>
+  <span style="color:#00a">ORDER</span> <span style="color:#00a">BY</span> buildings.geom &lt;-&gt; geom
+  <span style="color:#00a">LIMIT</span> <span style="color:#099">1</span>
+)
+</code></pre></div><p>Let&rsquo;s break this subquery down a bit further. First, we limit the geometries within 2000m of each other. This helps to limit the amount of spatial indexing we&rsquo;ll do, an efficiency hack essentially. The nearest neighbour search is then effectively done by the following two lines:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql">  <span style="color:#00a">ORDER</span> <span style="color:#00a">BY</span> buildings.geom &lt;-&gt; geom
+  <span style="color:#00a">LIMIT</span> <span style="color:#099">1</span>
+</code></pre></div><p><code>buildings.geom &lt;-&gt; geom</code> is the PostGIS way (termed a <a href="https://postgis.net/workshops/postgis-intro/knn.html#index-based-knn">“index-based distance operator”</a> of referring to the distance between polygon bounding boxes. This is NOT the same as the true <em>distance</em> between the polygons because it&rsquo;s based on the PostGIS spatial indexing R-tree (so it&rsquo;s approximate!). This is what provides the necessary speed to an efficient nearest neighbour search.  Then the <code>LIMIT 1</code> provides only the nearest geometry&hellip; nice!</p>
+<p>Let&rsquo;s look at <code>buildingsDistances</code>:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql">london=# <span style="color:#00a">SELECT</span> fid, dist <span style="color:#00a">FROM</span> buildingsDistances <span style="color:#00a">LIMIT</span> <span style="color:#099">10</span>;
+ fid |     dist     
+<span style="color:#aaa;font-style:italic">-----+--------------
+</span><span style="color:#aaa;font-style:italic"></span>   <span style="color:#099">0</span> | <span style="color:#099">539</span>.<span style="color:#099">95580113</span>
+   <span style="color:#099">1</span> | <span style="color:#099">315</span>.<span style="color:#099">44344397</span>
+   <span style="color:#099">2</span> | <span style="color:#099">164</span>.<span style="color:#099">43032264</span>
+   <span style="color:#099">3</span> |   <span style="color:#099">4</span>.<span style="color:#099">94973921</span>
+   <span style="color:#099">4</span> | <span style="color:#099">237</span>.<span style="color:#099">93579893</span>
+   <span style="color:#099">5</span> |  <span style="color:#099">16</span>.<span style="color:#099">53049982</span>
+   <span style="color:#099">6</span> |  <span style="color:#099">79</span>.<span style="color:#099">73473226</span>
+   <span style="color:#099">7</span> | <span style="color:#099">353</span>.<span style="color:#099">70800526</span>
+   <span style="color:#099">8</span> |  <span style="color:#099">72</span>.<span style="color:#099">46755079</span>
+   <span style="color:#099">9</span> | <span style="color:#099">231</span>.<span style="color:#099">41497931</span>
+(<span style="color:#099">10</span> <span style="color:#00a">rows</span>)
+</code></pre></div><h1 id="connecting-to-postgis-in-python">Connecting to PostGIS in python</h1>
+<p>To create a connection to our PostGIS database from python we can use the versatile <a href="https://www.sqlalchemy.org">sqlalchemy</a> toolkit.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#00a">from</span> <span style="color:#0aa;text-decoration:underline">sqlalchemy</span> <span style="color:#00a">import</span> create_engine
+db_string = <span style="color:#a50"></span><span style="color:#a50">&#34;</span><span style="color:#a50">postgres://postgres:123@localhost:5432/london</span><span style="color:#a50">&#34;</span>
+db_connection = create_engine(db_string)
+</code></pre></div><p>We can execute standard SQL queries which provide back an iterator for the rows of the query:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#aaa;font-style:italic"># check the connection</span>
+c = db_connection.execute(<span style="color:#a50"></span><span style="color:#a50">&#34;</span><span style="color:#a50">SELECT * FROM buildings;</span><span style="color:#a50">&#34;</span>)
+c.next()
+</code></pre></div><pre><code>(1, 0.0, '0106000000010000000103000077 ... (354 characters truncated) ... 893BFFAD5CC04940')
+</code></pre>
+<p>The long string in there is the binary representation of the polygon. Geopandas can connect to our PostGIS database via the <code>from_postgis</code> function with our database connection <code>db_connection</code>:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">within50 = gp.GeoDataFrame.from_postgis(<span style="color:#a50"></span><span style="color:#a50">&#34;</span><span style="color:#a50">SELECT * FROM within50;</span><span style="color:#a50">&#34;</span>,
+                                         db_connection,
+                                         geom_col=<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">geom</span><span style="color:#a50">&#39;</span>, 
+                                         index_col=<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">fid</span><span style="color:#a50">&#39;</span>, 
+                                         coerce_float=True)
+</code></pre></div><p>Let&rsquo;s visualise buildings within 50m of a grassy geometry:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">fig, ax = plt.subplots(figsize=(<span style="color:#099">15</span>, <span style="color:#099">15</span>))
+within50.plot(ax=ax, color=<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">None</span><span style="color:#a50">&#39;</span>, alpha=<span style="color:#099">1</span>)
+(landuse[landuse[<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">landuse</span><span style="color:#a50">&#39;</span>]==<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">grass</span><span style="color:#a50">&#39;</span>]).plot(column=<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">landuse</span><span style="color:#a50">&#39;</span>, ax=ax, color=<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">g</span><span style="color:#a50">&#39;</span>)
+ax.axis(<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">off</span><span style="color:#a50">&#39;</span>)
+</code></pre></div><p><img src="/img/postgis_python_19_2.png" alt="png"></p>
+<p>And now let&rsquo;s visualise the distance for each building:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#00a">from</span> <span style="color:#0aa;text-decoration:underline">mpl_toolkits.axes_grid1</span> <span style="color:#00a">import</span> make_axes_locatable 
+distances = gp.GeoDataFrame.from_postgis(<span style="color:#a50"></span><span style="color:#a50">&#34;</span><span style="color:#a50">SELECT * FROM buildingsDistances;</span><span style="color:#a50">&#34;</span>, db_connection, geom_col=<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">geom</span><span style="color:#a50">&#39;</span>, crs=None, index_col=<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">fid</span><span style="color:#a50">&#39;</span>)
+
+fig, ax = plt.subplots(figsize=(<span style="color:#099">15</span>, <span style="color:#099">15</span>))
+divider = make_axes_locatable(ax)
+cax = divider.append_axes(<span style="color:#a50"></span><span style="color:#a50">&#34;</span><span style="color:#a50">right</span><span style="color:#a50">&#34;</span>, size=<span style="color:#a50"></span><span style="color:#a50">&#34;</span><span style="color:#a50">5</span><span style="color:#a50">%</span><span style="color:#a50">&#34;</span>, pad=<span style="color:#099">0.1</span>)
+im = distances.plot(column=<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">dist</span><span style="color:#a50">&#39;</span>, 
+                        cmap=<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">viridis</span><span style="color:#a50">&#39;</span>,
+                        ax=ax, legend=True, 
+                    cax=cax)
+(landuse[landuse[<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">landuse</span><span style="color:#a50">&#39;</span>]==<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">grass</span><span style="color:#a50">&#39;</span>]).plot(column=<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">landuse</span><span style="color:#a50">&#39;</span>,
+                                                ax=ax, color=<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">g</span><span style="color:#a50">&#39;</span>)
+</code></pre></div><p><img src="/img/postgis_python_22_2.png" alt="png"></p>
+<h1 id="further-reading">Further reading</h1>
+<ul>
+<li>The <a href="http://postgis.net/workshops/postgis-intro/">official PostGIS workshop</a> is fantastic</li>
+<li>The PostGIS <a href="http://www.postgis.us/downloads/postgis21_cheatsheet.pdf">cheat sheet</a> is also pretty good</li>
+</ul>
+
+			</div>
+
+			<div class="tags">
+				
+					
+						<ul class="flat">
+							
+							<li><a href="/tags/postgis">PostGIS</a></li>
+							
+							<li><a href="/tags/python">python</a></li>
+							
+							<li><a href="/tags/postgresql">PostgreSQL</a></li>
+							
+							<li><a href="/tags/geopandas">geopandas</a></li>
+							
+							<li><a href="/tags/vector">vector</a></li>
+							
+						</ul>
+					
+				
+			</div></div>
+	</div>
+	<script type="text/javascript"
+    src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  </script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({ tex2jax: {inlineMath: [["$","$"],["\\(","\\)"]]} })
+</script>
+
+
+<div class="footer wrapper">
+	<nav class="nav">
+		<div>2020  <a href="https://github.com/knadh/hugo-ink">Ink</a> theme on <a href="https://gohugo.io">Hugo</a></div>
+	</nav>
+</div>
+
+<script>feather.replace()</script>
+</body>
+</html>
