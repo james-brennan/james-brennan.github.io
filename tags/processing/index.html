@@ -8,7 +8,7 @@
 <meta itemprop="description" content=""><meta property="og:title" content="processing" />
 <meta property="og:description" content="" />
 <meta property="og:type" content="website" />
-<meta property="og:url" content="https://james-brennan.github.io/tags/processing/" /><meta property="og:site_name" content="James Brennan" />
+<meta property="og:url" content="https://james-brennan.github.io/tags/processing/" />
 
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="processing"/>
@@ -19,7 +19,8 @@
 
         <link id="dark-scheme" rel="stylesheet" type="text/css" href="https://james-brennan.github.io/css/dark.css" />
 
-	<script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+	<script src="https://james-brennan.github.io/js/feather.min.js"></script>
+	
 		<script src="https://james-brennan.github.io/js/main.js"></script>
 </head>
 
@@ -36,7 +37,7 @@
 	
 	<h1 class="site-title"><a href="https://james-brennan.github.io/">James Brennan</a></h1>
 	<div class="site-description"><p>A blog about statistics, data science, and remote sensing.</p><nav class="nav social">
-			<ul class="flat"><li><a href="https://github.com/james-brennan/" title="Github"><i data-feather="github"></i></a></li><li><a href="https://twitter.com/jamesbrennan/" title="Twitter"><i data-feather="twitter"></i></a></li><li><a href="/index.xml" title="RSS"><i data-feather="rss"></i></a></li></ul>
+			<ul class="flat"><li><a href="https://github.com/james-brennan/" title="Github"><i data-feather="github"></i></a></li><li><a href="https://twitter.com/jamesbrennan/" title="Twitter"><i data-feather="twitter"></i></a></li></ul>
 		</nav>
 	</div>
 
@@ -85,28 +86,30 @@
 
   gtag('config', 'G-C14B1HDZD7');
 </script><script>feather.replace()</script>
+
+
 <script>
-	MathJax = {
-	  tex: {
-		inlineMath: [['$', '$'], ['\\(', '\\)']],
-		displayMath: [['$$','$$'], ['\\[', '\\]']],
-		processEscapes: true,
-		processEnvironments: true
-	  },
-	  options: {
-		skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
-	  }
-	};
-  
-	window.addEventListener('load', (event) => {
-		document.querySelectorAll("mjx-container").forEach(function(x){
-		  x.parentElement.classList += 'has-jax'})
-	  });
-  
-  </script>
-  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-  <script type="text/javascript" id="MathJax-script" async
-	src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+MathJax = {
+	tex: {
+	inlineMath: [['$', '$'], ['\\(', '\\)']],
+	displayMath: [['$$','$$'], ['\\[', '\\]']],
+	processEscapes: true,
+	processEnvironments: true
+	},
+	options: {
+	skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+	}
+};
+
+window.addEventListener('load', (event) => {
+	document.querySelectorAll("mjx-container").forEach(function(x){
+		x.parentElement.classList += 'has-jax'})
+	});
+
+</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript" id="MathJax-script" async
+src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </body>
 
 </html>

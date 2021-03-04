@@ -16,17 +16,6 @@
     </item>
     
     <item>
-      <title>About</title>
-      <link>https://james-brennan.github.io/about/</link>
-      <pubDate>Sat, 11 Apr 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://james-brennan.github.io/about/</guid>
-      <description>I made a single.html in ./themes/mytheme/layouts/mylayout/single.html
-I am getting a 404 error.
-Any help would be appreciated.</description>
-    </item>
-    
-    <item>
       <title>Estimating CDFs from data done right</title>
       <link>https://james-brennan.github.io/posts/edf/</link>
       <pubDate>Sat, 11 Apr 2020 00:00:00 +0000</pubDate>
