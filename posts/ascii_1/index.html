@@ -5,20 +5,17 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge"><title>ASCII maps of vector files - James Brennan</title><meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta itemprop="name" content="ASCII maps of vector files">
 <meta itemprop="description" content="ʕ•ᴥ•ʔ
-I recently came across a nice python package for visualising vector data quickly. Of course, an obvious option is to fire up QGIS but often I generate these on a remote server so would like something a little more &ldquo;text-based&rdquo;&hellip; Then this post highlighted some rather charming tools for generating ASCII rasterisations of vector geometries. I liked the look of the python-based gj2ascii the most.">
-<meta itemprop="datePublished" content="2020-03-01T00:00:00&#43;00:00" />
+I recently came across a nice python package for visualising vector data quickly. Of course, an obvious option is to fire up QGIS but often I generate these on a remote server so would like something a little more &ldquo;text-based&rdquo;&hellip; Then this post highlighted some rather charming tools for generating ASCII rasterisations of vector geometries. I liked the look of the python-based gj2ascii the most."><meta itemprop="datePublished" content="2020-03-01T00:00:00&#43;00:00" />
 <meta itemprop="dateModified" content="2020-03-01T00:00:00&#43;00:00" />
-<meta itemprop="wordCount" content="239">
-
-
-
+<meta itemprop="wordCount" content="242">
 <meta itemprop="keywords" content="vector,python,visualisation,terminal," /><meta property="og:title" content="ASCII maps of vector files" />
 <meta property="og:description" content="ʕ•ᴥ•ʔ
 I recently came across a nice python package for visualising vector data quickly. Of course, an obvious option is to fire up QGIS but often I generate these on a remote server so would like something a little more &ldquo;text-based&rdquo;&hellip; Then this post highlighted some rather charming tools for generating ASCII rasterisations of vector geometries. I liked the look of the python-based gj2ascii the most." />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://james-brennan.github.io/posts/ascii_1/" />
-<meta property="article:published_time" content="2020-03-01T00:00:00+00:00" />
-<meta property="article:modified_time" content="2020-03-01T00:00:00+00:00" /><meta property="og:site_name" content="James Brennan" />
+<meta property="og:url" content="https://james-brennan.github.io/posts/ascii_1/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2020-03-01T00:00:00&#43;00:00" />
+<meta property="article:modified_time" content="2020-03-01T00:00:00&#43;00:00" /><meta property="og:site_name" content="James Brennan" />
+
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="ASCII maps of vector files"/>
 <meta name="twitter:description" content="ʕ•ᴥ•ʔ
@@ -26,6 +23,8 @@ I recently came across a nice python package for visualising vector data quickly
 <link href='https://fonts.googleapis.com/css?family=Playfair+Display:700' rel='stylesheet' type='text/css'>
 	<link rel="stylesheet" type="text/css" media="screen" href="https://james-brennan.github.io/css/normalize.css" />
 	<link rel="stylesheet" type="text/css" media="screen" href="https://james-brennan.github.io/css/main.css" />
+
+        <link id="dark-scheme" rel="stylesheet" type="text/css" href="https://james-brennan.github.io/css/dark.css" />
 
 	<script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
 		<script src="https://james-brennan.github.io/js/main.js"></script>
@@ -42,9 +41,10 @@ I recently came across a nice python package for visualising vector data quickly
 		</div>
 	
 	<h1 class="site-title"><a href="https://james-brennan.github.io/">James Brennan</a></h1>
-	<div class="site-description"><p>A blog about scientific computing, statistics, geoscience and remote sensing.</p><nav class="nav social">
+	<div class="site-description"><p>A blog about statistics, data science, and remote sensing.</p><nav class="nav social">
 			<ul class="flat"><li><a href="https://github.com/james-brennan/" title="Github"><i data-feather="github"></i></a></li><li><a href="https://twitter.com/jamesbrennan/" title="Twitter"><i data-feather="twitter"></i></a></li><li><a href="/index.xml" title="RSS"><i data-feather="rss"></i></a></li></ul>
-		</nav></div>
+		</nav>
+	</div>
 
 	<nav class="nav">
 		<ul class="flat">
@@ -88,30 +88,30 @@ I recently came across a nice python package for visualising vector data quickly
 <div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#00a">import</span> <span style="color:#0aa;text-decoration:underline">fiona</span>
 <span style="color:#00a">import</span> <span style="color:#0aa;text-decoration:underline">gj2ascii</span>
 asc = []
-<span style="color:#00a">with</span> fiona.open(<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">fire_perimeters.shp</span><span style="color:#a50">&#39;</span>) <span style="color:#00a">as</span> poly:
+<span style="color:#00a">with</span> fiona.open(<span style="color:#a50">&#39;fire_perimeters.shp&#39;</span>) <span style="color:#00a">as</span> poly:
     b0 = poly.next()
-    asc.append(gj2ascii.render(b0, <span style="color:#099">100</span>, char=<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">.</span><span style="color:#a50">&#39;</span>, fill=<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50"> </span><span style="color:#a50">&#39;</span>,bbox=poly.bounds))
+    asc.append(gj2ascii.render(b0, <span style="color:#099">100</span>, char=<span style="color:#a50">&#39;.&#39;</span>, fill=<span style="color:#a50">&#39; &#39;</span>,bbox=poly.bounds))
     <span style="color:#00a">for</span> shp <span style="color:#00a">in</span> poly:
-        <span style="color:#00a">if</span> shp[<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">properties</span><span style="color:#a50">&#39;</span>][<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">Category</span><span style="color:#a50">&#39;</span>]==<span style="color:#099">2</span>:
+        <span style="color:#00a">if</span> shp[<span style="color:#a50">&#39;properties&#39;</span>][<span style="color:#a50">&#39;Category&#39;</span>]==<span style="color:#099">2</span>:
             <span style="color:#aaa;font-style:italic"># is really a burn</span>
-            asc.append(gj2ascii.render(shp, <span style="color:#099">100</span>, char=<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">+</span><span style="color:#a50">&#39;</span>, fill=<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50"> </span><span style="color:#a50">&#39;</span>,bbox=poly.bounds))
+            asc.append(gj2ascii.render(shp, <span style="color:#099">100</span>, char=<span style="color:#a50">&#39;+&#39;</span>, fill=<span style="color:#a50">&#39; &#39;</span>,bbox=poly.bounds))
 <span style="color:#aaa;font-style:italic"># stacking operation</span>
-stacked = gj2ascii.stack(asc, fill=<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50"> </span><span style="color:#a50">&#39;</span>)
+stacked = gj2ascii.stack(asc, fill=<span style="color:#a50">&#39; &#39;</span>)
 <span style="color:#00a">print</span>(stacked)
 </code></pre></div><p><img src="/img/asci1.png" alt="text based"></p>
 <p>Okay, it works! <code>gj2ascii</code> also has some nice options to &lsquo;modernize&rsquo; the ASCII to be a little less 70s FORTRAN readout, however. One is the simple addition of a colour map which switches the characters for blocks of colour.</p>
 <div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#aaa;font-style:italic"># Choose colour map</span>
 colormap = {
-    <span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">+</span><span style="color:#a50">&#39;</span>: <span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">red</span><span style="color:#a50">&#39;</span>,
-    <span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">.</span><span style="color:#a50">&#39;</span>: <span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">blue</span><span style="color:#a50">&#39;</span>,
+    <span style="color:#a50">&#39;+&#39;</span>: <span style="color:#a50">&#39;red&#39;</span>,
+    <span style="color:#a50">&#39;.&#39;</span>: <span style="color:#a50">&#39;blue&#39;</span>,
 }
 <span style="color:#00a">print</span>(gj2ascii.style(stacked, colormap))
 </code></pre></div><p><img src="/img/asci2.png" alt="colour blocks"></p>
 <p>Which is already considerably more visually informative.  And of course, if you really must:</p>
 <div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#aaa;font-style:italic"># Choose colour map</span>
 colormap = {
-    <span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">+</span><span style="color:#a50">&#39;</span>: <span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">:fire:</span><span style="color:#a50">&#39;</span>,
-    <span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">.</span><span style="color:#a50">&#39;</span>: <span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">:herb:</span><span style="color:#a50">&#39;</span>,
+    <span style="color:#a50">&#39;+&#39;</span>: <span style="color:#a50">&#39;:fire:&#39;</span>,
+    <span style="color:#a50">&#39;.&#39;</span>: <span style="color:#a50">&#39;:herb:&#39;</span>,
 }
 <span style="color:#00a">print</span>(gj2ascii.style(stacked, colormap))
 </code></pre></div><p><img src="/img/asci3.png" alt="emojis"></p>
@@ -136,17 +136,9 @@ colormap = {
 				
 			</div></div>
 	</div>
-	<script type="text/javascript"
-    src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
-  </script>
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({ tex2jax: {inlineMath: [["$","$"],["\\(","\\)"]]} })
-</script>
-
-
-<div class="footer wrapper">
+	<div class="footer wrapper">
 	<nav class="nav">
-		<div>2020  <a href="https://github.com/knadh/hugo-ink">Ink</a> theme on <a href="https://gohugo.io">Hugo</a></div>
+		<div>2021  <a href="https://github.com/knadh/hugo-ink">Ink</a> theme on <a href="https://gohugo.io">Hugo</a></div>
 	</nav>
 </div>
 

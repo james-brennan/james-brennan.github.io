@@ -4,25 +4,24 @@
 	<meta charset="utf-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge"><title>Estimating CDFs from data done right - James Brennan</title><meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta itemprop="name" content="Estimating CDFs from data done right">
-<meta itemprop="description" content="This post looks at estimating empirical cumulative density functions (CDFs) and their confidence intervals from data.">
-<meta itemprop="datePublished" content="2020-04-11T00:00:00&#43;00:00" />
+<meta itemprop="description" content="This post looks at estimating empirical cumulative density functions (CDFs) and their confidence intervals from data."><meta itemprop="datePublished" content="2020-04-11T00:00:00&#43;00:00" />
 <meta itemprop="dateModified" content="2020-04-11T00:00:00&#43;00:00" />
 <meta itemprop="wordCount" content="994">
-
-
-
 <meta itemprop="keywords" content="statistics,probability,uncertainty,python,CDF," /><meta property="og:title" content="Estimating CDFs from data done right" />
 <meta property="og:description" content="This post looks at estimating empirical cumulative density functions (CDFs) and their confidence intervals from data." />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://james-brennan.github.io/posts/edf/" />
-<meta property="article:published_time" content="2020-04-11T00:00:00+00:00" />
-<meta property="article:modified_time" content="2020-04-11T00:00:00+00:00" /><meta property="og:site_name" content="James Brennan" />
+<meta property="og:url" content="https://james-brennan.github.io/posts/edf/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2020-04-11T00:00:00&#43;00:00" />
+<meta property="article:modified_time" content="2020-04-11T00:00:00&#43;00:00" /><meta property="og:site_name" content="James Brennan" />
+
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Estimating CDFs from data done right"/>
 <meta name="twitter:description" content="This post looks at estimating empirical cumulative density functions (CDFs) and their confidence intervals from data."/>
 <link href='https://fonts.googleapis.com/css?family=Playfair+Display:700' rel='stylesheet' type='text/css'>
 	<link rel="stylesheet" type="text/css" media="screen" href="https://james-brennan.github.io/css/normalize.css" />
 	<link rel="stylesheet" type="text/css" media="screen" href="https://james-brennan.github.io/css/main.css" />
+
+        <link id="dark-scheme" rel="stylesheet" type="text/css" href="https://james-brennan.github.io/css/dark.css" />
 
 	<script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
 		<script src="https://james-brennan.github.io/js/main.js"></script>
@@ -39,9 +38,10 @@
 		</div>
 	
 	<h1 class="site-title"><a href="https://james-brennan.github.io/">James Brennan</a></h1>
-	<div class="site-description"><p>A blog about scientific computing, statistics, geoscience and remote sensing.</p><nav class="nav social">
+	<div class="site-description"><p>A blog about statistics, data science, and remote sensing.</p><nav class="nav social">
 			<ul class="flat"><li><a href="https://github.com/james-brennan/" title="Github"><i data-feather="github"></i></a></li><li><a href="https://twitter.com/jamesbrennan/" title="Twitter"><i data-feather="twitter"></i></a></li><li><a href="/index.xml" title="RSS"><i data-feather="rss"></i></a></li></ul>
-		</nav></div>
+		</nav>
+	</div>
 
 	<nav class="nav">
 		<ul class="flat">
@@ -90,18 +90,18 @@
 data = scipy.stats.gamma(<span style="color:#099">5</span>,<span style="color:#099">1</span>).rvs(<span style="color:#099">200</span>)
 </code></pre></div><p>And producing histograms (frequency counts) of the data is super easy of course:</p>
 <div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">fig, ax = plt.subplots(<span style="color:#099">1</span>,<span style="color:#099">2</span>, figsize=(<span style="color:#099">8</span>, <span style="color:#099">3</span>))
-ax[<span style="color:#099">0</span>].hist(data,lw=<span style="color:#099">1</span>,edgecolor=<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">k</span><span style="color:#a50">&#39;</span>)
-ax[<span style="color:#099">1</span>].hist(data,lw=<span style="color:#099">1</span>,edgecolor=<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">k</span><span style="color:#a50">&#39;</span>, cumulative=True)
-[a.set_xlabel(<span style="color:#a50"></span><span style="color:#a50">&#34;</span><span style="color:#a50">x</span><span style="color:#a50">&#34;</span>) <span style="color:#00a">for</span> a <span style="color:#00a">in</span> ax];
-[a.set_ylabel(<span style="color:#a50"></span><span style="color:#a50">&#34;</span><span style="color:#a50">Frequency</span><span style="color:#a50">&#34;</span>) <span style="color:#00a">for</span> a <span style="color:#00a">in</span> ax];
+ax[<span style="color:#099">0</span>].hist(data,lw=<span style="color:#099">1</span>,edgecolor=<span style="color:#a50">&#39;k&#39;</span>)
+ax[<span style="color:#099">1</span>].hist(data,lw=<span style="color:#099">1</span>,edgecolor=<span style="color:#a50">&#39;k&#39;</span>, cumulative=True)
+[a.set_xlabel(<span style="color:#a50">&#34;x&#34;</span>) <span style="color:#00a">for</span> a <span style="color:#00a">in</span> ax];
+[a.set_ylabel(<span style="color:#a50">&#34;Frequency&#34;</span>) <span style="color:#00a">for</span> a <span style="color:#00a">in</span> ax];
 sns.despine()
 </code></pre></div><p><img src="/img//EDF_3_0.png" alt="png"></p>
 <p>Where the figure on left is an ordinary histogram (i.e. the number of samples in each frequency bin) and the right is the cumulative count of samples for each bin: the cumulative histogram. Of course at the moment these are not strictly empirical distributions until they are normalised to provide discrete probability and cumulative distribution functions:</p>
 <div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">fig, ax = plt.subplots(<span style="color:#099">1</span>,<span style="color:#099">2</span>, figsize=(<span style="color:#099">8</span>, <span style="color:#099">3</span>))
-ax[<span style="color:#099">0</span>].hist(data, lw=<span style="color:#099">1</span>,edgecolor=<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">k</span><span style="color:#a50">&#39;</span>, density=True)
-ax[<span style="color:#099">1</span>].hist(data,lw=<span style="color:#099">1</span>,edgecolor=<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">k</span><span style="color:#a50">&#39;</span>, cumulative=True, density=True)
-[a.set_xlabel(<span style="color:#a50"></span><span style="color:#a50">&#34;</span><span style="color:#a50">$x$</span><span style="color:#a50">&#34;</span>) <span style="color:#00a">for</span> a <span style="color:#00a">in</span> ax];
-[a.set_ylabel(<span style="color:#a50"></span><span style="color:#a50">&#34;</span><span style="color:#a50">Density</span><span style="color:#a50">&#34;</span>) <span style="color:#00a">for</span> a <span style="color:#00a">in</span> ax];
+ax[<span style="color:#099">0</span>].hist(data, lw=<span style="color:#099">1</span>,edgecolor=<span style="color:#a50">&#39;k&#39;</span>, density=True)
+ax[<span style="color:#099">1</span>].hist(data,lw=<span style="color:#099">1</span>,edgecolor=<span style="color:#a50">&#39;k&#39;</span>, cumulative=True, density=True)
+[a.set_xlabel(<span style="color:#a50">&#34;$x$&#34;</span>) <span style="color:#00a">for</span> a <span style="color:#00a">in</span> ax];
+[a.set_ylabel(<span style="color:#a50">&#34;Density&#34;</span>) <span style="color:#00a">for</span> a <span style="color:#00a">in</span> ax];
 sns.despine()
 </code></pre></div><p><img src="/img//EDF_4_0.png" alt="png"></p>
 <h2 id="the-empirical-distribution-function">The empirical distribution function</h2>
@@ -127,11 +127,11 @@ sns.despine()
 
 x, y = edf(data)
 <span style="color:#aaa;font-style:italic"># plot it</span>
-plt.plot(x, y, <span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">k-</span><span style="color:#a50">&#39;</span>)
-plt.title(<span style="color:#a50"></span><span style="color:#a50">&#34;</span><span style="color:#a50">Empirical distribution function - $</span><span style="color:#a50">\</span><span style="color:#a50">hat{F}(x)$</span><span style="color:#a50">&#34;</span>)
-plt.xlabel(<span style="color:#a50"></span><span style="color:#a50">&#34;</span><span style="color:#a50">$x$</span><span style="color:#a50">&#34;</span>)
-plt.ylabel(<span style="color:#a50"></span><span style="color:#a50">&#34;</span><span style="color:#a50">Density</span><span style="color:#a50">&#34;</span>)
-plt.plot(data, [<span style="color:#099">0.01</span>]*<span style="color:#0aa">len</span>(data), <span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">|</span><span style="color:#a50">&#39;</span>, color=<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">k</span><span style="color:#a50">&#39;</span>)
+plt.plot(x, y, <span style="color:#a50">&#39;k-&#39;</span>)
+plt.title(<span style="color:#a50">&#34;Empirical distribution function - $\hat{F}(x)$&#34;</span>)
+plt.xlabel(<span style="color:#a50">&#34;$x$&#34;</span>)
+plt.ylabel(<span style="color:#a50">&#34;Density&#34;</span>)
+plt.plot(data, [<span style="color:#099">0.01</span>]*<span style="color:#0aa">len</span>(data), <span style="color:#a50">&#39;|&#39;</span>, color=<span style="color:#a50">&#39;k&#39;</span>)
 sns.despine()
 </code></pre></div><p><img src="/img//EDF_6_0.png" alt="png"></p>
 <p>$\hat{F}(x)$ looks at least superficially similar to the cumulative density shown in the plot above, increasing rapidly from 0 and then plateaus as the probabilities reach 1. The <code>plt.plot(data, [0.01]*len(data), '|', color='k')</code> here is a <a href="https://stackoverflow.com/questions/17875341/how-to-make-rug-plot-in-matplotlib">nice trick</a> for indicating sample points as we would with a <a href="https://en.wikipedia.org/wiki/Rug_plot">rugplot</a>.</p>
@@ -162,11 +162,11 @@ sns.despine()
 </code></pre></div><p>To calculate a 95% confidence interval ($1-0.05$):</p>
 <div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">x, y, l, u = edf(data, alpha=<span style="color:#099">0.05</span>)
 plt.fill_between(x, l, u)
-plt.plot(x, y, <span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">k-</span><span style="color:#a50">&#39;</span>)
-plt.title(<span style="color:#a50"></span><span style="color:#a50">&#34;</span><span style="color:#a50">Empirical distribution function - $</span><span style="color:#a50">\</span><span style="color:#a50">hat{F}(x)$</span><span style="color:#a50">&#34;</span>)
-plt.xlabel(<span style="color:#a50"></span><span style="color:#a50">&#34;</span><span style="color:#a50">$x$</span><span style="color:#a50">&#34;</span>)
-plt.ylabel(<span style="color:#a50"></span><span style="color:#a50">&#34;</span><span style="color:#a50">Density</span><span style="color:#a50">&#34;</span>)
-plt.plot(data, [<span style="color:#099">0.01</span>]*<span style="color:#0aa">len</span>(data), <span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">|</span><span style="color:#a50">&#39;</span>, color=<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">k</span><span style="color:#a50">&#39;</span>)
+plt.plot(x, y, <span style="color:#a50">&#39;k-&#39;</span>)
+plt.title(<span style="color:#a50">&#34;Empirical distribution function - $\hat{F}(x)$&#34;</span>)
+plt.xlabel(<span style="color:#a50">&#34;$x$&#34;</span>)
+plt.ylabel(<span style="color:#a50">&#34;Density&#34;</span>)
+plt.plot(data, [<span style="color:#099">0.01</span>]*<span style="color:#0aa">len</span>(data), <span style="color:#a50">&#39;|&#39;</span>, color=<span style="color:#a50">&#39;k&#39;</span>)
 sns.despine()
 </code></pre></div><p><img src="/img//EDF_9_0.png" alt="png"></p>
 <p>Which shows that our estimated EDF is not too shabby. The confidence intervals really shine however when we consider the impact of the number of samples we have on the EDF:</p>
@@ -184,22 +184,22 @@ Nsamps = np.logspace(<span style="color:#099">1</span>,<span style="color:#099">
     <span style="color:#aaa;font-style:italic"># calculate edf</span>
     x, y, l, u = edf(data, x0=<span style="color:#099">0</span>, x1=<span style="color:#099">14</span>)
     ax[k].fill_between(x, l, u)
-    ax[k].plot(x, y, <span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">k-</span><span style="color:#a50">&#39;</span>)
-    ax[k].set_title(f<span style="color:#a50"></span><span style="color:#a50">&#34;</span><span style="color:#a50">Samples: {Ns}</span><span style="color:#a50">&#34;</span>)
-    ax[k].set_xlabel(<span style="color:#a50"></span><span style="color:#a50">&#34;</span><span style="color:#a50">$x$</span><span style="color:#a50">&#34;</span>)
-    ax[k].set_ylabel(<span style="color:#a50"></span><span style="color:#a50">&#34;</span><span style="color:#a50">Density</span><span style="color:#a50">&#34;</span>)
+    ax[k].plot(x, y, <span style="color:#a50">&#39;k-&#39;</span>)
+    ax[k].set_title(f<span style="color:#a50">&#34;Samples: {Ns}&#34;</span>)
+    ax[k].set_xlabel(<span style="color:#a50">&#34;$x$&#34;</span>)
+    ax[k].set_ylabel(<span style="color:#a50">&#34;Density&#34;</span>)
     ax[k].plot(xcdf, scipy.stats.gamma(<span style="color:#099">5</span>,<span style="color:#099">1</span>).cdf(xcdf), 
-                <span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">k--</span><span style="color:#a50">&#39;</span>, linewidth=<span style="color:#099">1</span>   )
-    ax[k].plot(data, [<span style="color:#099">0.01</span>]*<span style="color:#0aa">len</span>(data), <span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">|</span><span style="color:#a50">&#39;</span>, color=<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">k</span><span style="color:#a50">&#39;</span>)
+                <span style="color:#a50">&#39;k--&#39;</span>, linewidth=<span style="color:#099">1</span>   )
+    ax[k].plot(data, [<span style="color:#099">0.01</span>]*<span style="color:#0aa">len</span>(data), <span style="color:#a50">&#39;|&#39;</span>, color=<span style="color:#a50">&#39;k&#39;</span>)
 </code></pre></div><p><img src="/img//EDF_11_0.png" alt="png"></p>
 <p>So the width of 95% confidence interval shrinks proportionally to $N$, providing us with a clear measure of the trust we can put in our cumulative distribution. We can get an idea of the width of the confidence interval from considering $\epsilon$ as a function of the number of observations $N$:</p>
 <div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">N = np.logspace(<span style="color:#099">1</span>, <span style="color:#099">4</span>)
-plt.plot(N, np.sqrt( <span style="color:#099">1.0</span>/(<span style="color:#099">2</span>*N) *np.log(<span style="color:#099">2.</span>/.<span style="color:#099">32</span>)), label=<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">$1</span><span style="color:#a50">\</span><span style="color:#a50">sigma$</span><span style="color:#a50">&#39;</span>)
-plt.plot(N, np.sqrt( <span style="color:#099">1.0</span>/(<span style="color:#099">2</span>*N) *np.log(<span style="color:#099">2.</span>/.<span style="color:#099">05</span>)), label=<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">$2</span><span style="color:#a50">\</span><span style="color:#a50">sigma$</span><span style="color:#a50">&#39;</span>)
+plt.plot(N, np.sqrt( <span style="color:#099">1.0</span>/(<span style="color:#099">2</span>*N) *np.log(<span style="color:#099">2.</span>/.<span style="color:#099">32</span>)), label=<span style="color:#a50">&#39;$1\sigma$&#39;</span>)
+plt.plot(N, np.sqrt( <span style="color:#099">1.0</span>/(<span style="color:#099">2</span>*N) *np.log(<span style="color:#099">2.</span>/.<span style="color:#099">05</span>)), label=<span style="color:#a50">&#39;$2\sigma$&#39;</span>)
 plt.semilogx()
-plt.ylabel(<span style="color:#a50"></span><span style="color:#a50">&#34;</span><span style="color:#a50">$</span><span style="color:#a50">\</span><span style="color:#a50">epsilon$</span><span style="color:#a50">&#34;</span>)
-plt.xlabel(<span style="color:#a50"></span><span style="color:#a50">&#34;</span><span style="color:#a50">Number of samples</span><span style="color:#a50">&#34;</span>)
-plt.legend(loc=<span style="color:#a50"></span><span style="color:#a50">&#39;</span><span style="color:#a50">best</span><span style="color:#a50">&#39;</span>)
+plt.ylabel(<span style="color:#a50">&#34;$\epsilon$&#34;</span>)
+plt.xlabel(<span style="color:#a50">&#34;Number of samples&#34;</span>)
+plt.legend(loc=<span style="color:#a50">&#39;best&#39;</span>)
 sns.despine()
 </code></pre></div><p><img src="/img//EDF_13_0.png" alt="png"></p>
 			</div>
@@ -224,17 +224,9 @@ sns.despine()
 				
 			</div></div>
 	</div>
-	<script type="text/javascript"
-    src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
-  </script>
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({ tex2jax: {inlineMath: [["$","$"],["\\(","\\)"]]} })
-</script>
-
-
-<div class="footer wrapper">
+	<div class="footer wrapper">
 	<nav class="nav">
-		<div>2020  <a href="https://github.com/knadh/hugo-ink">Ink</a> theme on <a href="https://gohugo.io">Hugo</a></div>
+		<div>2021  <a href="https://github.com/knadh/hugo-ink">Ink</a> theme on <a href="https://gohugo.io">Hugo</a></div>
 	</nav>
 </div>
 

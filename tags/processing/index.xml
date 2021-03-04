@@ -5,18 +5,14 @@
     <link>https://james-brennan.github.io/tags/processing/</link>
     <description>Recent content in processing on James Brennan</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Fri, 06 Mar 2020 00:00:00 +0000</lastBuildDate>
-    
-	<atom:link href="https://james-brennan.github.io/tags/processing/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Fri, 06 Mar 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://james-brennan.github.io/tags/processing/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Essential packages for geospatial analysis in python</title>
       <link>https://james-brennan.github.io/posts/pythongeo/</link>
       <pubDate>Fri, 06 Mar 2020 00:00:00 +0000</pubDate>
       
       <guid>https://james-brennan.github.io/posts/pythongeo/</guid>
-      <description>&lt;p&gt;Python is fast becoming the defacto standard for geospatial work &amp;ndash; primarily because of its great ecosystem of packages, but also probably whatever you want to do someone has posted an answer for it on &lt;a href=&#34;https://gis.stackexchange.com/questions/tagged/python&#34;&gt;stackoverflow&lt;/a&gt; with attached python code. To save you some of that trouble below is a collection of &amp;ldquo;essential&amp;rdquo;&amp;rdquo; packages for everything geospatial in python.&lt;/p&gt;</description>
+      <description>&lt;p&gt;Python is fast becoming the defacto standard for geospatial work &amp;ndash; primarily because of its great ecosystem of packages, but also probably whatever you want to do someone has posted an answer for it on &lt;a href=&#34;https://gis.stackexchange.com/questions/tagged/python&#34;&gt;stackoverflow&lt;/a&gt; with attached python code. To save you some of that trouble below is a collection of &amp;ldquo;essential&amp;rdquo;&amp;quot; packages for everything geospatial in python.&lt;/p&gt;</description>
     </item>
     
   </channel>
