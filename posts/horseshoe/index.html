@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"><title>Horseshoe priors in numpyro - James Brennan</title><meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta itemprop="name" content="Horseshoe priors in numpyro">
+<meta itemprop="description" content="This post looks at how to implement a horseshoe prior in numpyro to do sparse Bayesian inference. We&rsquo;ll see that the horseshoe prior provides a nicer shrinkage prior than lasso or ridge priors because it&rsquo;s more concentrated and more flexible.
+Let&rsquo;s start from the classical linear model where we predict a vector of some data $Y$ based on a design matrix $X$ and a vector of model coefficients $\beta$:
+$$ Y = X \beta &#43; \epsilon $$"><meta itemprop="datePublished" content="2021-03-06T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2021-03-06T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="1087">
+<meta itemprop="keywords" content="horseshoe prior,numpyro,priors,bayesian," /><meta property="og:title" content="Horseshoe priors in numpyro" />
+<meta property="og:description" content="This post looks at how to implement a horseshoe prior in numpyro to do sparse Bayesian inference. We&rsquo;ll see that the horseshoe prior provides a nicer shrinkage prior than lasso or ridge priors because it&rsquo;s more concentrated and more flexible.
+Let&rsquo;s start from the classical linear model where we predict a vector of some data $Y$ based on a design matrix $X$ and a vector of model coefficients $\beta$:
+$$ Y = X \beta &#43; \epsilon $$" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://james-brennan.github.io/posts/horseshoe/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2021-03-06T00:00:00&#43;00:00" />
+<meta property="article:modified_time" content="2021-03-06T00:00:00&#43;00:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Horseshoe priors in numpyro"/>
+<meta name="twitter:description" content="This post looks at how to implement a horseshoe prior in numpyro to do sparse Bayesian inference. We&rsquo;ll see that the horseshoe prior provides a nicer shrinkage prior than lasso or ridge priors because it&rsquo;s more concentrated and more flexible.
+Let&rsquo;s start from the classical linear model where we predict a vector of some data $Y$ based on a design matrix $X$ and a vector of model coefficients $\beta$:
+$$ Y = X \beta &#43; \epsilon $$"/>
+<link href='https://fonts.googleapis.com/css?family=Playfair+Display:700' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" type="text/css" media="screen" href="https://james-brennan.github.io/css/normalize.css" />
+	<link rel="stylesheet" type="text/css" media="screen" href="https://james-brennan.github.io/css/main.css" />
+
+        <link id="dark-scheme" rel="stylesheet" type="text/css" href="https://james-brennan.github.io/css/dark.css" />
+
+	<script src="https://james-brennan.github.io/js/feather.min.js"></script>
+	
+		<script src="https://james-brennan.github.io/js/main.js"></script>
+</head>
+
+<body>
+	<div class="container wrapper">
+		<div class="header">
+	
+		<div class="avatar">
+			<a href="https://james-brennan.github.io/">
+				<img src="/img/avatar.jpg" alt="James Brennan" />
+			</a>
+		</div>
+	
+	<h1 class="site-title"><a href="https://james-brennan.github.io/">James Brennan</a></h1>
+	<div class="site-description"><p>A blog about statistics, data science, and remote sensing.</p><nav class="nav social">
+			<ul class="flat"><li><a href="https://github.com/james-brennan/" title="Github"><i data-feather="github"></i></a></li><li><a href="https://twitter.com/jamesbrennan/" title="Twitter"><i data-feather="twitter"></i></a></li></ul>
+		</nav>
+	</div>
+
+	<nav class="nav">
+		<ul class="flat">
+			
+			<li>
+				<a href="/">Home</a>
+			</li>
+			
+			<li>
+				<a href="/posts">All posts</a>
+			</li>
+			
+			<li>
+				<a href="/tags">Tags</a>
+			</li>
+			
+		</ul>
+	</nav>
+</div>
+
+
+		<div class="post">
+			<div class="post-header">
+				
+					<div class="meta">
+						<div class="date">
+							<span class="day">06</span>
+							<span class="rest">Mar 2021</span>
+						</div>
+					</div>
+				
+				<div class="matter">
+					<h1 class="title">Horseshoe priors in numpyro</h1>
+				</div>
+			</div>
+					
+			<div class="markdown">
+				<p>This post looks at how to implement a horseshoe prior in <code>numpyro</code> to do sparse Bayesian inference. We&rsquo;ll see that the horseshoe prior provides a nicer shrinkage prior than lasso or ridge priors because it&rsquo;s more concentrated and more flexible.</p>
+<p>Let&rsquo;s start from the classical linear model where we predict a vector of some data $Y$ based on a design matrix $X$ and a vector of model coefficients $\beta$:</p>
+<p>$$ Y =  X \beta + \epsilon $$</p>
+<p>We don&rsquo;t expect our model to be an exact representation of the data generation process so the model will have some error $\epsilon$.</p>
+<h2 id="from-regularisation-to-bayesian-priors">From regularisation to Bayesian priors</h2>
+<p>In some cases, we&rsquo;re drowning in predictors: either we&rsquo;ve got far too many predictors we think might be involved, or at worse just happened to be in our CSV and we don&rsquo;t know what do to with them. In extreme cases, the number of rows in $X$ exceeds the number of data points we have in $Y$.</p>
+<p>One common frequentist approach to this problem has been through regularisation, in which the cost function $J(\beta)$ is augmented with a regularisation term that penalises larger values of $\beta$ at the expense of a worse fit to the data in what is referred to as <a href="https://en.wikipedia.org/wiki/Tikhonov_regularization">ridge regression</a>:</p>
+<p>$$ J(\beta) = || X \beta - Y ||^2 + \lambda ||\beta||^2 $$</p>
+<p>The term $\lambda ||\beta||^2$ penalises larger $\beta$ in a squared fashion due to the L2 norm, the strength of which is determined by the regularisation hyperparameter $\lambda$. $\lambda ||\beta||^2$ encourages the solution towards smaller values of all $\beta$, alternatively if we expect that some coefficients should be zero we can use an L1 norm in a <a href="https://en.wikipedia.org/wiki/Lasso_(statistics)">lasso</a> regression model:</p>
+<p>$$ J(\beta) = || X \beta - Y ||^2 + \lambda |\beta| $$</p>
+<p>which encourages sparser solutions than the L2 norm and is re.</p>
+<p>When we recast these models in a Bayesian sense we can get new insights into how some of the regularisation methods work. Let&rsquo;s take our unconstrained model, we&rsquo;ll assume that the errors $\epsilon$ are zero-mean <em><strong>iid</strong></em> normally distributed $\mathcal{N}(0, \sigma^2)$.  We can write our predictive model explicitly with this error model:</p>
+<p>$$ Y \sim \mathcal{N}(X\beta, \sigma^2) $$</p>
+<p>Now our data $Y$ is modelled as a random variable (RV) with a normal distribution for each point $Y_i$ described by a mean $(X \beta)_i$ and variance $\sigma^2$. With Bayesian inference, we extend this principle to encode all of our model parameters to be random variables also. So for our model above this means defining $\beta$ and $\sigma$ as RVs and in some cases $X$ when we have uncertainties in our predictors. For now, let&rsquo;s not go <a href="https://en.wikipedia.org/wiki/Radical_probabilism">&ldquo;turtles all the way down&rdquo;</a> and only define a prior distribution for $\beta$ and assume $x$ and $\sigma$ known.</p>
+<p>In our two regularisation examples, the prior distributions for $\beta$ are explicitly defined by the functionals. We could recast the L1 regularisation into a Bayesian model using a Laplacian prior for $\beta$ and the L2 a normal prior for $\beta$.</p>
+<h2 id="the-horseshoe">The horseshoe</h2>
+<p>Taking a Bayesian approach gives us more flexibility about how we define our priors, by making it possible to get inferences of mixture model priors that have the right properties for sparsity inducing priors. The <a href="http://proceedings.mlr.press/v5/carvalho09a/carvalho09a.pdf">Horseshoe prior</a> is one such prior:</p>
+<p>$$ \beta_i | \lambda_i, \tau \sim \mathcal{N}(0, \lambda_i^2, \tau^2) $$
+$$ \lambda_i \sim C^+(0,1) $$
+$$ \tau \sim C^+(0, 1)$$</p>
+<p>There&rsquo;s a lot to unpack here. Each coefficient $\beta_i$ is modelled as a normal distribution with a variance of $\lambda_i^2, \tau^2$. These two terms, define our mixture model, $\lambda_i$ provides a <em><strong>local</strong></em> shrinkage parameter - local to the individual coefficient $\beta_i$. While $\tau$ provides a <em><strong>global</strong></em> shrinkage parameter which is shared across all coefficients. Both shrinkage parameters are defined with a half-Cauchy distribution $C^+(0,1)$ which provide weakly informative priors.</p>
+<p>Now let&rsquo;s use numpyro to detail the benefits of the horseshoe. First, let&rsquo;s make some data $Y$ we wish to model that has a sparse set of predictors using <a href="https://scikit-learn.org/stable/modules/generated/sklearn.datasets.make_sparse_coded_signal.html"><code>make_sparse_coded_signal</code></a>.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#00a">import</span> <span style="color:#0aa;text-decoration:underline">matplotlib.pyplot</span> <span style="color:#00a">as</span> <span style="color:#0aa;text-decoration:underline">plt</span>
+<span style="color:#00a">import</span> <span style="color:#0aa;text-decoration:underline">matplotlib</span>
+matplotlib.rcParams[<span style="color:#a50">&#39;figure.figsize&#39;</span>] = (<span style="color:#099">16</span>, <span style="color:#099">6</span>)
+<span style="color:#00a">import</span> <span style="color:#0aa;text-decoration:underline">seaborn</span> <span style="color:#00a">as</span> <span style="color:#0aa;text-decoration:underline">sns</span> 
+<span style="color:#00a">import</span> <span style="color:#0aa;text-decoration:underline">numpy</span> <span style="color:#00a">as</span> <span style="color:#0aa;text-decoration:underline">np</span> 
+sns.set_style(<span style="color:#a50">&#34;dark&#34;</span>); sns.set_palette(<span style="color:#a50">&#34;muted&#34;</span>); sns.set_context(<span style="color:#a50">&#34;paper&#34;</span>)
+
+<span style="color:#00a">from</span> <span style="color:#0aa;text-decoration:underline">sklearn.datasets</span> <span style="color:#00a">import</span> make_sparse_coded_signal
+
+y, X, beta = make_sparse_coded_signal(n_samples=<span style="color:#099">1</span>,
+                                   n_components=<span style="color:#099">50</span>,
+                                   n_features=<span style="color:#099">100</span>,
+                                   n_nonzero_coefs=<span style="color:#099">20</span>,
+                                   random_state=<span style="color:#099">0</span>)
+
+
+<span style="color:#aaa;font-style:italic"># add some noise to y</span>
+y = y + <span style="color:#099">0.1</span> * np.random.randn(<span style="color:#0aa">len</span>(y))
+
+plt.step(<span style="color:#0aa">range</span>(<span style="color:#0aa">len</span>(beta)), beta,  where=<span style="color:#a50">&#39;mid&#39;</span>, lw=<span style="color:#099">1</span>)
+plt.plot(<span style="color:#0aa">range</span>(<span style="color:#0aa">len</span>(beta)), beta, <span style="color:#a50">&#39;.&#39;</span>)
+plt.xlabel(<span style="color:#a50">r</span><span style="color:#a50">&#39;$\beta$&#39;</span>)
+</code></pre></div><p><img src="/img/horseshoe_4_1.png" alt="png"></p>
+<p>Let&rsquo;s define our model in <code>numpyro</code>, using <a href="http://num.pyro.ai/en/stable/primitives.html#plate"><code>plate</code></a> to split up the indpendent RVs for $\lambda$:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#00a">import</span> <span style="color:#0aa;text-decoration:underline">numpyro</span>
+<span style="color:#00a">import</span> <span style="color:#0aa;text-decoration:underline">numpyro.distributions</span> <span style="color:#00a">as</span> <span style="color:#0aa;text-decoration:underline">dist</span>
+<span style="color:#00a">import</span> <span style="color:#0aa;text-decoration:underline">jax.numpy</span> <span style="color:#00a">as</span> <span style="color:#0aa;text-decoration:underline">jnp</span>
+
+<span style="color:#00a">def</span> <span style="color:#0a0">horeshoe_linear_model</span>(y=None, X=None, y_sigma=.<span style="color:#099">1</span>):
+    n_predictors = X.shape[<span style="color:#099">1</span>]
+    Tau = numpyro.sample(<span style="color:#a50">&#39;tau&#39;</span>, dist.HalfCauchy(scale=<span style="color:#099">1</span>))
+    <span style="color:#00a">with</span> numpyro.plate(<span style="color:#a50">&#39;local_shrinkage&#39;</span>, n_predictors):
+        Lambda = numpyro.sample(<span style="color:#a50">&#39;lambda&#39;</span>, dist.HalfCauchy(scale=<span style="color:#099">1</span>))
+        horseshoe_sigma = Tau**<span style="color:#099">2</span>*Lambda**<span style="color:#099">2</span>
+        Beta = numpyro.sample(<span style="color:#a50">&#39;beta&#39;</span>, dist.Normal(loc=<span style="color:#099">0</span>, scale=horseshoe_sigma))
+    mu = jnp.dot(X, Beta)
+    numpyro.sample(<span style="color:#a50">&#39;obs&#39;</span>, dist.Normal(loc=mu, scale=y_sigma), obs=y)
+</code></pre></div><p>And sample from our model using <code>numpyro's</code> built in <a href="https://arxiv.org/abs/1111.4246"><code>NUTS</code></a> sampler:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#00a">from</span> <span style="color:#0aa;text-decoration:underline">numpyro.infer</span> <span style="color:#00a">import</span> MCMC, NUTS
+<span style="color:#00a">from</span> <span style="color:#0aa;text-decoration:underline">jax</span> <span style="color:#00a">import</span> random
+
+nuts_kernel = NUTS(horeshoe_linear_model)
+mcmc = MCMC(nuts_kernel, num_warmup=<span style="color:#099">500</span>, num_samples=<span style="color:#099">1000</span>)
+rng_key = random.PRNGKey(<span style="color:#099">0</span>)
+mcmc.run(rng_key, y=y, X=X)
+</code></pre></div><pre><code>sample: 100%|██████████| 1500/1500 [00:09&lt;00:00, 152.43it/s, 374 steps of size 2.70e-03. acc. prob=0.86] 
+</code></pre>
+<p>We&rsquo;ll add the expected value of $\beta$ estimated for our model to our spikey plot above:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">posterior_samples = mcmc.get_samples()
+beta_mu = jnp.mean(posterior_samples[<span style="color:#a50">&#39;beta&#39;</span>], axis=<span style="color:#099">0</span>)
+plt.step(<span style="color:#0aa">range</span>(<span style="color:#0aa">len</span>(beta)), beta,  where=<span style="color:#a50">&#39;mid&#39;</span>, lw=<span style="color:#099">1</span>)
+plt.plot(<span style="color:#0aa">range</span>(<span style="color:#0aa">len</span>(beta)), beta, <span style="color:#a50">&#39;.&#39;</span>)
+plt.plot(<span style="color:#0aa">range</span>(<span style="color:#0aa">len</span>(beta)), beta_mu, <span style="color:#a50">&#39;g*&#39;</span>)
+plt.xlabel(<span style="color:#a50">r</span><span style="color:#a50">&#39;$\beta$&#39;</span>)
+</code></pre></div><p><img src="/img/horseshoe_10_1.png" alt="png"></p>
+<p>So our model (green dots) does a good job of retrieving a sparse solution that matches well with the true $\beta$. Let&rsquo;s contrast it with a classic least-squares solution where we have no prior on $\beta$. We can also implement this model in a Bayesian way by using a flat prior over $\beta$ so that we encode no knowledge (or concentration) into the distribution.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#00a">def</span> <span style="color:#0a0">linear_model</span>(y=None, X=None, y_sigma=.<span style="color:#099">1</span>):
+    n_predictors = X.shape[<span style="color:#099">1</span>]
+    Lambda = numpyro.sample(<span style="color:#a50">&#39;Lambda&#39;</span>, dist.HalfCauchy(scale=<span style="color:#099">1</span>))
+    <span style="color:#00a">with</span> numpyro.plate(<span style="color:#a50">&#39;beta_plate&#39;</span>, n_predictors):
+        Beta = numpyro.sample(<span style="color:#a50">&#39;beta&#39;</span>, dist.Uniform(low=-<span style="color:#099">1000</span>, high=<span style="color:#099">1000</span>))
+    mu = jnp.dot(X, Beta)
+    numpyro.sample(<span style="color:#a50">&#39;obs&#39;</span>, dist.Normal(loc=mu, scale=y_sigma), obs=y)
+
+lsq_mcmc = MCMC(
+            NUTS(linear_model), 
+            num_warmup=<span style="color:#099">500</span>, num_samples=<span style="color:#099">1000</span>)
+lsq_mcmc.run(random.PRNGKey(<span style="color:#099">0</span>), y=y, X=X)
+lsq_samples =  lsq_mcmc.get_samples()
+
+
+posterior_samples = lsq_mcmc.get_samples()
+beta_mu = jnp.mean(posterior_samples[<span style="color:#a50">&#39;beta&#39;</span>], axis=<span style="color:#099">0</span>)
+
+plt.step(<span style="color:#0aa">range</span>(<span style="color:#0aa">len</span>(beta)), beta,  where=<span style="color:#a50">&#39;mid&#39;</span>, lw=<span style="color:#099">1</span>)
+plt.plot(<span style="color:#0aa">range</span>(<span style="color:#0aa">len</span>(beta)), beta, <span style="color:#a50">&#39;.&#39;</span>)
+plt.plot(<span style="color:#0aa">range</span>(<span style="color:#0aa">len</span>(beta)), beta_mu, <span style="color:#a50">&#39;g*&#39;</span>)
+plt.xlabel(<span style="color:#a50">r</span><span style="color:#a50">&#39;$\beta$&#39;</span>)
+</code></pre></div><pre><code>sample: 100%|██████████| 1500/1500 [00:07&lt;00:00, 204.90it/s, 47 steps of size 1.84e-02. acc. prob=0.87]
+</code></pre>
+<p><img src="/img/horseshoe_12_2.png" alt="png"></p>
+<p>Without any shrinkage, $\beta$ is fitted to residual noise in the dataset (we can see this if we compare $\beta_8$ across both models for example).</p>
+<h2 id="further-reading">Further reading</h2>
+<ul>
+<li><a href="https://betanalpha.github.io/assets/case_studies/bayes_sparse_regression.html">Bayesian sparse regression</a></li>
+<li><a href="http://num.pyro.ai/en/latest/getting_started.html">Getting started with numpyro</a></li>
+<li>I&rsquo;ve also included small examples of ridge and lasso priors below</li>
+</ul>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#00a">def</span> <span style="color:#0a0">ridge_linear_model</span>(y=None, X=None, y_sigma=.<span style="color:#099">1</span>):
+    n_predictors = X.shape[<span style="color:#099">1</span>]
+    Lambda = numpyro.sample(<span style="color:#a50">&#39;Lambda&#39;</span>, dist.HalfCauchy(scale=<span style="color:#099">1</span>))
+    <span style="color:#00a">with</span> numpyro.plate(<span style="color:#a50">&#39;beta_plate&#39;</span>, n_predictors):
+        Beta = numpyro.sample(<span style="color:#a50">&#39;beta&#39;</span>, dist.Normal(loc=<span style="color:#099">0</span>, scale=Lambda))
+    mu = jnp.dot(X, Beta)
+    numpyro.sample(<span style="color:#a50">&#39;obs&#39;</span>, dist.Normal(loc=mu, scale=y_sigma), obs=y)
+    
+<span style="color:#00a">def</span> <span style="color:#0a0">lasso_linear_model</span>(y=None, X=None, y_sigma=.<span style="color:#099">1</span>):
+    n_predictors = X.shape[<span style="color:#099">1</span>]
+    Lambda = numpyro.sample(<span style="color:#a50">&#39;Lambda&#39;</span>, dist.HalfCauchy(scale=<span style="color:#099">1</span>))
+    <span style="color:#00a">with</span> numpyro.plate(<span style="color:#a50">&#39;beta_plate&#39;</span>, n_predictors):
+        Beta = numpyro.sample(<span style="color:#a50">&#39;beta&#39;</span>, dist.Laplace(loc=<span style="color:#099">0</span>, scale=Lambda))
+    mu = jnp.dot(X, Beta)
+    numpyro.sample(<span style="color:#a50">&#39;obs&#39;</span>, dist.Normal(loc=mu, scale=y_sigma), obs=y)
+</code></pre></div>
+			</div>
+
+			<div class="tags">
+				
+					
+						<ul class="flat">
+							
+							<li><a href="/tags/horseshoe-prior">horseshoe prior</a></li>
+							
+							<li><a href="/tags/numpyro">numpyro</a></li>
+							
+							<li><a href="/tags/priors">priors</a></li>
+							
+							<li><a href="/tags/bayesian">bayesian</a></li>
+							
+						</ul>
+					
+				
+			</div></div>
+	</div>
+	<div class="footer wrapper">
+	<nav class="nav">
+		<div>2021  <a href="https://github.com/knadh/hugo-ink">Ink</a> theme on <a href="https://gohugo.io">Hugo</a></div>
+	</nav>
+</div>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C14B1HDZD7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C14B1HDZD7');
+</script><script>feather.replace()</script>
+
+
+<script>
+MathJax = {
+	tex: {
+	inlineMath: [['$', '$'], ['\\(', '\\)']],
+	displayMath: [['$$','$$'], ['\\[', '\\]']],
+	processEscapes: true,
+	processEnvironments: true
+	},
+	options: {
+	skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+	}
+};
+
+window.addEventListener('load', (event) => {
+	document.querySelectorAll("mjx-container").forEach(function(x){
+		x.parentElement.classList += 'has-jax'})
+	});
+
+</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript" id="MathJax-script" async
+src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>priors on James Brennan</title>
+    <link>https://james-brennan.github.io/tags/priors/</link>
+    <description>Recent content in priors on James Brennan</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <lastBuildDate>Sat, 06 Mar 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://james-brennan.github.io/tags/priors/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Horseshoe priors in numpyro</title>
+      <link>https://james-brennan.github.io/posts/horseshoe/</link>
+      <pubDate>Sat, 06 Mar 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://james-brennan.github.io/posts/horseshoe/</guid>
+      <description>This post looks at how to implement a horseshoe prior in numpyro to do sparse Bayesian inference. We&amp;rsquo;ll see that the horseshoe prior provides a nicer shrinkage prior than lasso or ridge priors because it&amp;rsquo;s more concentrated and more flexible.
+Let&amp;rsquo;s start from the classical linear model where we predict a vector of some data $Y$ based on a design matrix $X$ and a vector of model coefficients $\beta$:
+$$ Y = X \beta + \epsilon $$</description>
+    </item>
+    
+  </channel>
+</rss>

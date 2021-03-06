@@ -300,7 +300,6 @@ ax.axis(<span style="color:#a50">&#39;off&#39;</span>)
 <div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#00a">for</span> leaf <span style="color:#00a">in</span> r_tree.leaves()[:<span style="color:#099">2</span>]:
     idxs, indices, bbox = leaf
     <span style="color:#00a">print</span>(f<span style="color:#a50">&#39;-&gt; points in box {idxs}: &#39;</span>,  indices, <span style="color:#a50">&#39;</span><span style="color:#a50">\n</span><span style="color:#a50"> bounding box: &#39;</span>, bbox, <span style="color:#a50">&#39;</span><span style="color:#a50">\n</span><span style="color:#a50">&#39;</span>)
-    
 <span style="color:#00a">print</span>(f<span style="color:#a50">&#34;number of leaves: {len(r_tree.leaves())}&#34;</span>)
 </code></pre></div><pre><code>-&gt; points in box 6:  [182654, 182656, 182665, 182663, 182659, 182664, 182655, 182657, 182660, 182652, 182653, 182675, 182677, 182671, 182670, 182674, 182680, 182678, 182673, 182672, 182669, 182668, 182679, 182676, 182686, 182681, 182684, 182687, 182690, 182688, 182685, 182682, 182689, 182683, 182692, 182696, 182693, 182699, 182695, 182697, 182694, 182691, 182698, 182703, 182702, 182706, 182704, 182707, 182701, 182705, 182700, 182710, 182711, 182709, 182708, 182712, 182713, 182714, 182715, 182716, 182718, 182717, 182719, 182721, 182720, 182722, 182728, 182725, 182724, 182729] 
  bounding box:  [-10882520.74215797, 2750455.9416639777, -10852868.728300184, 2759722.1959945355] 
@@ -313,16 +312,13 @@ number of leaves: 3239
 <p>Plotting the first 200 bounding boxes shows how the data is partitioned geographically:</p>
 <div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#00a">import</span> <span style="color:#0aa;text-decoration:underline">shapely.geometry</span>
 <span style="color:#00a">from</span> <span style="color:#0aa;text-decoration:underline">descartes</span> <span style="color:#00a">import</span> PolygonPatch
-
 ax = gdf.plot(markersize=.<span style="color:#099">1</span>, figsize=(<span style="color:#099">12</span>, <span style="color:#099">8</span>), column=<span style="color:#a50">&#39;dob&#39;</span>, cmap=<span style="color:#a50">&#39;jet&#39;</span>)
 plt.autoscale(False)
-
 <span style="color:#00a">for</span> leaf <span style="color:#00a">in</span> r_tree.leaves()[:<span style="color:#099">200</span>]:
     idxs, indices, bbox = leaf
     r_box = shapely.geometry.box(*bbox)
     box_patch = PolygonPatch(r_box, fc=<span style="color:#a50">&#39;None&#39;</span>, ec=<span style="color:#a50">&#39;k&#39;</span>)
     ax.add_patch(box_patch)
-    
 world.to_crs(gdf.crs).plot(ax=ax, color=<span style="color:#a50">&#39;none&#39;</span>, edgecolor=<span style="color:#a50">&#39;grey&#39;</span>)
 ax.axis(<span style="color:#a50">&#39;off&#39;</span>)
 </code></pre></div><p><img src="/img/geopandas%20gridding_16_1.png" alt="png"></p>

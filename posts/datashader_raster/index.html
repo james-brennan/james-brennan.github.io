@@ -86,7 +86,7 @@
 <p>The data to visualise is a scientific dataset with satellite observations from the <a href="https://modis.gsfc.nasa.gov/about/">NASA MODIS instruments</a>. A dataset of vegetation leaf area index (LAI) &ndash; essentially the average number of leaves on the trees recorded by the instrument is provided in the <a href="https://lpdaac.usgs.gov/products/mcd15a2hv006/">MCD15</a> data product.</p>
 <p>The raster dataset is provided as smaller datasets split into geographic tiles to make the size more manageable &ndash; the data is collected globally at 500 metres! So the observations are split into individual files which correspond to geographic tiles of about 1200km in size. This format is referred to as the <a href="https://modis.gsfc.nasa.gov/about/">MODIS grid</a> and is shown in the image below:</p>
 <p><img src="/img/modis_tiles.png" alt="modis_tiles"></p>
-<p>To produce a visualisation covering the entire land surface means dealing with the some ~270 individual products which comprise the global product.</p>
+<p>To produce a visualisation covering the entire land surface means dealing with some ~270 individual products which comprise the global product.</p>
 <div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ ls MCD15A2H.A2019001.*
     MCD15A2H.A2019001.h00v08.006.2019014203755.hdf  MCD15A2H.A2019001.h14v10.006.2019014203827.hdf  MCD15A2H.A2019001.h24v02.006.2019014203845.hdf
     MCD15A2H.A2019001.h00v09.006.2019014203829.hdf  MCD15A2H.A2019001.h14v11.006.2019014203821.hdf  MCD15A2H.A2019001.h24v03.006.2019014203846.hdf
@@ -277,7 +277,7 @@ Lower Right (20015109.354,-6671703.118) (  0d 0<span style="color:#a50">&#39; 0.
 </span><span style="color:#a50">  Offset: 0,   Scale:0.1
 </span></code></pre></div><p>So <code>LAI.vrt</code> has one raster band, a scaling factor to rescale the data to fall between 0.0-2.55 rather than 0-255 which match the expected units of LAI itself. The size of the raster is 86400 pixels &ldquo;tall&rdquo; and 31200 pixels wide, which means it contains 2695680000 pixels &ndash; i.e some ~2.69 billion!</p>
 <h3 id="xarray-for-out-of-memory-rasters">xarray for out-of-memory rasters</h3>
-<p>Loading <code>LAI.vrt</code> is remarkably simple thanks to the <a href="http://xarray.pydata.org/en/stable/#">xarray</a> and <a href="https://rasterio.readthedocs.io/en/latest/">rasterio</a> python package which is built ontop of GDAL.</p>
+<p>Loading <code>LAI.vrt</code> is remarkably simple thanks to the <a href="http://xarray.pydata.org/en/stable/#">xarray</a> and <a href="https://rasterio.readthedocs.io/en/latest/">rasterio</a> python package which is built on top of GDAL.</p>
 <div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#00a">import</span> <span style="color:#0aa;text-decoration:underline">xarray</span> <span style="color:#00a">as</span> <span style="color:#0aa;text-decoration:underline">xr</span>
 
 In [<span style="color:#099">2</span>]: da = xr.open_rasterio(<span style="color:#a50">&#34;LAI.vrt&#34;</span>)

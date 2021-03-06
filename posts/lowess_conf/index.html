@@ -6,7 +6,7 @@
 	<meta itemprop="name" content="Confidence intervals for LOWESS models in python">
 <meta itemprop="description" content="LOWESS (or also referred to as LOESS for locally-weighted scatterplot smoothing) is a non-parametric regression method for smoothing data. But how do we get uncertainties on the curve?"><meta itemprop="datePublished" content="2020-03-23T00:00:00&#43;00:00" />
 <meta itemprop="dateModified" content="2020-03-23T00:00:00&#43;00:00" />
-<meta itemprop="wordCount" content="1845">
+<meta itemprop="wordCount" content="1844">
 <meta itemprop="keywords" content="python,uncertainty,statistics," /><meta property="og:title" content="Confidence intervals for LOWESS models in python" />
 <meta property="og:description" content="LOWESS (or also referred to as LOESS for locally-weighted scatterplot smoothing) is a non-parametric regression method for smoothing data. But how do we get uncertainties on the curve?" />
 <meta property="og:type" content="article" />
@@ -213,7 +213,7 @@ w_1 &amp;  &amp; \\\<br>
 \end{bmatrix} $$</p>
 <p>Solving the system provides $\hat{\beta}$ - the intercept $\beta_0$ and slope $\beta_1$. The LOWESS smoothed observation $\hat{y}_{sm}$ is fitted/predicted from the row of the system corresponding to $i$:</p>
 <p>$$ \hat{y}_{sm} = \mathbf{X}_i \hat{\beta}  $$</p>
-<p>So algorithmically we loop over each observation $i$ update the $\mathbf{W}$ with the new weights and resolve the least squares system above to update $\hat{\beta}$ and then predict each $\hat{y}_{sm}$.</p>
+<p>So algorithmically we loop over each observation $i$ update the $\mathbf{W}$ with the new weights and resolve the least-squares system above to update $\hat{\beta}$ and then predict each $\hat{y}_{sm}$.</p>
 <p>In code this relatively simple to implement for one observation $i$:</p>
 <div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">dist = np.abs((x[i]-x))
 w = tricube(dist)

@@ -2,10 +2,31 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://james-brennan.github.io/tags/geopandas/</loc>
-    <lastmod>2020-05-13T00:00:00+00:00</lastmod>
+    <loc>https://james-brennan.github.io/tags/bayesian/</loc>
+    <lastmod>2021-03-06T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://james-brennan.github.io/tags/horseshoe-prior/</loc>
+    <lastmod>2021-03-06T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://james-brennan.github.io/posts/horseshoe/</loc>
+    <lastmod>2021-03-06T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://james-brennan.github.io/</loc>
+    <lastmod>2021-03-06T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://james-brennan.github.io/tags/numpyro/</loc>
+    <lastmod>2021-03-06T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://james-brennan.github.io/posts/</loc>
+    <lastmod>2021-03-06T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://james-brennan.github.io/tags/priors/</loc>
+    <lastmod>2021-03-06T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://james-brennan.github.io/tags/</loc>
+    <lastmod>2021-03-06T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://james-brennan.github.io/tags/geopandas/</loc>
     <lastmod>2020-05-13T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://james-brennan.github.io/posts/postgis_python/</loc>
@@ -17,13 +38,7 @@
     <loc>https://james-brennan.github.io/tags/postgresql/</loc>
     <lastmod>2020-05-13T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://james-brennan.github.io/posts/</loc>
-    <lastmod>2020-05-13T00:00:00+00:00</lastmod>
-  </url><url>
     <loc>https://james-brennan.github.io/tags/python/</loc>
-    <lastmod>2020-05-13T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://james-brennan.github.io/tags/</loc>
     <lastmod>2020-05-13T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://james-brennan.github.io/tags/vector/</loc>

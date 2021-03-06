@@ -5,7 +5,43 @@
     <link>https://james-brennan.github.io/tags/</link>
     <description>Recent content in Tags on James Brennan</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Wed, 13 May 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://james-brennan.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 06 Mar 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://james-brennan.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>bayesian</title>
+      <link>https://james-brennan.github.io/tags/bayesian/</link>
+      <pubDate>Sat, 06 Mar 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://james-brennan.github.io/tags/bayesian/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>horseshoe prior</title>
+      <link>https://james-brennan.github.io/tags/horseshoe-prior/</link>
+      <pubDate>Sat, 06 Mar 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://james-brennan.github.io/tags/horseshoe-prior/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>numpyro</title>
+      <link>https://james-brennan.github.io/tags/numpyro/</link>
+      <pubDate>Sat, 06 Mar 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://james-brennan.github.io/tags/numpyro/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>priors</title>
+      <link>https://james-brennan.github.io/tags/priors/</link>
+      <pubDate>Sat, 06 Mar 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://james-brennan.github.io/tags/priors/</guid>
+      <description></description>
+    </item>
+    
     <item>
       <title>geopandas</title>
       <link>https://james-brennan.github.io/tags/geopandas/</link>
