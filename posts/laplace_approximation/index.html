@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"><title>The Laplace approximation for approximate inference in python - James Brennan</title><meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta itemprop="name" content="The Laplace approximation for approximate inference in python">
+<meta itemprop="description" content="The Laplace Laplace approximation still provides the simplest deterministic method available for approximate inference. Let&#39;s implement it in python."><meta itemprop="datePublished" content="2021-03-12T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2021-03-12T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="1022">
+<meta itemprop="keywords" content="Laplace approximation,approximate inference,python," /><meta property="og:title" content="The Laplace approximation for approximate inference in python" />
+<meta property="og:description" content="The Laplace Laplace approximation still provides the simplest deterministic method available for approximate inference. Let&#39;s implement it in python." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://james-brennan.github.io/posts/laplace_approximation/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2021-03-12T00:00:00&#43;00:00" />
+<meta property="article:modified_time" content="2021-03-12T00:00:00&#43;00:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="The Laplace approximation for approximate inference in python"/>
+<meta name="twitter:description" content="The Laplace Laplace approximation still provides the simplest deterministic method available for approximate inference. Let&#39;s implement it in python."/>
+<link href='https://fonts.googleapis.com/css?family=Playfair+Display:700' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" type="text/css" media="screen" href="https://james-brennan.github.io/css/normalize.css" />
+	<link rel="stylesheet" type="text/css" media="screen" href="https://james-brennan.github.io/css/main.css" />
+
+        <link id="dark-scheme" rel="stylesheet" type="text/css" href="https://james-brennan.github.io/css/dark.css" />
+
+	<script src="https://james-brennan.github.io/js/feather.min.js"></script>
+	
+		<script src="https://james-brennan.github.io/js/main.js"></script>
+	
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C14B1HDZD7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C14B1HDZD7');
+</script>
+</head>
+
+<body>
+	<div class="container wrapper">
+		<div class="header">
+	
+		<div class="avatar">
+			<a href="https://james-brennan.github.io/">
+				<img src="/img/avatar.jpg" alt="James Brennan" />
+			</a>
+		</div>
+	
+	<h1 class="site-title"><a href="https://james-brennan.github.io/">James Brennan</a></h1>
+	<div class="site-description"><p>A blog about statistics, data science, and remote sensing.</p><nav class="nav social">
+			<ul class="flat"><li><a href="https://github.com/james-brennan/" title="Github"><i data-feather="github"></i></a></li><li><a href="https://twitter.com/jamesbrennan/" title="Twitter"><i data-feather="twitter"></i></a></li></ul>
+		</nav>
+	</div>
+
+	<nav class="nav">
+		<ul class="flat">
+			
+			<li>
+				<a href="/">Home</a>
+			</li>
+			
+			<li>
+				<a href="/posts">All posts</a>
+			</li>
+			
+			<li>
+				<a href="/tags">Tags</a>
+			</li>
+			
+		</ul>
+	</nav>
+</div>
+
+
+		<div class="post">
+			<div class="post-header">
+				
+					<div class="meta">
+						<div class="date">
+							<span class="day">12</span>
+							<span class="rest">Mar 2021</span>
+						</div>
+					</div>
+				
+				<div class="matter">
+					<h1 class="title">The Laplace approximation for approximate inference in python</h1>
+				</div>
+			</div>
+					
+			<div class="markdown">
+				<p>For any model more complex than <a href="https://en.wikipedia.org/wiki/Linear_regression">some</a> <a href="https://en.wikipedia.org/wiki/Kalman_filter">well</a> <a href="https://en.wikipedia.org/wiki/Compartmental_models_in_epidemiology#The_SIR_model">studied</a> <a href="https://en.wikipedia.org/wiki/Conjugate_prior">examples</a>, an exact description of the posterior is computationally intractable. Beyond an exhaustive evaluation, approximate inference makes it possible to retrieve reasonable descriptions of a posterior or cost surface based on approximation methods. While for many models, <a href="https://en.wikipedia.org/wiki/Markov_chain_Monte_Carlo">Markov chain Monte Carlo</a> is the approximate inference method of choice, the Laplace approximation still provides the simplest deterministic method available.</p>
+<p>Simply put the Laplace approximation entails finding a Gaussian approximation to a continuous probability density. Let&rsquo;s consider a univariate continuous variable $x$ whose distribution $p(x)$ is defined as:</p>
+<p>$$ p(z) = \frac{1}{Z}f(z) $$</p>
+<p>where $Z$ is the normalisation coefficient</p>
+<p>$$Z=\int f(z) \; \mathrm{d} z$$</p>
+<p>which ensures the integral of distribution is 1. As with other approximate inference methods, the goal of the Laplace approximation is to find a Gaussian approximation $q(z)$ to the distribution $p(z)$. The mean of this approximation is specified to be the mode of the true distribution $p(z)$, the point $z_0$.</p>
+<p>We make a Taylor expansion of $\ln f(z)$ centred on $z_0$ to provide an approximation for $\ln f(z)$:</p>
+<p>$$ \ln f(z) \approx \ln f(z_0) - \frac{1}{2}A (z-z_0)^2 $$</p>
+<p>where</p>
+<p>$$ A = -\frac{\mathrm{d}^2}{\mathrm{d}  z^2} \ln f(z) \bigg\rvert_{z=z_0}$$</p>
+<p>Taking the exponential of $\ln f(z)$ provides an approximation to our function or likelihood $f(z)$:</p>
+<p>$$ f(z) \approx f(z_0) \exp \left[ -\frac{A}{2}(z-z_0)^2 \right] $$</p>
+<p>We reach our proper approximate distribution $q(z)$ by making use of the standard normalisation of a Gaussian so that $q(z)$ is:</p>
+<p>$$ q(z) = \left(\frac{A}{2\pi}\right)^{1/2} \exp \left[ -\frac{A}{2}(z-z_0)^2 \right] $$</p>
+<p>Below illustrates the principle. The asymmetric distribution $q(z)$ can be approximated with a Gaussian distribution $p(z)$. The left figure shows the two distributions with $p(z)$ centred on the mode. The right figure shows the negative logarithms of each distribution, which highlights the inability of the approximation to represent the asymmetry of $q(z)$.</p>
+<p><img src="/img/laplace_approximation_1_1.png" alt="png"></p>
+<h2 id="laplace-approximation-for-multivariate-inference">Laplace approximation for multivariate inference</h2>
+<p>We can of course extend the Laplace approximation for a multivariate distribution. For the $M$-dimensional multivariate distribution $p(\mathbf{z})$, $\mathbf{z}\in R^M$ we can carry out a multivariate procedure. Taking the Taylor expansion at the mode $\mathbf{z}_0$ again:</p>
+<p>$$ \ln f(\mathbf{z}) \approx \ln f(\mathbf{z}_0) -\frac{1}{2} (\mathbf{z} - \mathbf{z}_0)^T \mathbf{H} (\mathbf{z} - \mathbf{z}_0) $$</p>
+<p>where $\mathbf{H}$ is the <a href="https://en.wikipedia.org/wiki/Hessian_matrix">Hessian</a> matrix, the matrix of second-order partial derivatives which describes the local curvature of $\ln f(\mathbf{z})$ at $\mathbf{z}_0$. As before exponentiating and including the normalisation constant for a multivariate normal we have the approximate multivariate distribution:</p>
+<p>$$ q(\mathbf{z}) = \frac{|\mathbf{H}|^{1/2}}{(2\pi)^{M/2}} \exp \left[ -\frac{1}{2} (\mathbf{z} - \mathbf{z}_0)^\mathrm{T} \mathbf{H} (\mathbf{z} - \mathbf{z}_0)\right]$$</p>
+<p>Wrapping it up and turning to inference, the Laplace approximation provides a Gaussian approximation to the posterior of a model $p(\mathbf{z}|\mathbf{y})$ centred on the <a href="https://en.wikipedia.org/wiki/Maximum_a_posteriori_estimation">Maximum a posteriori (MAP) estimate</a>:</p>
+<p>$$  p(\mathbf{z}|\mathbf{y}) \approx \textrm{Normal} \left( \mathbf{z} | \mathbf{z}_0, \mathbf{H}^{-1} \right) $$</p>
+<h2 id="demonstration-in-python">Demonstration in python</h2>
+<p>Let&rsquo;s develop the classic use of the Laplace approximation for posterior inference with a Bayesian logistic regression model. Let&rsquo;s set up a nonsense dataset we&rsquo;ll use for this:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#00a">from</span> <span style="color:#0aa;text-decoration:underline">sklearn.datasets</span> <span style="color:#00a">import</span> make_blobs
+<span style="color:#00a">import</span> <span style="color:#0aa;text-decoration:underline">numpy</span> <span style="color:#00a">as</span> <span style="color:#0aa;text-decoration:underline">np</span>
+X, y = make_blobs(n_samples=<span style="color:#099">100</span>, centers=<span style="color:#099">2</span>, n_features=<span style="color:#099">2</span>,
+                  random_state=<span style="color:#099">42</span>, cluster_std=<span style="color:#099">6</span>)
+</code></pre></div><p>For the data $y$ and parameters of the model $\mathbf{w}$, we can write the negative log posterior of our Bayesian logistic regression as:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#00a">def</span> <span style="color:#0a0">log_posterior</span>(w, y, X):
+    N = <span style="color:#0aa">len</span>(w)
+    w_p = np.zeros(N)
+    w_prior_covariance = np.eye(N)
+    y_hat = <span style="color:#099">1</span>/(<span style="color:#099">1</span> + np.exp(-X.dot(w))) 
+    prior = <span style="color:#099">0.5</span> * (w - w_p).dot(np.linalg.inv(w_prior_covariance)).dot(w - w_p)
+    likelihood = np.sum(y * np.log(y_hat) + (<span style="color:#099">1</span>-y)*np.log(<span style="color:#099">1</span>-y_hat))
+    <span style="color:#00a">return</span> prior - likelihood
+</code></pre></div><p>Now we consider producing the Laplace approximation. We define the probability distribution:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#00a">def</span> <span style="color:#0a0">laplace_approx</span>(w, w_map, H):
+    detH =  np.linalg.det(H)
+    constant = np.sqrt(detH)/(<span style="color:#099">2</span>*np.pi)**(<span style="color:#099">2.0</span>/<span style="color:#099">2.0</span>)
+    density = np.exp(-<span style="color:#099">0.5</span> * (w-w_map).dot(H).dot(w-w_map))
+    <span style="color:#00a">return</span> constant * density
+</code></pre></div><p>To estimate the approximation we find the mode of our posterior $w_{\mathrm{MAP}}$ with the <a href="https://docs.scipy.org/doc/scipy/reference/optimize.minimize-bfgs.html#optimize-minimize-bfgs">BFGS minimisation</a> algorithm. BFGS also provides us with an estimate of the covariance matrix of the solution, which is the inverse of our Hessian $\mathbf{H}$</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#00a">import</span> <span style="color:#0aa;text-decoration:underline">scipy.optimize</span>
+w_0 = np.ones(<span style="color:#099">2</span>) <span style="color:#aaa;font-style:italic"># initial guess</span>
+solution = scipy.optimize.minimize(log_posterior, w_0, args=(y, X), method=<span style="color:#a50">&#39;BFGS&#39;</span>)
+w_map = solution.x
+hessian = np.linalg.inv(solution.hess_inv)
+</code></pre></div><p>Let&rsquo;s visualise the shape of both the true posterior and our Laplace approximation to it. We&rsquo;ll evaluate our posterior over a grid using a <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.brute.html">brute</a> sampling.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#aaa;font-style:italic"># Let&#39;s evalaute the posterior over a grid </span>
+rranges = (<span style="color:#0aa">slice</span>(-<span style="color:#099">7</span>, <span style="color:#099">7</span>, <span style="color:#099">0.1</span>), <span style="color:#0aa">slice</span>(-<span style="color:#099">7</span>, <span style="color:#099">7</span>, <span style="color:#099">0.1</span>))
+grid_sol = scipy.optimize.brute(log_posterior, rranges, args=(y, X),
+                                full_output=True)
+<span style="color:#aaa;font-style:italic"># pull out components</span>
+w_i0, w_i1, log_posterior_surface = grid_sol[<span style="color:#099">2</span>][<span style="color:#099">0</span>], grid_sol[<span style="color:#099">2</span>][<span style="color:#099">1</span>],  grid_sol[<span style="color:#099">3</span>]
+<span style="color:#aaa;font-style:italic"># we&#39;ll do the same for the laplace approximation</span>
+laplace_surface = scipy.optimize.brute(laplace_approx, rranges, args=(w_map, hessian),
+                                       full_output=True)
+neg_log_laplace = -np.log(laplace_surface[<span style="color:#099">3</span>])
+
+<span style="color:#aaa;font-style:italic"># plot surface of the model</span>
+fig, ax = plt.subplots(<span style="color:#099">1</span>,<span style="color:#099">2</span>, sharey=True)
+CS = ax[<span style="color:#099">0</span>].contour(w_i0, w_i1, log_posterior_surface, cmap=<span style="color:#a50">&#39;viridis&#39;</span>, levels=<span style="color:#099">20</span>)
+ax[<span style="color:#099">0</span>].clabel(CS, inline=<span style="color:#099">1</span>, fontsize=<span style="color:#099">10</span>)
+ax[<span style="color:#099">0</span>].plot(w_map[<span style="color:#099">0</span>], w_map[<span style="color:#099">1</span>], <span style="color:#a50">&#39;ro&#39;</span>)
+CS = ax[<span style="color:#099">1</span>].contour(w_i0, w_i1, neg_log_laplace, cmap=<span style="color:#a50">&#39;viridis&#39;</span>, levels=<span style="color:#099">20</span>)
+ax[<span style="color:#099">1</span>].clabel(CS, inline=<span style="color:#099">1</span>, fontsize=<span style="color:#099">10</span>)
+ax[<span style="color:#099">1</span>].plot(w_map[<span style="color:#099">0</span>], w_map[<span style="color:#099">1</span>], <span style="color:#a50">&#39;ro&#39;</span>)
+plt.tight_layout()
+</code></pre></div><p><img src="/img/laplace_approximation_4_0.png" alt="png"></p>
+<p>So our Laplace approximation has done a reasonable job. The contours of approximation are at least visually similar to our real posterior. The approximation has also correctly captured that there is more uncertainty in $w_0$ (the x-axis) than $w_1$ which we can see by the broader bowl in the x-axis. Of course, being quadratic, the Laplace approximation cannot capture the asymmetry in the log posterior, but overall it&rsquo;s not bad!</p>
+<h2 id="issues-with-the-laplace-approximation">Issues with the Laplace approximation</h2>
+<p>Naturally, any approximation method is going to have issues, especially one which assumes quadratic posteriors. Let&rsquo;s explore the primary weakness of the Laplace method by making a silly but illustrative change to our model:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#00a">def</span> <span style="color:#0a0">log_posterior_2</span>(w, y, X):
+    N = <span style="color:#0aa">len</span>(w)
+    w_p = np.zeros(N)
+    w_prior_covariance = np.eye(N)
+    y_hat = <span style="color:#099">1</span>/(<span style="color:#099">1</span> + np.exp(-X.dot(np.cos(<span style="color:#099">0.4</span>*w)**<span style="color:#099">2</span>)))
+    prior = <span style="color:#099">0.5</span> * (w - w_p).dot(np.linalg.inv(w_prior_covariance)).dot(w - w_p)
+    likelihood = np.sum(y * np.log(y_hat) + (<span style="color:#099">1</span>-y)*np.log(<span style="color:#099">1</span>-y_hat))
+    <span style="color:#00a">return</span> prior-likelihood
+</code></pre></div><p>This time we&rsquo;ll plot the log posterior and approximation in 3d:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#00a">from</span> <span style="color:#0aa;text-decoration:underline">mpl_toolkits</span> <span style="color:#00a">import</span> mplot3d
+fig = plt.figure(figsize=plt.figaspect(<span style="color:#099">0.5</span>))
+ax = fig.add_subplot(<span style="color:#099">1</span>, <span style="color:#099">2</span>, <span style="color:#099">1</span>, projection=<span style="color:#a50">&#39;3d&#39;</span>)
+ax.view_init(<span style="color:#099">60</span>, <span style="color:#099">35</span>)
+ax.contour3D(w_i0, w_i1, log_posterior_surface, <span style="color:#099">50</span>, cmap=<span style="color:#a50">&#39;viridis&#39;</span>)
+ax.scatter3D(w_map[<span style="color:#099">0</span>], w_map[<span style="color:#099">1</span>],grid_sol[<span style="color:#099">1</span>], color=<span style="color:#a50">&#39;r&#39;</span>)
+ax.axis(<span style="color:#a50">&#39;off&#39;</span>)
+ax.set_title(<span style="color:#a50">r</span><span style="color:#a50">&#34;$-\ln p(z)$&#34;</span>)
+ax = fig.add_subplot(<span style="color:#099">1</span>, <span style="color:#099">2</span>, <span style="color:#099">2</span>, projection=<span style="color:#a50">&#39;3d&#39;</span>)
+ax.view_init(<span style="color:#099">60</span>, <span style="color:#099">35</span>)
+ax.contour3D(w_i0, w_i1, neg_log_laplace, <span style="color:#099">50</span>, cmap=<span style="color:#a50">&#39;viridis&#39;</span>)
+ax.scatter3D(w_map[<span style="color:#099">0</span>], w_map[<span style="color:#099">1</span>],-np.log(laplace_surface[<span style="color:#099">1</span>]), color=<span style="color:#a50">&#39;r&#39;</span>)
+ax.axis(<span style="color:#a50">&#39;off&#39;</span>)
+ax.set_title(<span style="color:#a50">r</span><span style="color:#a50">&#34;$-\ln q(z)$&#34;</span>)
+</code></pre></div><p><img src="/img/laplace_approximation_6_0.png" alt="png"></p>
+<p>Now our approximation isn&rsquo;t much good. Our posterior is multi-modal so the MAP isn&rsquo;t particularly representative, we could equally focus on our Gaussian on the other minima. Our estimate of the variance in the parameters also doesn&rsquo;t seem particularly good, we&rsquo;ve not captured the shape of the true posterior at all.</p>
+
+			</div>
+
+			<div class="tags">
+				
+					
+						<ul class="flat">
+							
+							<li><a href="/tags/laplace-approximation">Laplace approximation</a></li>
+							
+							<li><a href="/tags/approximate-inference">approximate inference</a></li>
+							
+							<li><a href="/tags/python">python</a></li>
+							
+						</ul>
+					
+				
+			</div></div>
+	</div>
+	<div class="footer wrapper">
+	<nav class="nav">
+		<div>2021  <a href="https://github.com/knadh/hugo-ink">Ink</a> theme on <a href="https://gohugo.io">Hugo</a></div>
+	</nav>
+</div><script>feather.replace()</script>
+
+
+<script>
+MathJax = {
+	tex: {
+	inlineMath: [['$', '$'], ['\\(', '\\)']],
+	displayMath: [['$$','$$'], ['\\[', '\\]']],
+	processEscapes: true,
+	processEnvironments: true
+	},
+	options: {
+	skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+	}
+};
+
+window.addEventListener('load', (event) => {
+	document.querySelectorAll("mjx-container").forEach(function(x){
+		x.parentElement.classList += 'has-jax'})
+	});
+
+</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript" id="MathJax-script" async
+src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</body>
+</html>

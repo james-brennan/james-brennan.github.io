@@ -5,7 +5,34 @@
     <link>https://james-brennan.github.io/tags/</link>
     <description>Recent content in Tags on James Brennan</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Sat, 06 Mar 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://james-brennan.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 12 Mar 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://james-brennan.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>approximate inference</title>
+      <link>https://james-brennan.github.io/tags/approximate-inference/</link>
+      <pubDate>Fri, 12 Mar 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://james-brennan.github.io/tags/approximate-inference/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Laplace approximation</title>
+      <link>https://james-brennan.github.io/tags/laplace-approximation/</link>
+      <pubDate>Fri, 12 Mar 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://james-brennan.github.io/tags/laplace-approximation/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>python</title>
+      <link>https://james-brennan.github.io/tags/python/</link>
+      <pubDate>Fri, 12 Mar 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://james-brennan.github.io/tags/python/</guid>
+      <description></description>
+    </item>
+    
     <item>
       <title>bayesian</title>
       <link>https://james-brennan.github.io/tags/bayesian/</link>
@@ -75,15 +102,6 @@
       <pubDate>Wed, 13 May 2020 00:00:00 +0000</pubDate>
       
       <guid>https://james-brennan.github.io/tags/postgresql/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>python</title>
-      <link>https://james-brennan.github.io/tags/python/</link>
-      <pubDate>Wed, 13 May 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://james-brennan.github.io/tags/python/</guid>
       <description></description>
     </item>
     
