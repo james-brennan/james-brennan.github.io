@@ -89,15 +89,12 @@
 			</div>
 					
 			<div class="markdown">
-				<p>This post looks at using the <a href="https://geopandas.org">geopandas</a> library to do fast efficient gridding of point data onto a regular grid.</p>
-<p>Geopandas is a python package that provides a geospatial extension to pandas &ndash; so that dataframes can store geographic data such as points and polygons.</p>
+				<p>This post looks at using the <a href="https://geopandas.org">geopandas</a> library to do fast efficient gridding of point data onto a regular grid. Geopandas is a python package that provides a geospatial extension to pandas &ndash; so that dataframes can store geographic data such as points and polygons.</p>
 <h3 id="data">Data</h3>
 <p>A simple csv of point data provides a useful starting point for this. <code>dob.csv</code> contains locations of wildfires detected by the <a href="https://terra.nasa.gov/about/terra-instruments/modis">NASA MODIS instruments</a> for a year over North and South America.</p>
 <div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#00a">import</span> <span style="color:#0aa;text-decoration:underline">pandas</span> <span style="color:#00a">as</span> <span style="color:#0aa;text-decoration:underline">pd</span>
 <span style="color:#00a">import</span> <span style="color:#0aa;text-decoration:underline">numpy</span> <span style="color:#00a">as</span> <span style="color:#0aa;text-decoration:underline">np</span>
 <span style="color:#00a">import</span> <span style="color:#0aa;text-decoration:underline">matplotlib.pyplot</span> <span style="color:#00a">as</span> <span style="color:#0aa;text-decoration:underline">plt</span>
-
-
 df = pd.read_csv(<span style="color:#a50">&#34;dob.csv&#34;</span>, index_col=<span style="color:#099">0</span>)
 df = df.sort_values(<span style="color:#a50">&#39;y&#39;</span>)
 df = df.drop(columns=<span style="color:#a50">&#34;geometry&#34;</span>)
@@ -148,8 +145,9 @@ df.head()
 <h1 id="geopandas">geopandas</h1>
 <p>Given our spatial data is point data with x and y coordinates it&rsquo;s simple to convert the <code>df</code> into a geopandas <code>GeoDataFrame</code>:</p>
 <div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#00a">import</span> <span style="color:#0aa;text-decoration:underline">geopandas</span>
-gdf = geopandas.GeoDataFrame(df, geometry=geopandas.points_from_xy(df.x, df.y), 
-                            crs=<span style="color:#a50">&#34;+proj=sinu +lon_0=0 +x_0=0 +y_0=0 +a=6371007.181 +b=6371007.181 +units=m +no_defs&#34;</span>)
+gdf = geopandas.GeoDataFrame(df, 
+            geometry=geopandas.points_from_xy(df.x, df.y),
+            crs=<span style="color:#a50">&#34;+proj=sinu +lon_0=0 +x_0=0 +y_0=0 +a=6371007.181 +b=6371007.181 +units=m +no_defs&#34;</span>)
 gdf.head()
 </code></pre></div><table>
 <thead>
@@ -254,14 +252,11 @@ ax.axis(<span style="color:#a50">&#39;off&#39;</span>)
 <p>First, let&rsquo;s make the grid that the data is being binned into. To make a regular rectangular mesh for the binned data we can loop over the extent of the data and use shapely to produce each individual grid cell as a geometric polygon:</p>
 <div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#aaa;font-style:italic"># total area for the grid</span>
 xmin, ymin, xmax, ymax= gdf.total_bounds
-
 <span style="color:#aaa;font-style:italic"># how many cells across and down</span>
 n_cells=<span style="color:#099">30</span>
 cell_size = (xmax-xmin)/n_cells
-
 <span style="color:#aaa;font-style:italic"># projection of the grid</span>
 crs = <span style="color:#a50">&#34;+proj=sinu +lon_0=0 +x_0=0 +y_0=0 +a=6371007.181 +b=6371007.181 +units=m +no_defs&#34;</span>
-
 <span style="color:#aaa;font-style:italic"># create the cells in a loop</span>
 grid_cells = []
 <span style="color:#00a">for</span> x0 <span style="color:#00a">in</span> np.arange(xmin, xmax+cell_size, cell_size ):
@@ -289,8 +284,7 @@ merged[<span style="color:#a50">&#39;n_fires&#39;</span>]=<span style="color:#09
 <span style="color:#aaa;font-style:italic"># Compute stats per grid cell -- aggregate fires to grid cells with dissolve</span>
 dissolve = merged.dissolve(by=<span style="color:#a50">&#34;index_right&#34;</span>, aggfunc=<span style="color:#a50">&#34;count&#34;</span>)
 <span style="color:#aaa;font-style:italic"># put this into cell</span>
-cell.loc[dissolve.index, <span style="color:#a50">&#39;n_fires&#39;</span>]=dissolve.n_fires.values
-<span style="color:#00a">del</span> dissolve
+cell.loc[dissolve.index, <span style="color:#a50">&#39;n_fires&#39;</span>] = dissolve.n_fires.values
 </code></pre></div><p>Then finally let&rsquo;s plot the grid and the number of fires in each grid cell with geopandas:</p>
 <div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">ax = cell.plot(column=<span style="color:#a50">&#39;n_fires&#39;</span>, figsize=(<span style="color:#099">12</span>, <span style="color:#099">8</span>), cmap=<span style="color:#a50">&#39;viridis&#39;</span>, vmax=<span style="color:#099">5000</span>, edgecolor=<span style="color:#a50">&#34;grey&#34;</span>)
 plt.autoscale(False)
@@ -331,6 +325,7 @@ plt.autoscale(False)
 world.to_crs(gdf.crs).plot(ax=ax, color=<span style="color:#a50">&#39;none&#39;</span>, edgecolor=<span style="color:#a50">&#39;grey&#39;</span>)
 ax.axis(<span style="color:#a50">&#39;off&#39;</span>)
 </code></pre></div><p><img src="/img/geopandas%20gridding_16_1.png" alt="png"></p>
+
 			</div>
 
 			<div class="tags">
