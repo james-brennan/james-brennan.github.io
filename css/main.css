@@ -182,7 +182,7 @@ ul.flat {
 }
 
 ul.flat li {
-    display: block;
+    display: inline;
     list-style: none;
     margin-left: 0;
 }

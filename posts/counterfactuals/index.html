@@ -6,7 +6,7 @@
 	<meta itemprop="name" content="Building counterfactuals for sklearn models">
 <meta itemprop="description" content="Counterfactuals provide a model-agnostic method for black box machine learning algorithms interpretable and human-understandable. "><meta itemprop="datePublished" content="2021-03-22T00:00:00&#43;00:00" />
 <meta itemprop="dateModified" content="2021-03-22T00:00:00&#43;00:00" />
-<meta itemprop="wordCount" content="1324">
+<meta itemprop="wordCount" content="1328">
 <meta itemprop="keywords" content="counterfactual,interpretability,causality,machine learning," /><meta property="og:title" content="Building counterfactuals for sklearn models" />
 <meta property="og:description" content="Counterfactuals provide a model-agnostic method for black box machine learning algorithms interpretable and human-understandable. " />
 <meta property="og:type" content="article" />
@@ -87,7 +87,6 @@
 					<h1 class="title">Building counterfactuals for sklearn models</h1>
 				</div>
 			</div>
-					
 			<div class="markdown">
 				<p><a href="https://arxiv.org/abs/2010.10596">Counterfactuals</a> provide a model-agnostic method for <a href="https://en.wikipedia.org/wiki/Black_box">black box</a> machine learning algorithms interpretable and human-understandable. Counterfactuals provide explanations as to what the model would have predicted if the inputs were perturbed in a particular way. A counterfactual explanation, therefore, provides a casual description linking model inputs $X$ and predictions $Y$: &ldquo;If X had not occurred, Y would not have occurred&rdquo;.  For example, &ldquo;if I had woken up 5 minutes earlier I would have caught the train&rdquo; is a counterfactual in which wakeup time $X$ is altered to change the outcome $Y=\mathrm{&lsquo;Train}$ to $Y=\mathrm{Train}$. Consider the black box model below which takes three input observations $[x_1, x_2, x_3]$ and makes a prediction $Y$:</p>
 <p><img src="/img/counterfactuals_2_0.svg" alt="svg"></p>
@@ -97,6 +96,7 @@
 <p>where $x&rsquo;$ is the counterfactual to the observation $x$, $y'$ is the desired outcome (e.g. caught the train). The first term is a quadratic distance between the model prediction $f(x^\prime)$ and $y'$, which is minimised when $x'$ has been altered sufficiently so that the model predicts $y'$. The second term $D()$ is the more interesting one and reveals more about specifying <em>good</em> counterfactuals:</p>
 <p>$$ D(x,x^\prime)=\sum_{j=1}^p\frac{\left|x_j-x^\prime_j\right|}{\mathrm{MAD}_j} $$</p>
 <p>The distance metric $D(x,x^\prime)$ measures the distance between each of the $p$ features of $x'$ and $x$ normalised by the <a href="https://en.wikipedia.org/wiki/Median_absolute_deviation">median absolute deviation (MAD)</a> of each feature $j$. That we include a distance metric at all indicates, that we want counterfactuals that are relatively close to the original $x$, it&rsquo;s no use telling me to wake up two hours earlier if I would have got the train being 5 minutes earlier. This feature has the use that it makes counterfactuals reasonable: relying on small changes. The <a href="https://montjoile.medium.com/l0-norm-l1-norm-l2-norm-l-infinity-norm-7a7d18a4f40c">L1 norm</a> has the advantage of promoting sparse solutions in $x'$. Sparsity here is highly desirable because it promotes counterfactuals in which only a small number of variables are changed. This makes the counterfactual easier to interpret and communicate; simply put its makes them descriptively shorter too. Normalising by the MAD places each feature on the same scale, and is more robust to outliers than normalising by the variance $\sigma^2$. The hyperparameter $\lambda$ balances the two terms, with a higher $\lambda$ preferring counterfactuals that better match the desired outcome.</p>
+<h2 id="counterfactuals-with-sklearn-models">Counterfactuals with sklearn models</h2>
 <p>To demonstrate counterfactuals we&rsquo;ll train a simple sklearn classifier on some data. We&rsquo;ll use the classic <a href="https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_breast_cancer.html">breast cancer dataset</a> packaged with sklearn and only use the first two features (<code>mean radius</code>, <code>mean texture</code>) to make the problem easier to visualise. Let&rsquo;s also train an RBF support vector machine classifier on it:</p>
 <div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#00a">import</span> <span style="color:#0aa;text-decoration:underline">numpy</span> <span style="color:#00a">as</span> <span style="color:#0aa;text-decoration:underline">np</span> 
 <span style="color:#00a">import</span> <span style="color:#0aa;text-decoration:underline">matplotlib.pyplot</span> <span style="color:#00a">as</span> <span style="color:#0aa;text-decoration:underline">plt</span>
