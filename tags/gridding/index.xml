@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>gridding on James Brennan</title>
+    <link>https://james-brennan.github.io/tags/gridding/</link>
+    <description>Recent content in gridding on James Brennan</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <lastBuildDate>Mon, 16 Mar 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://james-brennan.github.io/tags/gridding/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Fast and easy gridding of point data with geopandas</title>
+      <link>https://james-brennan.github.io/posts/fast_gridding_geopandas/</link>
+      <pubDate>Mon, 16 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://james-brennan.github.io/posts/fast_gridding_geopandas/</guid>
+      <description>This post looks at using the geopandas library to do fast efficient gridding of point data onto a regular grid. Geopandas is a python package that provides a geospatial extension to pandas &amp;ndash; so that dataframes can store geographic data such as points and polygons.
+Data A simple csv of point data provides a useful starting point for this. dob.csv contains locations of wildfires detected by the NASA MODIS instruments for a year over North and South America.</description>
+    </item>
+    
+  </channel>
+</rss>

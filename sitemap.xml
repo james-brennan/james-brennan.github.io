@@ -2,22 +2,37 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://james-brennan.github.io/tags/approximate-inference/</loc>
-    <lastmod>2021-03-12T00:00:00+00:00</lastmod>
+    <loc>https://james-brennan.github.io/posts/counterfactuals/</loc>
+    <lastmod>2021-03-22T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://james-brennan.github.io/tags/causality/</loc>
+    <lastmod>2021-03-22T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://james-brennan.github.io/tags/counterfactual/</loc>
+    <lastmod>2021-03-22T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://james-brennan.github.io/tags/interpretability/</loc>
+    <lastmod>2021-03-22T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://james-brennan.github.io/</loc>
+    <lastmod>2021-03-22T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://james-brennan.github.io/tags/machine-learning/</loc>
+    <lastmod>2021-03-22T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://james-brennan.github.io/posts/</loc>
+    <lastmod>2021-03-22T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://james-brennan.github.io/tags/</loc>
+    <lastmod>2021-03-22T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://james-brennan.github.io/tags/approximate-inference/</loc>
     <lastmod>2021-03-12T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://james-brennan.github.io/tags/laplace-approximation/</loc>
     <lastmod>2021-03-12T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://james-brennan.github.io/posts/</loc>
-    <lastmod>2021-03-12T00:00:00+00:00</lastmod>
-  </url><url>
     <loc>https://james-brennan.github.io/tags/python/</loc>
-    <lastmod>2021-03-12T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://james-brennan.github.io/tags/</loc>
     <lastmod>2021-03-12T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://james-brennan.github.io/posts/laplace_approximation/</loc>
@@ -77,7 +92,13 @@
     <loc>https://james-brennan.github.io/posts/lowess_conf/</loc>
     <lastmod>2020-03-23T00:00:00+00:00</lastmod>
   </url><url>
+    <loc>https://james-brennan.github.io/tags/lowess/</loc>
+    <lastmod>2020-03-23T00:00:00+00:00</lastmod>
+  </url><url>
     <loc>https://james-brennan.github.io/posts/fast_gridding_geopandas/</loc>
+    <lastmod>2020-03-16T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://james-brennan.github.io/tags/gridding/</loc>
     <lastmod>2020-03-16T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://james-brennan.github.io/tags/visualisation/</loc>

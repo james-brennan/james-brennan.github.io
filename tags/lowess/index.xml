@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>lowess on James Brennan</title>
+    <link>https://james-brennan.github.io/tags/lowess/</link>
+    <description>Recent content in lowess on James Brennan</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <lastBuildDate>Mon, 23 Mar 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://james-brennan.github.io/tags/lowess/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Confidence intervals for LOWESS models in python</title>
+      <link>https://james-brennan.github.io/posts/lowess_conf/</link>
+      <pubDate>Mon, 23 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://james-brennan.github.io/posts/lowess_conf/</guid>
+      <description>&lt;p&gt;LOWESS (or also referred to as LOESS for &lt;em&gt;locally-weighted scatterplot smoothing&lt;/em&gt;) is a non-parametric regression method for smoothing data. But how do we get uncertainties on the curve?&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

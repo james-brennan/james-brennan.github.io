@@ -5,9 +5,45 @@
     <link>https://james-brennan.github.io/tags/</link>
     <description>Recent content in Tags on James Brennan</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Fri, 12 Mar 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://james-brennan.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 22 Mar 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://james-brennan.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>approximate inference</title>
+      <title>causality</title>
+      <link>https://james-brennan.github.io/tags/causality/</link>
+      <pubDate>Mon, 22 Mar 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://james-brennan.github.io/tags/causality/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>counterfactual</title>
+      <link>https://james-brennan.github.io/tags/counterfactual/</link>
+      <pubDate>Mon, 22 Mar 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://james-brennan.github.io/tags/counterfactual/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>interpretability</title>
+      <link>https://james-brennan.github.io/tags/interpretability/</link>
+      <pubDate>Mon, 22 Mar 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://james-brennan.github.io/tags/interpretability/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>machine learning</title>
+      <link>https://james-brennan.github.io/tags/machine-learning/</link>
+      <pubDate>Mon, 22 Mar 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://james-brennan.github.io/tags/machine-learning/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>approximate-inference</title>
       <link>https://james-brennan.github.io/tags/approximate-inference/</link>
       <pubDate>Fri, 12 Mar 2021 00:00:00 +0000</pubDate>
       
@@ -16,7 +52,7 @@
     </item>
     
     <item>
-      <title>Laplace approximation</title>
+      <title>Laplace-approximation</title>
       <link>https://james-brennan.github.io/tags/laplace-approximation/</link>
       <pubDate>Fri, 12 Mar 2021 00:00:00 +0000</pubDate>
       
@@ -147,6 +183,24 @@
       <pubDate>Sat, 11 Apr 2020 00:00:00 +0000</pubDate>
       
       <guid>https://james-brennan.github.io/tags/uncertainty/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>lowess</title>
+      <link>https://james-brennan.github.io/tags/lowess/</link>
+      <pubDate>Mon, 23 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://james-brennan.github.io/tags/lowess/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>gridding</title>
+      <link>https://james-brennan.github.io/tags/gridding/</link>
+      <pubDate>Mon, 16 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://james-brennan.github.io/tags/gridding/</guid>
       <description></description>
     </item>
     

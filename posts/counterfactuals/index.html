@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"><title>Building counterfactuals for sklearn models - James Brennan</title><meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta itemprop="name" content="Building counterfactuals for sklearn models">
+<meta itemprop="description" content="Counterfactuals provide a model-agnostic method for black box machine learning algorithms interpretable and human-understandable. "><meta itemprop="datePublished" content="2021-03-22T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2021-03-22T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="1324">
+<meta itemprop="keywords" content="counterfactual,interpretability,causality,machine learning," /><meta property="og:title" content="Building counterfactuals for sklearn models" />
+<meta property="og:description" content="Counterfactuals provide a model-agnostic method for black box machine learning algorithms interpretable and human-understandable. " />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://james-brennan.github.io/posts/counterfactuals/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2021-03-22T00:00:00&#43;00:00" />
+<meta property="article:modified_time" content="2021-03-22T00:00:00&#43;00:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Building counterfactuals for sklearn models"/>
+<meta name="twitter:description" content="Counterfactuals provide a model-agnostic method for black box machine learning algorithms interpretable and human-understandable. "/>
+<link href='https://fonts.googleapis.com/css?family=Playfair+Display:700' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" type="text/css" media="screen" href="https://james-brennan.github.io/css/normalize.css" />
+	<link rel="stylesheet" type="text/css" media="screen" href="https://james-brennan.github.io/css/main.css" />
+
+        <link id="dark-scheme" rel="stylesheet" type="text/css" href="https://james-brennan.github.io/css/dark.css" />
+
+	<script src="https://james-brennan.github.io/js/feather.min.js"></script>
+	
+		<script src="https://james-brennan.github.io/js/main.js"></script>
+	
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C14B1HDZD7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-C14B1HDZD7');
+</script>
+</head>
+
+<body>
+	<div class="container wrapper">
+		<div class="header">
+	
+		<div class="avatar">
+			<a href="https://james-brennan.github.io/">
+				<img src="/img/avatar.jpg" alt="James Brennan" />
+			</a>
+		</div>
+	
+	<h1 class="site-title"><a href="https://james-brennan.github.io/">James Brennan</a></h1>
+	<div class="site-description"><p>A blog about statistics, data science, and remote sensing.</p><nav class="nav social">
+			<ul class="flat"><li><a href="https://github.com/james-brennan/" title="Github"><i data-feather="github"></i></a></li><li><a href="https://twitter.com/jamesbrennan/" title="Twitter"><i data-feather="twitter"></i></a></li></ul>
+		</nav>
+	</div>
+
+	<nav class="nav">
+		<ul class="flat">
+			
+			<li>
+				<a href="/">Home</a>
+			</li>
+			
+			<li>
+				<a href="/posts">All posts</a>
+			</li>
+			
+			<li>
+				<a href="/tags">Tags</a>
+			</li>
+			
+		</ul>
+	</nav>
+</div>
+
+
+		<div class="post">
+			<div class="post-header">
+				
+					<div class="meta">
+						<div class="date">
+							<span class="day">22</span>
+							<span class="rest">Mar 2021</span>
+						</div>
+					</div>
+				
+				<div class="matter">
+					<h1 class="title">Building counterfactuals for sklearn models</h1>
+				</div>
+			</div>
+					
+			<div class="markdown">
+				<p><a href="https://arxiv.org/abs/2010.10596">Counterfactuals</a> provide a model-agnostic method for <a href="https://en.wikipedia.org/wiki/Black_box">black box</a> machine learning algorithms interpretable and human-understandable. Counterfactuals provide explanations as to what the model would have predicted if the inputs were perturbed in a particular way. A counterfactual explanation, therefore, provides a casual description linking model inputs $X$ and predictions $Y$: &ldquo;If X had not occurred, Y would not have occurred&rdquo;.  For example, &ldquo;if I had woken up 5 minutes earlier I would have caught the train&rdquo; is a counterfactual in which wakeup time $X$ is altered to change the outcome $Y=\mathrm{&lsquo;Train}$ to $Y=\mathrm{Train}$. Consider the black box model below which takes three input observations $[x_1, x_2, x_3]$ and makes a prediction $Y$:</p>
+<p><img src="/img/counterfactuals_2_0.svg" alt="svg"></p>
+<p>The causality here is clear, the outcome of the model $Y$ is determined by how the model evaluates the inputs $[x_1, x_2, x_3]$. Counterfactuals make use of this causality: altering the inputs to cause a change in the output. With the most simple methods for finding counterfactuals, we do not need to peak inside the model, instead, we can phrase the search for counterfactuals as an optimisation problem.</p>
+<p><a href="https://arxiv.org/abs/1711.00399">Wachter et al.</a> first proposed counterfactual explanations in 2017 as an optimisation problem with two terms:</p>
+<p>$$ L(x,x^\prime,y^\prime,\lambda)=\lambda\cdot(f(x^\prime)-y^\prime)^2+D(x,x^\prime) $$</p>
+<p>where $x&rsquo;$ is the counterfactual to the observation $x$, $y'$ is the desired outcome (e.g. caught the train). The first term is a quadratic distance between the model prediction $f(x^\prime)$ and $y'$, which is minimised when $x'$ has been altered sufficiently so that the model predicts $y'$. The second term $D()$ is the more interesting one and reveals more about specifying <em>good</em> counterfactuals:</p>
+<p>$$ D(x,x^\prime)=\sum_{j=1}^p\frac{\left|x_j-x^\prime_j\right|}{\mathrm{MAD}_j} $$</p>
+<p>The distance metric $D(x,x^\prime)$ measures the distance between each of the $p$ features of $x'$ and $x$ normalised by the <a href="https://en.wikipedia.org/wiki/Median_absolute_deviation">median absolute deviation (MAD)</a> of each feature $j$. That we include a distance metric at all indicates, that we want counterfactuals that are relatively close to the original $x$, it&rsquo;s no use telling me to wake up two hours earlier if I would have got the train being 5 minutes earlier. This feature has the use that it makes counterfactuals reasonable: relying on small changes. The <a href="https://montjoile.medium.com/l0-norm-l1-norm-l2-norm-l-infinity-norm-7a7d18a4f40c">L1 norm</a> has the advantage of promoting sparse solutions in $x'$. Sparsity here is highly desirable because it promotes counterfactuals in which only a small number of variables are changed. This makes the counterfactual easier to interpret and communicate; simply put its makes them descriptively shorter too. Normalising by the MAD places each feature on the same scale, and is more robust to outliers than normalising by the variance $\sigma^2$. The hyperparameter $\lambda$ balances the two terms, with a higher $\lambda$ preferring counterfactuals that better match the desired outcome.</p>
+<p>To demonstrate counterfactuals we&rsquo;ll train a simple sklearn classifier on some data. We&rsquo;ll use the classic <a href="https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_breast_cancer.html">breast cancer dataset</a> packaged with sklearn and only use the first two features (<code>mean radius</code>, <code>mean texture</code>) to make the problem easier to visualise. Let&rsquo;s also train an RBF support vector machine classifier on it:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#00a">import</span> <span style="color:#0aa;text-decoration:underline">numpy</span> <span style="color:#00a">as</span> <span style="color:#0aa;text-decoration:underline">np</span> 
+<span style="color:#00a">import</span> <span style="color:#0aa;text-decoration:underline">matplotlib.pyplot</span> <span style="color:#00a">as</span> <span style="color:#0aa;text-decoration:underline">plt</span>
+<span style="color:#00a">from</span> <span style="color:#0aa;text-decoration:underline">matplotlib.patches</span> <span style="color:#00a">import</span> ConnectionPatch
+<span style="color:#00a">from</span> <span style="color:#0aa;text-decoration:underline">sklearn.datasets</span> <span style="color:#00a">import</span> load_breast_cancer
+<span style="color:#00a">from</span> <span style="color:#0aa;text-decoration:underline">sklearn.svm</span> <span style="color:#00a">import</span> SVC
+data = load_breast_cancer()
+Y = data.target
+X = data.data[:, <span style="color:#099">0</span>:<span style="color:#099">2</span>]
+classifier =  SVC(C=.<span style="color:#099">5</span>, probability=True)
+classifier.fit(X, Y)
+</code></pre></div><p>To understand a bit more about the data and how our classifier works let&rsquo;s plot the dataset and the probability that the growth is cancerous with <code>mean radius</code> and <code>mean texture</code>.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#00a">def</span> <span style="color:#0a0">plot_probability_surface</span>(classifier, levels=<span style="color:#099">20</span>, points=True):
+    xx, yy = np.meshgrid(np.linspace(<span style="color:#099">5</span>, <span style="color:#099">30</span>, <span style="color:#099">500</span>), np.linspace(<span style="color:#099">5</span>, <span style="color:#099">45</span>, <span style="color:#099">500</span>))
+    Z = classifier.predict_proba(np.c_[xx.ravel(), yy.ravel()])[:, <span style="color:#099">1</span>]
+    Z = Z.reshape(xx.shape)
+    fig, axis = plt.subplots(<span style="color:#099">1</span>, <span style="color:#099">1</span>, figsize=(<span style="color:#099">10</span>, <span style="color:#099">10</span>))
+    axis.contourf(xx, yy, Z, alpha=<span style="color:#099">0.75</span>, cmap=<span style="color:#a50">&#39;bone&#39;</span>, vmin=<span style="color:#099">0</span>, vmax=<span style="color:#099">1</span>, levels=levels)
+    <span style="color:#00a">if</span> points:
+        axis.scatter(X[:, <span style="color:#099">0</span>], X[:, <span style="color:#099">1</span>], c=Y, s=<span style="color:#099">15</span>,
+                    cmap=<span style="color:#a50">&#39;bone&#39;</span>, edgecolors=<span style="color:#a50">&#39;black&#39;</span>, linewidth=.<span style="color:#099">5</span>)
+    axis.axis(<span style="color:#a50">&#39;off&#39;</span>)
+    <span style="color:#00a">return</span> axis
+ax = plot_probability_surface(classifier)
+</code></pre></div><p><img src="/img/counterfactuals_7_0.png" alt="png"></p>
+<p>Points plotted in black correspond to those that were identified as malignant while those in white were benign. The classifier has done an acceptable job of learning the overall split in the data, albeit with quite a few outliers. Let&rsquo;s now define the cost function for evaluating counterfactuals:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#00a">import</span> <span style="color:#0aa;text-decoration:underline">scipy.stats</span> 
+<span style="color:#00a">def</span> <span style="color:#0a0">cost_function</span>(x_prime, x, y_prime, lambda_value, model, X):
+    mad =  scipy.stats.median_abs_deviation(X, axis=<span style="color:#099">0</span>)
+    distance = np.sum(np.abs(x-x_prime)/mad)
+    misfit = (model(x_prime, y_prime)-y_prime)**<span style="color:#099">2</span>
+    <span style="color:#00a">return</span> lambda_value * misfit + distance
+</code></pre></div><p>We can see that minimising this cost function minimises both the distance of the counterfactual $x'$ to the original observation $x$ through <code>distance</code>, and the <code>misfit</code> to the target prediction $y'$. The function <code>model()</code> is a simple wrapper around the <a href="https://scikit-learn.org/stable/modules/classes.html">sklearn API</a> to only return the predicted probability:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#00a">def</span> <span style="color:#0a0">evaluate_model</span>(x, y_prime):
+    <span style="color:#aaa;font-style:italic"># round the y_prime value to provide the right class [0,1]</span>
+    predicted_prob = classifier.predict_proba(x.reshape((<span style="color:#099">1</span>, -<span style="color:#099">1</span>)))[<span style="color:#099">0</span>,<span style="color:#0aa">int</span>(np.round(y_prime))]
+    <span style="color:#00a">return</span> predicted_prob
+</code></pre></div><p>Let&rsquo;s now detail how to optimise both $\lambda$ and the counterfactual $x'$. For different datasets and models, the optimal $\lambda$ will be different, the optimal $\lambda$ will in fact vary with whatever instance $x$ we attempt to generate a counterfactual for. Because of this the simplest thing to do is to split the optimisation and conduct a line-search over $\lambda$, where we optimise the cost function at different values of $\lambda$ between a range [$\lambda_{min}, \lambda_{max}$].</p>
+<p>Given that we might not be able to generate a counterfactual $x'$ for a value of $\lambda$ that minimises $L$ we can evaluate whether the prediction falls within an acceptable tolerance $|f(x')-y'|\leq\epsilon$ to consider it a valid counterfactual explanation.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#00a">def</span> <span style="color:#0a0">get_counterfactuals</span>(x, y_prime_target, model):
+    eps = .<span style="color:#099">05</span> <span style="color:#aaa;font-style:italic"># tolerance</span>
+    lambda_min =  <span style="color:#099">1e-10</span>
+    lambda_max = <span style="color:#099">1e4</span>
+    lambda_steps = <span style="color:#099">30</span>
+    lambdas = np.logspace(np.log10(lambda_min), 
+                            np.log10(lambda_max), 
+                            lambda_steps)
+    <span style="color:#aaa;font-style:italic"># scan over lambda</span>
+    candidates = []
+    Y_primes = []
+    <span style="color:#00a">for</span> lambda_k <span style="color:#00a">in</span> lambdas:
+        arguments = x, y_prime_target, lambda_k, model, X
+        <span style="color:#aaa;font-style:italic"># optimise the cost function -- assuming here it&#39;s smooth</span>
+        solution = scipy.optimize.minimize(cost_function, 
+                                           x, <span style="color:#aaa;font-style:italic"># start from our current observation</span>
+                                           args=arguments)
+        x_prime_hat = solution.x
+        Y_primes.append(model(x_prime_hat, y_prime_target))
+        candidates.append(x_prime_hat)
+    Y_primes = np.array(Y_primes)
+    candidates = np.array(candidates)
+    <span style="color:#aaa;font-style:italic"># check if any counterfactual candidates meet the tolerance condition</span>
+    eps_condition = np.abs(Y_primes - y_prime_target) &lt;= eps
+    <span style="color:#00a">return</span> candidates[eps_condition]
+</code></pre></div><p>Let&rsquo;s take the following observation as our example which we&rsquo;ll generate counterfactuals for.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">instance = <span style="color:#099">90</span>
+<span style="color:#00a">print</span>(<span style="color:#a50">&#39;mean radius: &#39;</span>,    X[instance, <span style="color:#099">0</span>], 
+      <span style="color:#a50">&#39;</span><span style="color:#a50">\n</span><span style="color:#a50">mean texture: &#39;</span>, X[instance, <span style="color:#099">1</span>], 
+      <span style="color:#a50">&#39;</span><span style="color:#a50">\n</span><span style="color:#a50">truth: &#39;</span>,    data.target_names[Y[instance]],
+      <span style="color:#a50">&#39;</span><span style="color:#a50">\n</span><span style="color:#a50">model prediction: &#39;</span>, data.target_names[classifier.predict(X[instance].reshape(<span style="color:#099">1</span>, -<span style="color:#099">1</span>))],
+      <span style="color:#a50">&#39;</span><span style="color:#a50">\n</span><span style="color:#a50">model probability: &#39;</span>, classifier.predict_proba(X[instance].reshape(<span style="color:#099">1</span>, -<span style="color:#099">1</span>)))
+</code></pre></div><pre><code>mean radius:  14.62 
+mean texture:  24.02 
+truth:  benign 
+model prediction:  ['malignant'] 
+model probability:  [[0.87713292 0.12286708]]
+</code></pre>
+<p>So our model has incorrectly classified the benign tumour as malignant. Let&rsquo;s generate counterfactuals for this observation that would have led to a benign prediction. We&rsquo;ll focus on a counterfactual that <strong>just</strong> tips the balance, where the probability $p_{\text{benign}} \approx 0.51$, and with our given tolerance $\epsilon = 0.05$ accept any counterfactuals within $y'\in[0.46, 0.56]$.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">P_benign = .<span style="color:#099">51</span>
+counterfactuals = get_counterfactuals(X[instance], P_benign, evaluate_model)
+counterfactuals
+</code></pre></div><pre><code>array([[13.34872439, 24.01999999],
+       [13.33853873, 24.02077621],
+       [13.29875635, 24.01999999],
+       [13.30968431, 23.17429894],
+       [13.32756653, 23.03365356],
+       [13.29820608, 24.02      ]])
+</code></pre>
+<p>Our best counterfactual is that which maximises $\lambda$ which is the last one. We can see that the larger one has a bigger change to the <code>mean radius</code> but does not change the <code>mean texture</code>. As discussed above, if our model had many more features than here, having sparse counterfactuals is preferable for explanatory purposes. We explain the counterfactual as &ldquo;if the mean radius of the tumour was 9% smaller than the model would have predicted the tumour to have been benign'.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">best_counterfactual = counterfactuals[-<span style="color:#099">1</span>]
+<span style="color:#00a">print</span>(<span style="color:#a50">&#34;</span><span style="color:#a50">% d</span><span style="color:#a50">ifference (x&#39;, x):&#34;</span>, (<span style="color:#099">100</span>*(best_counterfactual-X[instance])/X[instance]).round(<span style="color:#099">2</span>))
+</code></pre></div><pre><code>% difference (x', x): [-9.04 -0.  ]
+</code></pre>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">ax = plot_probability_surface(classifier, levels=<span style="color:#099">20</span>, points=True)
+ax.scatter(X[instance][<span style="color:#099">0</span>], X[instance][<span style="color:#099">1</span>], s=<span style="color:#099">25</span>, fc=<span style="color:#a50">&#39;None&#39;</span>, edgecolors=<span style="color:#a50">&#39;r&#39;</span>, linewidth=<span style="color:#099">2</span>)
+ax.plot(best_counterfactual[<span style="color:#099">0</span>], best_counterfactual[<span style="color:#099">1</span>], <span style="color:#a50">&#39;go&#39;</span>, markersize=<span style="color:#099">5</span>)
+con = ConnectionPatch(X[instance], best_counterfactual, <span style="color:#a50">&#34;data&#34;</span>, <span style="color:#a50">&#34;data&#34;</span>,
+                      arrowstyle=<span style="color:#a50">&#34;-|&gt;&#34;</span>, shrinkA=<span style="color:#099">5</span>, shrinkB=<span style="color:#099">5</span>,
+                      mutation_scale=<span style="color:#099">20</span>, color=<span style="color:#a50">&#34;red&#34;</span>)
+ax.add_artist(con)
+</code></pre></div><p><img src="/img/counterfactuals_20_1.png" alt="png"></p>
+<p>If we wanted a higher confidence in the prediction, we could see what counterfactual would generate a $p_{\text{benign}}\approx 0.9$.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">P_benign = .<span style="color:#099">9</span>
+counterfactuals = get_counterfactuals(X[instance], P_benign, evaluate_model)
+best_counterfactual = counterfactuals[-<span style="color:#099">1</span>]
+<span style="color:#00a">print</span>(<span style="color:#a50">&#34;</span><span style="color:#a50">% d</span><span style="color:#a50">ifference (x&#39;, x):&#34;</span>, (<span style="color:#099">100</span>*(best_counterfactual-X[instance])/X[instance]).round(<span style="color:#099">2</span>))
+ax = plot_probability_surface(classifier, levels=<span style="color:#099">20</span>, points=True)
+ax.scatter(X[instance][<span style="color:#099">0</span>], X[instance][<span style="color:#099">1</span>], s=<span style="color:#099">25</span>, fc=<span style="color:#a50">&#39;None&#39;</span>, edgecolors=<span style="color:#a50">&#39;r&#39;</span>, linewidth=<span style="color:#099">2</span>)
+ax.plot(best_counterfactual[<span style="color:#099">0</span>], best_counterfactual[<span style="color:#099">1</span>], <span style="color:#a50">&#39;go&#39;</span>, markersize=<span style="color:#099">10</span>)
+con = ConnectionPatch(X[instance], best_counterfactual, <span style="color:#a50">&#34;data&#34;</span>, <span style="color:#a50">&#34;data&#34;</span>,
+                      arrowstyle=<span style="color:#a50">&#34;-|&gt;&#34;</span>, shrinkA=<span style="color:#099">5</span>, shrinkB=<span style="color:#099">5</span>,
+                      mutation_scale=<span style="color:#099">20</span>, color=<span style="color:#a50">&#34;r&#34;</span>)
+ax.add_artist(con)
+</code></pre></div><pre><code>% difference (x', x): [-21.15  -0.  ]
+</code></pre>
+<p><img src="/img/counterfactuals_22_2.png" alt="png"></p>
+<h1 id="further-reading">Further Reading</h1>
+<ul>
+<li><a href="https://arxiv.org/abs/2010.10596">Counterfactual Explanations for Machine Learning: A Review</a></li>
+<li>Christoph Molnar excellent book <a href="https://christophm.github.io/interpretable-ml-book/"><em>Interpretable Machine Learning</em></a></li>
+<li>I would recommend the python library <a href="https://docs.seldon.io/projects/alibi/en/latest/index.html"><code>Alibi</code></a> for machine learning model inspection and interpretation, it&rsquo;s got counterfactual methods <a href="https://docs.seldon.io/projects/alibi/en/latest/methods/CF.html">built in too</a>.</li>
+</ul>
+
+			</div>
+
+			<div class="tags">
+				
+					
+						<ul class="flat">
+							
+							<li><a href="/tags/counterfactual">counterfactual</a></li>
+							
+							<li><a href="/tags/interpretability">interpretability</a></li>
+							
+							<li><a href="/tags/causality">causality</a></li>
+							
+							<li><a href="/tags/machine-learning">machine learning</a></li>
+							
+						</ul>
+					
+				
+			</div></div>
+	</div>
+	<div class="footer wrapper">
+	<nav class="nav">
+		<div>2021  <a href="https://github.com/knadh/hugo-ink">Ink</a> theme on <a href="https://gohugo.io">Hugo</a></div>
+	</nav>
+</div><script>feather.replace()</script>
+
+
+<script>
+MathJax = {
+	tex: {
+	inlineMath: [['$', '$'], ['\\(', '\\)']],
+	displayMath: [['$$','$$'], ['\\[', '\\]']],
+	processEscapes: true,
+	processEnvironments: true
+	},
+	options: {
+	skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+	}
+};
+
+window.addEventListener('load', (event) => {
+	document.querySelectorAll("mjx-container").forEach(function(x){
+		x.parentElement.classList += 'has-jax'})
+	});
+
+</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript" id="MathJax-script" async
+src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</body>
+</html>
